@@ -1,0 +1,74 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+CUBATURE_GENERATOR_COMPRESSED_EIGEN	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^class CUBATURE_GENERATOR_COMPRESSED_EIGEN {$/;"	c
+CUBATURE_GENERATOR_COMPRESSED_EIGEN_H	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^#define CUBATURE_GENERATOR_COMPRESSED_EIGEN_H$/;"	d
+CUBATURE_GENERATOR_EIGEN	CUBATURE_GENERATOR_COMPRESSED_EIGEN.cpp	/^CUBATURE_GENERATOR_EIGEN::CUBATURE_GENERATOR_EIGEN(SUBSPACE_FLUID_3D_EIGEN* fluid,$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+CUBATURE_GENERATOR_EIGEN	CUBATURE_GENERATOR_EIGEN.cpp	/^CUBATURE_GENERATOR_EIGEN::CUBATURE_GENERATOR_EIGEN(SUBSPACE_FLUID_3D_EIGEN* fluid,$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+CUBATURE_GENERATOR_EIGEN	CUBATURE_GENERATOR_EIGEN.h	/^class CUBATURE_GENERATOR_EIGEN {$/;"	c
+CUBATURE_GENERATOR_EIGEN_H	CUBATURE_GENERATOR_EIGEN.h	/^#define CUBATURE_GENERATOR_EIGEN_H$/;"	d
+_candidatesPerTry	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  int _candidatesPerTry;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_candidatesPerTry	CUBATURE_GENERATOR_EIGEN.h	/^  int _candidatesPerTry;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_errorTolerance	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  double _errorTolerance;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_errorTolerance	CUBATURE_GENERATOR_EIGEN.h	/^  double _errorTolerance;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_filename	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  string _filename;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_filename	CUBATURE_GENERATOR_EIGEN.h	/^  string _filename;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_fluid	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  SUBSPACE_FLUID_3D_COMPRESSED_EIGEN* _fluid;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_fluid	CUBATURE_GENERATOR_EIGEN.h	/^  SUBSPACE_FLUID_3D_EIGEN* _fluid;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_grabAllCandidates	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  bool _grabAllCandidates;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_grabAllCandidates	CUBATURE_GENERATOR_EIGEN.h	/^  bool _grabAllCandidates;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_importanceSamples	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  int _importanceSamples;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_importanceSamples	CUBATURE_GENERATOR_EIGEN.h	/^  int _importanceSamples;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_keyCells	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  vector<int> _keyCells;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_keyCells	CUBATURE_GENERATOR_EIGEN.h	/^  vector<int> _keyCells;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_keyWeights	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  vector<Real> _keyWeights;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_keyWeights	CUBATURE_GENERATOR_EIGEN.h	/^  vector<Real> _keyWeights;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_magnitude	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  Real _magnitude;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_magnitude	CUBATURE_GENERATOR_EIGEN.h	/^  Real _magnitude;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_maxIterationsNNLS	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  int _maxIterationsNNLS;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_maxIterationsNNLS	CUBATURE_GENERATOR_EIGEN.h	/^  int _maxIterationsNNLS;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_maxKeyCells	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  int _maxKeyCells;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_maxKeyCells	CUBATURE_GENERATOR_EIGEN.h	/^  int _maxKeyCells;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_postadvectionMagnitudes	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  VectorXd _postadvectionMagnitudes;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_postadvectionMagnitudes	CUBATURE_GENERATOR_EIGEN.h	/^  VectorXd _postadvectionMagnitudes;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_tolerance	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  Real _tolerance;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_tolerance	CUBATURE_GENERATOR_EIGEN.h	/^  Real _tolerance;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_trainingPostadvection	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  vector<VectorXd> _trainingPostadvection;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_trainingPostadvection	CUBATURE_GENERATOR_EIGEN.h	/^  vector<VectorXd> _trainingPostadvection;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_trainingPreadvection	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  vector<VectorXd> _trainingPreadvection;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_trainingPreadvection	CUBATURE_GENERATOR_EIGEN.h	/^  vector<VectorXd> _trainingPreadvection;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+_twister	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  MERSENNETWISTER _twister;$/;"	m	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+_twister	CUBATURE_GENERATOR_EIGEN.h	/^  MERSENNETWISTER _twister;$/;"	m	class:CUBATURE_GENERATOR_EIGEN
+candidatesPerTry	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  int& candidatesPerTry()  { return _candidatesPerTry; };$/;"	f	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+candidatesPerTry	CUBATURE_GENERATOR_EIGEN.h	/^  int& candidatesPerTry()  { return _candidatesPerTry; };$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+cullCubatureZeros	CUBATURE_GENERATOR_COMPRESSED_EIGEN.cpp	/^void CUBATURE_GENERATOR_EIGEN::cullCubatureZeros(VectorXd& weights, vector<int>& candidates)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+cullCubatureZeros	CUBATURE_GENERATOR_EIGEN.cpp	/^void CUBATURE_GENERATOR_EIGEN::cullCubatureZeros(VectorXd& weights, vector<int>& candidates)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+errorTolerance	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  double& errorTolerance() { return _errorTolerance; };$/;"	f	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+errorTolerance	CUBATURE_GENERATOR_EIGEN.h	/^  double& errorTolerance() { return _errorTolerance; };$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+fluid	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  const SUBSPACE_FLUID_3D_COMPRESSED_EIGEN* fluid() { return _fluid; };$/;"	f	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+fluid	CUBATURE_GENERATOR_EIGEN.h	/^  const SUBSPACE_FLUID_3D_EIGEN* fluid() { return _fluid; };$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+generateImportanceSampledCubature	CUBATURE_GENERATOR_COMPRESSED_EIGEN.cpp	/^void CUBATURE_GENERATOR_EIGEN::generateImportanceSampledCubature()$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+generateImportanceSampledCubature	CUBATURE_GENERATOR_EIGEN.cpp	/^void CUBATURE_GENERATOR_EIGEN::generateImportanceSampledCubature()$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+getStagedTrainingColumn	CUBATURE_GENERATOR_COMPRESSED_EIGEN.cpp	/^VectorXd CUBATURE_GENERATOR_EIGEN::getStagedTrainingColumn(int index)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+getStagedTrainingColumn	CUBATURE_GENERATOR_EIGEN.cpp	/^VectorXd CUBATURE_GENERATOR_EIGEN::getStagedTrainingColumn(int index)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+grabAllCandidates	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  bool& grabAllCandidates() { return _grabAllCandidates; };$/;"	f	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+grabAllCandidates	CUBATURE_GENERATOR_EIGEN.h	/^  bool& grabAllCandidates() { return _grabAllCandidates; };$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+importanceSamples	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  int& importanceSamples() { return _importanceSamples; };$/;"	f	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+importanceSamples	CUBATURE_GENERATOR_EIGEN.h	/^  int& importanceSamples() { return _importanceSamples; };$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+matlabFNNLS	CUBATURE_GENERATOR_COMPRESSED_EIGEN.cpp	/^VectorXd CUBATURE_GENERATOR_EIGEN::matlabFNNLS(const MatrixXd& A, const VectorXd& b, bool verbose)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+matlabFNNLS	CUBATURE_GENERATOR_COMPRESSED_EIGEN.cpp	/^VectorXd CUBATURE_GENERATOR_EIGEN::matlabFNNLS(const vector<VectorXd>& columns, const VectorXd& b, bool verbose)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+matlabFNNLS	CUBATURE_GENERATOR_EIGEN.cpp	/^VectorXd CUBATURE_GENERATOR_EIGEN::matlabFNNLS(const MatrixXd& A, const VectorXd& b, bool verbose)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+matlabFNNLS	CUBATURE_GENERATOR_EIGEN.cpp	/^VectorXd CUBATURE_GENERATOR_EIGEN::matlabFNNLS(const vector<VectorXd>& columns, const VectorXd& b, bool verbose)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+pickImportanceSampledCandidatesOMP	CUBATURE_GENERATOR_COMPRESSED_EIGEN.cpp	/^void CUBATURE_GENERATOR_EIGEN::pickImportanceSampledCandidatesOMP(const int pass, map<int, bool> alreadyUsed, const VectorXd& residual, vector<int>& candidates, int totalCandidates)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+pickImportanceSampledCandidatesOMP	CUBATURE_GENERATOR_EIGEN.cpp	/^void CUBATURE_GENERATOR_EIGEN::pickImportanceSampledCandidatesOMP(const int pass, map<int, bool> alreadyUsed, const VectorXd& residual, vector<int>& candidates, int totalCandidates)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+trainingPostadvection	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  vector<VectorXd>& trainingPostadvection() { return _trainingPostadvection; };$/;"	f	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+trainingPostadvection	CUBATURE_GENERATOR_EIGEN.h	/^  vector<VectorXd>& trainingPostadvection() { return _trainingPostadvection; };$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+trainingPreadvection	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  vector<VectorXd>& trainingPreadvection() { return _trainingPreadvection; };$/;"	f	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+trainingPreadvection	CUBATURE_GENERATOR_EIGEN.h	/^  vector<VectorXd>& trainingPreadvection() { return _trainingPreadvection; };$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+writeCubature	CUBATURE_GENERATOR_COMPRESSED_EIGEN.cpp	/^void CUBATURE_GENERATOR_EIGEN::writeCubature(const string& filename)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+writeCubature	CUBATURE_GENERATOR_EIGEN.cpp	/^void CUBATURE_GENERATOR_EIGEN::writeCubature(const string& filename)$/;"	f	class:CUBATURE_GENERATOR_EIGEN
+~CUBATURE_GENERATOR_COMPRESSED_EIGEN	CUBATURE_GENERATOR_COMPRESSED_EIGEN.h	/^  ~CUBATURE_GENERATOR_COMPRESSED_EIGEN() {};$/;"	f	class:CUBATURE_GENERATOR_COMPRESSED_EIGEN
+~CUBATURE_GENERATOR_EIGEN	CUBATURE_GENERATOR_EIGEN.h	/^  ~CUBATURE_GENERATOR_EIGEN() {};$/;"	f	class:CUBATURE_GENERATOR_EIGEN

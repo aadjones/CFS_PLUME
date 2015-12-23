@@ -1,0 +1,168 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ABS	IMAGE.h	/^template < class T > inline T ABS( T a ) { $/;"	f
+CLAMP	IMAGE.h	/^template < class T > inline void CLAMP( T &a, T b=0., T c=1.) { $/;"	f
+DOWNCOEFFS	WAVELET_NOISE.h	/^#define DOWNCOEFFS /;"	d
+HEAP_ENTRY	MIN_HEAP.h	/^  HEAP_ENTRY() {$/;"	f	class:HEAP_ENTRY
+HEAP_ENTRY	MIN_HEAP.h	/^class HEAP_ENTRY {$/;"	c
+IMAGE	IMAGE.h	/^namespace IMAGE {$/;"	n
+IMAGE_H	IMAGE.h	/^#define IMAGE_H$/;"	d
+M	MERSENNETWISTER.h	/^	enum { M = 397 };  \/\/ period parameter$/;"	e	enum:MERSENNETWISTER::__anon3
+MAX	IMAGE.h	/^template < class T > inline T MAX( T a, T b) {$/;"	f
+MAX3	IMAGE.h	/^template < class T > inline T MAX3( T a, T b, T c) {$/;"	f
+MAX3V	IMAGE.h	/^template < class T > inline float MAX3V( T vec) {$/;"	f
+MERSENNETWISTER	MERSENNETWISTER.h	/^class MERSENNETWISTER {$/;"	c
+MERSENNETWISTER	MERSENNETWISTER.h	/^inline MERSENNETWISTER::MERSENNETWISTER( const uint32& oneSeed )$/;"	f	class:MERSENNETWISTER
+MERSENNETWISTER	MERSENNETWISTER.h	/^inline MERSENNETWISTER::MERSENNETWISTER( uint32 *const bigSeed, const uint32 seedLength )$/;"	f	class:MERSENNETWISTER
+MERSENNETWISTER	MERSENNETWISTER.h	/^inline MERSENNETWISTER::MERSENNETWISTER()$/;"	f	class:MERSENNETWISTER
+MERSENNETWISTER_H	MERSENNETWISTER.h	/^#define MERSENNETWISTER_H$/;"	d
+MIN	IMAGE.h	/^template < class T > inline T MIN( T a, T b) {$/;"	f
+MIN3V	IMAGE.h	/^template < class T > inline float MIN3V( T vec) {$/;"	f
+MIN_HEAP	MIN_HEAP.cpp	/^MIN_HEAP::MIN_HEAP() :$/;"	f	class:MIN_HEAP
+MIN_HEAP	MIN_HEAP.h	/^class MIN_HEAP  $/;"	c
+MIN_HEAP_H	MIN_HEAP.h	/^#define MIN_HEAP_H$/;"	d
+N	MERSENNETWISTER.h	/^	enum { N = 624 };       \/\/ length of state vector$/;"	e	enum:MERSENNETWISTER::__anon1
+NOISE_TILE_SIZE	WAVELET_NOISE.h	/^#define NOISE_TILE_SIZE /;"	d
+QT_ATOM	QUICKTIME_MOVIE.h	/^    QT_ATOM(FILE* fp,const char* type)$/;"	f	class:QT_ATOM
+QT_ATOM	QUICKTIME_MOVIE.h	/^class QT_ATOM$/;"	c
+QUICKTIME_MOVIE	QUICKTIME_MOVIE.h	/^  QUICKTIME_MOVIE() {$/;"	f	class:QUICKTIME_MOVIE
+QUICKTIME_MOVIE	QUICKTIME_MOVIE.h	/^class QUICKTIME_MOVIE {$/;"	c
+QUICKTIME_MOVIE_H	QUICKTIME_MOVIE.h	/^#define QUICKTIME_MOVIE_H$/;"	d
+SAVE	MERSENNETWISTER.h	/^	enum { SAVE = N + 1 };  \/\/ length of array for save()$/;"	e	enum:MERSENNETWISTER::__anon2
+SIMPLE_PARSER	SIMPLE_PARSER.cpp	/^SIMPLE_PARSER::SIMPLE_PARSER(std::string file)$/;"	f	class:SIMPLE_PARSER
+SIMPLE_PARSER	SIMPLE_PARSER.h	/^class SIMPLE_PARSER  $/;"	c
+SIMPLE_PARSER_H	SIMPLE_PARSER.h	/^#define SIMPLE_PARSER_H$/;"	d
+SWAP_POINTERS	IMAGE.h	/^template < class T > inline void SWAP_POINTERS( T &a, T &b ) { $/;"	f
+Swap_Endianity	QUICKTIME_MOVIE.h	/^  inline void Swap_Endianity(T& x)$/;"	f	class:QUICKTIME_MOVIE
+TIMER	TIMER.cpp	/^TIMER::TIMER(string blockName) : _stopped(false) $/;"	f	class:TIMER
+TIMER	TIMER.h	/^class TIMER$/;"	c
+TIMER_H	TIMER.h	/^#define TIMER_H$/;"	d
+WAVELET_NOISE_H	WAVELET_NOISE.h	/^#define WAVELET_NOISE_H$/;"	d
+WNoise	WAVELET_NOISE.h	/^static inline Real WNoise(VEC3F p, Real* data)$/;"	f
+Write	QUICKTIME_MOVIE.h	/^  void Write(FILE* fp, char num)$/;"	f	class:QUICKTIME_MOVIE
+Write	QUICKTIME_MOVIE.h	/^  void Write(FILE* fp, uint num)$/;"	f	class:QUICKTIME_MOVIE
+Write	QUICKTIME_MOVIE.h	/^  void Write(FILE* fp, ushort num)$/;"	f	class:QUICKTIME_MOVIE
+Write_Identity_Matrix	QUICKTIME_MOVIE.h	/^  void Write_Identity_Matrix(FILE* fp)$/;"	f	class:QUICKTIME_MOVIE
+_callStack	TIMER.cpp	/^std::stack<std::string> TIMER::_callStack;$/;"	m	class:TIMER	file:
+_callStack	TIMER.h	/^  static std::stack<std::string> _callStack;$/;"	m	class:TIMER
+_elapsed	TIMER.h	/^  double _elapsed;$/;"	m	class:TIMER
+_frameRows	QUICKTIME_MOVIE.h	/^  std::vector<JSAMPLE*> _frameRows;$/;"	m	class:QUICKTIME_MOVIE
+_heap	MIN_HEAP.h	/^  vector<HEAP_ENTRY> _heap;$/;"	m	class:MIN_HEAP
+_heapIndex	MIN_HEAP.h	/^  map<int,int> _heapIndex;$/;"	m	class:MIN_HEAP
+_height	QUICKTIME_MOVIE.h	/^  int _height;$/;"	m	class:QUICKTIME_MOVIE
+_size	MIN_HEAP.h	/^  int _size;$/;"	m	class:MIN_HEAP
+_stopped	TIMER.h	/^  bool _stopped;$/;"	m	class:TIMER
+_tick	TIMER.h	/^  static timeval _tick;$/;"	m	class:TIMER
+_timings	TIMER.cpp	/^std::map<std::string, double> TIMER::_timings;$/;"	m	class:TIMER	file:
+_timings	TIMER.h	/^  static std::map<std::string, double> _timings;$/;"	m	class:TIMER
+_tock	TIMER.cpp	/^timeval TIMER::_tock;$/;"	m	class:TIMER	file:
+_tock	TIMER.h	/^  static timeval _tock;$/;"	m	class:TIMER
+_totalFrames	QUICKTIME_MOVIE.h	/^  int _totalFrames;$/;"	m	class:QUICKTIME_MOVIE
+_upCoeffs	WAVELET_NOISE.h	/^static Real _upCoeffs[4] = {0.25f, 0.75f, 0.75f, 0.25f};$/;"	v
+_width	QUICKTIME_MOVIE.h	/^  int _width;$/;"	m	class:QUICKTIME_MOVIE
+addFrameGL	QUICKTIME_MOVIE.h	/^  void addFrameGL()$/;"	f	class:QUICKTIME_MOVIE
+addLuminanceFrame	QUICKTIME_MOVIE.h	/^  void addLuminanceFrame(const float* image, const int& width, const int& height) $/;"	f	class:QUICKTIME_MOVIE
+big_endian	QUICKTIME_MOVIE.h	/^  bool big_endian;$/;"	m	class:QUICKTIME_MOVIE
+clear	MIN_HEAP.h	/^  void clear() {$/;"	f	class:MIN_HEAP
+decreaseKey	MIN_HEAP.cpp	/^void MIN_HEAP::decreaseKey(int toChange, Real newKey)$/;"	f	class:MIN_HEAP
+defined	SIMPLE_PARSER.cpp	/^bool SIMPLE_PARSER::defined(string name)$/;"	f	class:SIMPLE_PARSER
+distance	MIN_HEAP.h	/^  Real distance;$/;"	m	class:HEAP_ENTRY
+downsampleNeumann	WAVELET_NOISE.h	/^static void downsampleNeumann(const Real *from, Real *to, int n, int stride)$/;"	f
+downsampleX	WAVELET_NOISE.h	/^static void downsampleX(Real *from, Real *to, int n){$/;"	f
+downsampleXNeumann	WAVELET_NOISE.h	/^static void downsampleXNeumann(Real* to, const Real* from, int sx,int sy, int sz) {$/;"	f
+downsampleY	WAVELET_NOISE.h	/^static void downsampleY(Real *from, Real *to, int n){$/;"	f
+downsampleYNeumann	WAVELET_NOISE.h	/^static void downsampleYNeumann(Real* to, const Real* from, int sx,int sy, int sz) {$/;"	f
+downsampleZ	WAVELET_NOISE.h	/^static void downsampleZ(Real *from, Real *to, int n){$/;"	f
+downsampleZNeumann	WAVELET_NOISE.h	/^static void downsampleZNeumann(Real* to, const Real* from, int sx,int sy, int sz) {$/;"	f
+dumpNumberedPNG	IMAGE.h	/^  static void dumpNumberedPNG(int counter, std::string prefix, float* field, int xRes, int yRes)$/;"	f	namespace:IMAGE
+elapsed	TIMER.h	/^  const double elapsed() { return _elapsed; };$/;"	f	class:TIMER
+empty	MIN_HEAP.h	/^  bool empty() { return _size == 0; };$/;"	f	class:MIN_HEAP
+forceLower	SIMPLE_PARSER.cpp	/^static void forceLower(string& input) {$/;"	f	file:
+fp	QUICKTIME_MOVIE.h	/^    FILE *fp;$/;"	m	class:QT_ATOM
+generateTile	WAVELET_NOISE.h	/^static void generateTile(Real* const noiseTileData, std::string filename, int seed = 123456) {$/;"	f
+getBool	SIMPLE_PARSER.cpp	/^bool SIMPLE_PARSER::getBool(string name, bool defaultValue, bool needed)$/;"	f	class:SIMPLE_PARSER
+getFloat	SIMPLE_PARSER.cpp	/^double SIMPLE_PARSER::getFloat(string name,  double defaultValue, bool needed)$/;"	f	class:SIMPLE_PARSER
+getInt	SIMPLE_PARSER.cpp	/^int SIMPLE_PARSER::getInt(string name,    int defaultValue,    bool needed)$/;"	f	class:SIMPLE_PARSER
+getScalarValue	SIMPLE_PARSER.cpp	/^template<class T> T SIMPLE_PARSER::getScalarValue(string name, T defaultValue, bool needed)$/;"	f	class:SIMPLE_PARSER
+getString	SIMPLE_PARSER.cpp	/^string SIMPLE_PARSER::getString(string name, string defaultValue, bool needed)$/;"	f	class:SIMPLE_PARSER
+hash	MERSENNETWISTER.h	/^inline MERSENNETWISTER::uint32 MERSENNETWISTER::hash( time_t t, clock_t c )$/;"	f	class:MERSENNETWISTER
+haveUnusedValues	SIMPLE_PARSER.cpp	/^bool SIMPLE_PARSER::haveUnusedValues()$/;"	f	class:SIMPLE_PARSER
+heapIndex	MIN_HEAP.h	/^  int heapIndex;$/;"	m	class:HEAP_ENTRY
+heapMin	MIN_HEAP.cpp	/^HEAP_ENTRY MIN_HEAP::heapMin()$/;"	f	class:MIN_HEAP
+heapify	MIN_HEAP.cpp	/^void MIN_HEAP::heapify(int index)$/;"	f	class:MIN_HEAP
+hiBit	MERSENNETWISTER.h	/^	uint32 hiBit( const uint32& u ) const { return u & 0x80000000UL; }$/;"	f	class:MERSENNETWISTER
+hours	TIMER.h	/^  static int hours(int seconds) { return seconds \/ (60 * 60); };$/;"	f	class:TIMER
+index	MIN_HEAP.h	/^  int index;$/;"	m	class:HEAP_ENTRY
+initialize	MERSENNETWISTER.h	/^inline void MERSENNETWISTER::initialize( const uint32 seed )$/;"	f	class:MERSENNETWISTER
+insert	MIN_HEAP.cpp	/^void MIN_HEAP::insert(HEAP_ENTRY& cell)$/;"	f	class:MIN_HEAP
+left	MERSENNETWISTER.h	/^	int left;          \/\/ number of values left before reload needed$/;"	m	class:MERSENNETWISTER
+left	MIN_HEAP.h	/^  int left(int i) { return i * 2; };$/;"	f	class:MIN_HEAP
+loBit	MERSENNETWISTER.h	/^	uint32 loBit( const uint32& u ) const { return u & 0x00000001UL; }$/;"	f	class:MERSENNETWISTER
+loBits	MERSENNETWISTER.h	/^	uint32 loBits( const uint32& u ) const { return u & 0x7fffffffUL; }$/;"	f	class:MERSENNETWISTER
+load	MERSENNETWISTER.h	/^inline void MERSENNETWISTER::load( uint32 *const loadArray )$/;"	f	class:MERSENNETWISTER
+loadTile	WAVELET_NOISE.h	/^static bool loadTile(Real* const noiseTileData, std::string filename)$/;"	f
+mUsed	SIMPLE_PARSER.h	/^		map<string, bool> mUsed;$/;"	m	class:SIMPLE_PARSER
+mVals	SIMPLE_PARSER.h	/^		map<string, string> mVals;$/;"	m	class:SIMPLE_PARSER
+minutes	TIMER.h	/^  static int minutes(int seconds) {$/;"	f	class:TIMER
+mixBits	MERSENNETWISTER.h	/^	uint32 mixBits( const uint32& u, const uint32& v ) const$/;"	f	class:MERSENNETWISTER
+modFast128	WAVELET_NOISE.h	/^#define modFast128(/;"	d
+modFast64	WAVELET_NOISE.h	/^#define modFast64(/;"	d
+noiseTileSize	WAVELET_NOISE.h	/^static const int noiseTileSize = NOISE_TILE_SIZE;$/;"	v
+operator ()	MERSENNETWISTER.h	/^	double operator()() { return rand(); }  \/\/ same as rand()$/;"	f	class:MERSENNETWISTER
+operator <<	MERSENNETWISTER.h	/^inline std::ostream& operator<<( std::ostream& os, const MERSENNETWISTER& mtrand )$/;"	f
+operator >>	MERSENNETWISTER.h	/^inline std::istream& operator>>( std::istream& is, MERSENNETWISTER& mtrand )$/;"	f
+pNext	MERSENNETWISTER.h	/^	uint32 *pNext;     \/\/ next value to get from state$/;"	m	class:MERSENNETWISTER
+parent	MIN_HEAP.h	/^  int parent(int i) { return i \/ 2; };$/;"	f	class:MIN_HEAP
+popMin	MIN_HEAP.cpp	/^HEAP_ENTRY MIN_HEAP::popMin()$/;"	f	class:MIN_HEAP
+print	MIN_HEAP.cpp	/^void MIN_HEAP::print()$/;"	f	class:MIN_HEAP
+printAllUnused	SIMPLE_PARSER.cpp	/^string SIMPLE_PARSER::printAllUnused()$/;"	f	class:SIMPLE_PARSER
+printTimings	TIMER.cpp	/^void TIMER::printTimings()$/;"	f	class:TIMER
+printTimingsPerFrame	TIMER.cpp	/^void TIMER::printTimingsPerFrame(const int frames)$/;"	f	class:TIMER
+rand	MERSENNETWISTER.h	/^inline double MERSENNETWISTER::rand( const double& n )$/;"	f	class:MERSENNETWISTER
+rand	MERSENNETWISTER.h	/^inline double MERSENNETWISTER::rand()$/;"	f	class:MERSENNETWISTER
+rand53	MERSENNETWISTER.h	/^inline double MERSENNETWISTER::rand53()$/;"	f	class:MERSENNETWISTER
+randDblExc	MERSENNETWISTER.h	/^inline double MERSENNETWISTER::randDblExc( const double& n )$/;"	f	class:MERSENNETWISTER
+randDblExc	MERSENNETWISTER.h	/^inline double MERSENNETWISTER::randDblExc()$/;"	f	class:MERSENNETWISTER
+randExc	MERSENNETWISTER.h	/^inline double MERSENNETWISTER::randExc( const double& n )$/;"	f	class:MERSENNETWISTER
+randExc	MERSENNETWISTER.h	/^inline double MERSENNETWISTER::randExc()$/;"	f	class:MERSENNETWISTER
+randInt	MERSENNETWISTER.h	/^inline MERSENNETWISTER::uint32 MERSENNETWISTER::randInt( const uint32& n )$/;"	f	class:MERSENNETWISTER
+randInt	MERSENNETWISTER.h	/^inline MERSENNETWISTER::uint32 MERSENNETWISTER::randInt()$/;"	f	class:MERSENNETWISTER
+randNorm	MERSENNETWISTER.h	/^inline double MERSENNETWISTER::randNorm( const double& mean, const double& variance )$/;"	f	class:MERSENNETWISTER
+reload	MERSENNETWISTER.h	/^inline void MERSENNETWISTER::reload()$/;"	f	class:MERSENNETWISTER
+removeWhitespace	SIMPLE_PARSER.cpp	/^static string removeWhitespace(string in) {$/;"	f	file:
+right	MIN_HEAP.h	/^  int right(int i) { return i * 2 + 1; };$/;"	f	class:MIN_HEAP
+save	MERSENNETWISTER.h	/^inline void MERSENNETWISTER::save( uint32* saveArray ) const$/;"	f	class:MERSENNETWISTER
+saveTile	WAVELET_NOISE.h	/^static void saveTile(Real* const noiseTileData, std::string filename)$/;"	f
+seconds	TIMER.h	/^  static int seconds(int seconds) {$/;"	f	class:TIMER
+seed	MERSENNETWISTER.h	/^inline void MERSENNETWISTER::seed( const uint32 oneSeed )$/;"	f	class:MERSENNETWISTER
+seed	MERSENNETWISTER.h	/^inline void MERSENNETWISTER::seed( uint32 *const bigSeed, const uint32 seedLength )$/;"	f	class:MERSENNETWISTER
+seed	MERSENNETWISTER.h	/^inline void MERSENNETWISTER::seed()$/;"	f	class:MERSENNETWISTER
+size	MIN_HEAP.h	/^  int size() { return _size; };$/;"	f	class:MIN_HEAP
+start_offset	QUICKTIME_MOVIE.h	/^    long start_offset;$/;"	m	class:QT_ATOM
+state	MERSENNETWISTER.h	/^	uint32 state[N];   \/\/ internal state$/;"	m	class:MERSENNETWISTER
+stop	TIMER.cpp	/^void TIMER::stop()$/;"	f	class:TIMER
+swap	MIN_HEAP.cpp	/^void MIN_HEAP::swap(int index1, int index2)$/;"	f	class:MIN_HEAP
+timing	TIMER.h	/^  static double timing(timeval& begin = _tick, timeval& end  = _tock) {$/;"	f	class:TIMER
+twist	MERSENNETWISTER.h	/^	uint32 twist( const uint32& m, const uint32& s0, const uint32& s1 ) const$/;"	f	class:MERSENNETWISTER
+type	QUICKTIME_MOVIE.h	/^    const char* type;$/;"	m	class:QT_ATOM
+uint	QUICKTIME_MOVIE.h	/^typedef unsigned int uint;$/;"	t
+uint32	MERSENNETWISTER.h	/^	typedef unsigned long uint32;  \/\/ unsigned integer type, at least 32 bits$/;"	t	class:MERSENNETWISTER
+upsampleNeumann	WAVELET_NOISE.h	/^static void upsampleNeumann(const Real *from, Real *to, int n, int stride) {$/;"	f
+upsampleX	WAVELET_NOISE.h	/^static void upsampleX(Real *from, Real *to, int n) {$/;"	f
+upsampleXNeumann	WAVELET_NOISE.h	/^static void upsampleXNeumann(Real* to, const Real* from, int sx, int sy, int sz) {$/;"	f
+upsampleY	WAVELET_NOISE.h	/^static void upsampleY(Real *from, Real *to, int n) {$/;"	f
+upsampleYNeumann	WAVELET_NOISE.h	/^static void upsampleYNeumann(Real* to, const Real* from, int sx, int sy, int sz) {$/;"	f
+upsampleZ	WAVELET_NOISE.h	/^static void upsampleZ(Real *from, Real *to, int n) {$/;"	f
+upsampleZNeumann	WAVELET_NOISE.h	/^static void upsampleZNeumann(Real* to, const Real* from, int sx, int sy, int sz) {$/;"	f
+ushort	QUICKTIME_MOVIE.h	/^typedef unsigned short ushort;$/;"	t
+writeMovie	QUICKTIME_MOVIE.h	/^  void writeMovie(const char* filename)$/;"	f	class:QUICKTIME_MOVIE
+writePng	IMAGE.h	/^  static int writePng(const char *fileName, unsigned char **rowsp, int w, int h, bool normalize)$/;"	f	namespace:IMAGE
+~MIN_HEAP	MIN_HEAP.cpp	/^MIN_HEAP::~MIN_HEAP()$/;"	f	class:MIN_HEAP
+~QT_ATOM	QUICKTIME_MOVIE.h	/^    ~QT_ATOM()$/;"	f	class:QT_ATOM
+~QUICKTIME_MOVIE	QUICKTIME_MOVIE.h	/^  ~QUICKTIME_MOVIE() {$/;"	f	class:QUICKTIME_MOVIE
+~SIMPLE_PARSER	SIMPLE_PARSER.cpp	/^SIMPLE_PARSER::~SIMPLE_PARSER()$/;"	f	class:SIMPLE_PARSER
+~TIMER	TIMER.cpp	/^TIMER::~TIMER()$/;"	f	class:TIMER

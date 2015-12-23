@@ -1,0 +1,477 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+BIG_MATRIX	BIG_MATRIX.cpp	/^BIG_MATRIX::BIG_MATRIX() :$/;"	f	class:BIG_MATRIX
+BIG_MATRIX	BIG_MATRIX.cpp	/^BIG_MATRIX::BIG_MATRIX(const BIG_MATRIX& m) $/;"	f	class:BIG_MATRIX
+BIG_MATRIX	BIG_MATRIX.cpp	/^BIG_MATRIX::BIG_MATRIX(const MATRIX& m)$/;"	f	class:BIG_MATRIX
+BIG_MATRIX	BIG_MATRIX.cpp	/^BIG_MATRIX::BIG_MATRIX(const string& filename)$/;"	f	class:BIG_MATRIX
+BIG_MATRIX	BIG_MATRIX.cpp	/^BIG_MATRIX::BIG_MATRIX(int rows, int cols) :$/;"	f	class:BIG_MATRIX
+BIG_MATRIX	BIG_MATRIX.h	/^class BIG_MATRIX $/;"	c
+BIG_MATRIX_H	BIG_MATRIX.h	/^#define BIG_MATRIX_H$/;"	d
+EIGEN	EIGEN.h	/^class EIGEN {$/;"	c
+EIGENPAIR	MATRIX.cpp	/^struct EIGENPAIR {$/;"	s	file:
+EIGEN_H	EIGEN.h	/^#define EIGEN_H$/;"	d
+I	MATRIX3.cpp	/^MATRIX3 MATRIX3::I() { return MATRIX3(VEC3F(1,0,0), VEC3F(0,1,0), VEC3F(0,0,1)); }$/;"	f	class:MATRIX3
+MATRIX	MATRIX.cpp	/^MATRIX::MATRIX() :$/;"	f	class:MATRIX
+MATRIX	MATRIX.cpp	/^MATRIX::MATRIX(const MATRIX& m) :$/;"	f	class:MATRIX
+MATRIX	MATRIX.cpp	/^MATRIX::MATRIX(const VECTOR& data, int rows, int cols) :$/;"	f	class:MATRIX
+MATRIX	MATRIX.cpp	/^MATRIX::MATRIX(const char* filename) :$/;"	f	class:MATRIX
+MATRIX	MATRIX.cpp	/^MATRIX::MATRIX(int rows, int cols) :$/;"	f	class:MATRIX
+MATRIX	MATRIX.cpp	/^MATRIX::MATRIX(vector<VECTOR>& cols) :$/;"	f	class:MATRIX
+MATRIX	MATRIX.h	/^  class MATRIX {$/;"	c
+MATRIX3	MATRIX3.cpp	/^MATRIX3::MATRIX3(Real* data)$/;"	f	class:MATRIX3
+MATRIX3	MATRIX3.h	/^  MATRIX3() { *this = 0.0; }$/;"	f	class:MATRIX3
+MATRIX3	MATRIX3.h	/^  MATRIX3(const MATRIX3& m) { *this = m; }$/;"	f	class:MATRIX3
+MATRIX3	MATRIX3.h	/^  MATRIX3(const VEC3F& r0,const VEC3F& r1,const VEC3F& r2)$/;"	f	class:MATRIX3
+MATRIX3	MATRIX3.h	/^class MATRIX3$/;"	c
+MATRIX_H	MATRIX.h	/^#define MATRIX_H$/;"	d
+M_PI	MATRIX3.h	/^#define M_PI /;"	d
+NNLS_H	NNLS.h	/^#define NNLS_H$/;"	d
+NNLS_SOLVER	NNLS.h	/^	NNLS_SOLVER() :$/;"	f	class:NNLS_SOLVER
+NNLS_SOLVER	NNLS.h	/^	NNLS_SOLVER(int rows, int maxCols) :$/;"	f	class:NNLS_SOLVER
+NNLS_SOLVER	NNLS.h	/^class NNLS_SOLVER$/;"	c
+PCA	MATRIX.cpp	/^void MATRIX::PCA(MATRIX& components, VECTOR& values)$/;"	f	class:MATRIX
+REAL_EPSILON	MATRIX.cpp	/^#define REAL_EPSILON /;"	d	file:
+SPARSE_MATRIX	SPARSE_MATRIX.cpp	/^SPARSE_MATRIX::SPARSE_MATRIX() :$/;"	f	class:SPARSE_MATRIX
+SPARSE_MATRIX	SPARSE_MATRIX.cpp	/^SPARSE_MATRIX::SPARSE_MATRIX(int rows, int cols) :$/;"	f	class:SPARSE_MATRIX
+SPARSE_MATRIX	SPARSE_MATRIX.h	/^class SPARSE_MATRIX {$/;"	c
+SPARSE_MATRIX_ARRAY	SPARSE_MATRIX_ARRAY.cpp	/^SPARSE_MATRIX_ARRAY::SPARSE_MATRIX_ARRAY(int rows, int cols) :$/;"	f	class:SPARSE_MATRIX_ARRAY
+SPARSE_MATRIX_ARRAY	SPARSE_MATRIX_ARRAY.h	/^class SPARSE_MATRIX_ARRAY {$/;"	c
+SPARSE_MATRIX_ARRAY_H	SPARSE_MATRIX_ARRAY.h	/^#define SPARSE_MATRIX_ARRAY_H$/;"	d
+SPARSE_MATRIX_H	SPARSE_MATRIX.h	/^#define SPARSE_MATRIX_H$/;"	d
+SVD	MATRIX.cpp	/^void MATRIX::SVD(MATRIX& U, VECTOR& S, MATRIX& VT)$/;"	f	class:MATRIX
+TVEC2	VEC2.h	/^    TVEC2(T s=0) { *this = s; }$/;"	f	class:TVEC2
+TVEC2	VEC2.h	/^    TVEC2(T x, T y) { elt[0]=x; elt[1]=y; }$/;"	f	class:TVEC2
+TVEC2	VEC2.h	/^    template<class U> TVEC2(const TVEC2<U>& v) { *this = v; }$/;"	f	class:TVEC2
+TVEC2	VEC2.h	/^    template<class U> TVEC2(const U v[2]) { elt[0]=v[0]; elt[1]=v[1]; }$/;"	f	class:TVEC2
+TVEC2	VEC2.h	/^class TVEC2 {$/;"	c
+TVEC3	VEC3.h	/^  TVEC3(T s=0) { *this = s; }$/;"	f	class:TVEC3
+TVEC3	VEC3.h	/^  TVEC3(T x, T y, T z) { element[0]=x; element[1]=y; element[2]=z; }$/;"	f	class:TVEC3
+TVEC3	VEC3.h	/^  template<class U> TVEC3(const TVEC3<U>& v) { *this = v; }$/;"	f	class:TVEC3
+TVEC3	VEC3.h	/^  template<class U> TVEC3(const U v[3])$/;"	f	class:TVEC3
+TVEC3	VEC3.h	/^class TVEC3 {$/;"	c
+VEC2	VEC2.h	/^typedef TVEC2<Real> VEC2;$/;"	t
+VEC2F	VEC2.h	/^typedef TVEC2<Real>  VEC2F;$/;"	t
+VEC3	VEC3.h	/^typedef TVEC3<Real> VEC3;$/;"	t
+VEC3F	VEC3.h	/^typedef TVEC3<Real> VEC3F;$/;"	t
+VEC3I	VEC3.h	/^typedef TVEC3<int> VEC3I;$/;"	t
+VEC3L	VEC3.h	/^typedef TVEC3<long long> VEC3L;$/;"	t
+VECTOR	VECTOR.cpp	/^VECTOR::VECTOR() :$/;"	f	class:VECTOR
+VECTOR	VECTOR.cpp	/^VECTOR::VECTOR(const VECTOR& v) $/;"	f	class:VECTOR
+VECTOR	VECTOR.cpp	/^VECTOR::VECTOR(const char* filename) :$/;"	f	class:VECTOR
+VECTOR	VECTOR.cpp	/^VECTOR::VECTOR(const vector<Real>& v)$/;"	f	class:VECTOR
+VECTOR	VECTOR.cpp	/^VECTOR::VECTOR(int size) :$/;"	f	class:VECTOR
+VECTOR	VECTOR.h	/^class VECTOR {$/;"	c
+VECTOR_H	VECTOR.h	/^#define VECTOR_H$/;"	d
+_MAT3_H_	MATRIX3.h	/^#define _MAT3_H_$/;"	d
+_VEC2_H_	VEC2.h	/^#define _VEC2_H_$/;"	d
+_VEC3_H_	VEC3.h	/^#define _VEC3_H_$/;"	d
+_blockSize	BIG_MATRIX.cpp	/^int BIG_MATRIX::_blockSize = 115;$/;"	m	class:BIG_MATRIX	file:
+_blockSize	BIG_MATRIX.h	/^  static int _blockSize;$/;"	m	class:BIG_MATRIX
+_cols	BIG_MATRIX.h	/^  int _cols;$/;"	m	class:BIG_MATRIX
+_cols	MATRIX.h	/^    int _cols;$/;"	m	class:MATRIX
+_cols	SPARSE_MATRIX.h	/^  int _cols;$/;"	m	class:SPARSE_MATRIX
+_cols	SPARSE_MATRIX_ARRAY.h	/^  int _cols;$/;"	m	class:SPARSE_MATRIX_ARRAY
+_columns	BIG_MATRIX.h	/^  vector<VECTOR> _columns;$/;"	m	class:BIG_MATRIX
+_dud	SPARSE_MATRIX.h	/^  Real _dud;$/;"	m	class:SPARSE_MATRIX
+_matrix	MATRIX.h	/^    Real* _matrix;$/;"	m	class:MATRIX
+_matrix	SPARSE_MATRIX.h	/^  map<pair<int,int>, Real> _matrix;$/;"	m	class:SPARSE_MATRIX
+_matrix	SPARSE_MATRIX_ARRAY.h	/^  vector<pair<int, Real> >* _matrix;$/;"	m	class:SPARSE_MATRIX_ARRAY
+_maxCols	NNLS.h	/^	int _maxCols;$/;"	m	class:NNLS_SOLVER
+_maxIter	NNLS.h	/^  int _maxIter;$/;"	m	class:NNLS_SOLVER
+_pivots	MATRIX.h	/^    int* _pivots;$/;"	m	class:MATRIX
+_precision	MATRIX.cpp	/^int MATRIX::_precision = 4;$/;"	m	class:MATRIX	file:
+_precision	MATRIX.h	/^    static int _precision;$/;"	m	class:MATRIX
+_rows	BIG_MATRIX.h	/^  int _rows;$/;"	m	class:BIG_MATRIX
+_rows	MATRIX.h	/^    int _rows;$/;"	m	class:MATRIX
+_rows	NNLS.h	/^	int _rows;$/;"	m	class:NNLS_SOLVER
+_rows	SPARSE_MATRIX.h	/^  int _rows;$/;"	m	class:SPARSE_MATRIX
+_rows	SPARSE_MATRIX_ARRAY.h	/^  int _rows;$/;"	m	class:SPARSE_MATRIX_ARRAY
+_scratchPath	BIG_MATRIX.cpp	/^string BIG_MATRIX::_scratchPath = string(".\/scratch\/");$/;"	m	class:BIG_MATRIX	file:
+_scratchPath	BIG_MATRIX.h	/^  static string _scratchPath;$/;"	m	class:BIG_MATRIX
+_size	VECTOR.h	/^  int _size;$/;"	m	class:VECTOR
+_sseSize	VECTOR.h	/^  int _sseSize;$/;"	m	class:VECTOR
+_vector	VECTOR.h	/^  Real* _vector;$/;"	m	class:VECTOR
+_width	MATRIX.cpp	/^int MATRIX::_width = 14;$/;"	m	class:MATRIX	file:
+_width	MATRIX.h	/^    static int _width;$/;"	m	class:MATRIX
+_workA	NNLS.h	/^	double* _workA;$/;"	m	class:NNLS_SOLVER
+_workIndex	NNLS.h	/^	int* _workIndex;$/;"	m	class:NNLS_SOLVER
+_workW	NNLS.h	/^	double* _workW;$/;"	m	class:NNLS_SOLVER
+_workZ	NNLS.h	/^	double* _workZ;$/;"	m	class:NNLS_SOLVER
+abs	VECTOR.cpp	/^VECTOR VECTOR::abs() const$/;"	f	class:VECTOR
+absSum	MATRIX3.h	/^  Real absSum() {$/;"	f	class:MATRIX3
+absoluteValue	MATRIX.cpp	/^void MATRIX::absoluteValue()$/;"	f	class:MATRIX
+access	MATRIX.h	/^    static inline Real &access( Real *A, int rows, int cols, int i, int j )$/;"	f	class:MATRIX
+access	MATRIX.h	/^    static inline Real access( const Real *A, int rows, int cols, int i, int j )$/;"	f	class:MATRIX
+addColumn	MATRIX.cpp	/^void MATRIX::addColumn(const VECTOR& column, int index)$/;"	f	class:MATRIX
+addSubmatrix	MATRIX.cpp	/^void MATRIX::addSubmatrix(MATRIX& matrix, int row)$/;"	f	class:MATRIX
+adjoint	MATRIX3.h	/^  MATRIX3 adjoint() {$/;"	f	class:MATRIX3
+anyNans	MATRIX.cpp	/^bool MATRIX::anyNans()$/;"	f	class:MATRIX
+axpy	MATRIX.cpp	/^void MATRIX::axpy( Real *A, const Real *B, int rows, int cols,$/;"	f	class:MATRIX
+axpy	MATRIX.cpp	/^void MATRIX::axpy(const Real alpha, const MATRIX& A)$/;"	f	class:MATRIX
+axpy	VEC3.h	/^  void axpy(const T scalar, const TVEC3& v) {$/;"	f	class:TVEC3
+axpy	VECTOR.cpp	/^void VECTOR::axpy(Real alpha, const VECTOR& x)$/;"	f	class:VECTOR
+blockSize	BIG_MATRIX.h	/^  static int& blockSize() { return _blockSize; };$/;"	f	class:BIG_MATRIX
+buildFromColumns	EIGEN.cpp	/^MatrixXd EIGEN::buildFromColumns(const vector<VectorXd>& columns)$/;"	f	class:EIGEN
+c__0	NNLS.cpp	/^int c__0 = 0;$/;"	v
+c__1	NNLS.cpp	/^int c__1 = 1;$/;"	v
+c__2	NNLS.cpp	/^int c__2 = 2;$/;"	v
+cayley	MATRIX3.cpp	/^MATRIX3 MATRIX3::cayley(VEC3F omega)$/;"	f	class:MATRIX3
+clear	MATRIX.cpp	/^void MATRIX::clear()$/;"	f	class:MATRIX
+clear	MATRIX.h	/^    static inline void clear( Real *A, int rows, int cols )$/;"	f	class:MATRIX
+clear	MATRIX3.h	/^  void clear() {$/;"	f	class:MATRIX3
+clear	SPARSE_MATRIX.cpp	/^void SPARSE_MATRIX::clear()$/;"	f	class:SPARSE_MATRIX
+clear	SPARSE_MATRIX_ARRAY.cpp	/^void SPARSE_MATRIX_ARRAY::clear()$/;"	f	class:SPARSE_MATRIX_ARRAY
+clear	VEC3.h	/^  void clear() {$/;"	f	class:TVEC3
+clear	VECTOR.cpp	/^void VECTOR::clear()$/;"	f	class:VECTOR
+clearAndStompSparsity	SPARSE_MATRIX.h	/^  void clearAndStompSparsity() { _matrix.clear(); };$/;"	f	class:SPARSE_MATRIX
+clearingAxpy	MATRIX.cpp	/^void MATRIX::clearingAxpy(Real alpha, MATRIX& A)$/;"	f	class:MATRIX
+clearingAxpy	VEC3.h	/^  void clearingAxpy(const T scalar, const TVEC3& v) {$/;"	f	class:TVEC3
+clearingGemm	MATRIX.cpp	/^void MATRIX::clearingGemm(Real alpha, MATRIX& A, MATRIX& B)$/;"	f	class:MATRIX
+clearingGemm	MATRIX.h	/^    void clearingGemm(MATRIX& A, MATRIX& B) { clearingGemm(1.0f, A, B); };$/;"	f	class:MATRIX
+col	MATRIX3.h	/^  inline VEC3F col(int i) const {return VEC3F(row[0][i],row[1][i],row[2][i]);}$/;"	f	class:MATRIX3
+cols	BIG_MATRIX.h	/^  int cols() const { return _cols; };$/;"	f	class:BIG_MATRIX
+cols	BIG_MATRIX.h	/^  int& cols() { return _cols; };$/;"	f	class:BIG_MATRIX
+cols	MATRIX.h	/^    int cols() const { return _cols; };$/;"	f	class:MATRIX
+cols	MATRIX.h	/^    int& cols() { return _cols; };$/;"	f	class:MATRIX
+cols	SPARSE_MATRIX.h	/^  const int& cols() const { return _cols; };$/;"	f	class:SPARSE_MATRIX
+cols	SPARSE_MATRIX_ARRAY.h	/^  const int cols() const { return _cols; };$/;"	f	class:SPARSE_MATRIX_ARRAY
+componentProduct	VEC3.h	/^  TVEC3 componentProduct(const TVEC3& v) const {$/;"	f	class:TVEC3
+computeBlockSize	BIG_MATRIX.cpp	/^int BIG_MATRIX::computeBlockSize(int rows, int cols)$/;"	f	class:BIG_MATRIX
+conditionNumber	MATRIX.cpp	/^Real MATRIX::conditionNumber()$/;"	f	class:MATRIX
+contraction	MATRIX3.h	/^  Real contraction(MATRIX3& rhs) {$/;"	f	class:MATRIX3
+convert	EIGEN.cpp	/^VECTOR EIGEN::convert(const VectorXd& input)$/;"	f	class:EIGEN
+convert	EIGEN.cpp	/^VectorXd EIGEN::convert(const VECTOR& input)$/;"	f	class:EIGEN
+convertInt	EIGEN.cpp	/^VECTOR EIGEN::convertInt(const VectorXi& input)$/;"	f	class:EIGEN
+copiesInto	MATRIX.cpp	/^void MATRIX::copiesInto(MATRIX3& matrix3)$/;"	f	class:MATRIX
+copy	MATRIX.cpp	/^void MATRIX::copy( Real *A, const MATRIX3 &B )$/;"	f	class:MATRIX
+copy	MATRIX.cpp	/^void MATRIX::copy( Real *A, const Real *B, int rows, int cols )$/;"	f	class:MATRIX
+copyInplace	MATRIX.cpp	/^void MATRIX::copyInplace( const Real *data, int rows, int cols )$/;"	f	class:MATRIX
+copyInplace	MATRIX.h	/^    void copyInplace( const MATRIX &M )$/;"	f	class:MATRIX
+copyUpperToLower	MATRIX.cpp	/^void MATRIX::copyUpperToLower()$/;"	f	class:MATRIX
+coutPrecision	MATRIX.h	/^    static int& coutPrecision() { return _precision; };$/;"	f	class:MATRIX
+coutWidth	MATRIX.h	/^    static int& coutWidth() { return _width; };$/;"	f	class:MATRIX
+cross	MATRIX.cpp	/^MATRIX MATRIX::cross(const VEC3F& vec)$/;"	f	class:MATRIX
+cross	MATRIX.cpp	/^MATRIX MATRIX::cross(const VECTOR& vec)$/;"	f	class:MATRIX
+cross	MATRIX3.cpp	/^MATRIX3 MATRIX3::cross(const VEC3F& vec)$/;"	f	class:MATRIX3
+cross	VEC2.h	/^template<class T> inline T cross (const TVEC2<T>& u, const TVEC2<T>& v)   $/;"	f
+cross	VEC3.h	/^template<class T> inline TVEC3<T> cross(const TVEC3<T>& u, const TVEC3<T>& v)$/;"	f
+d_sign	NNLS.cpp	/^double d_sign(double& a, double& b)$/;"	f
+data	MATRIX.h	/^    Real* data() { return _matrix; };$/;"	f	class:MATRIX
+data	VECTOR.h	/^  Real* data() { return _vector; };$/;"	f	class:VECTOR
+dataConst	MATRIX.h	/^    const Real* dataConst() const { return _matrix; };$/;"	f	class:MATRIX
+dataConst	VECTOR.h	/^  const Real* dataConst() const { return _vector; };$/;"	f	class:VECTOR
+det	MATRIX3.h	/^inline Real det(const MATRIX3& m) { return m[0] * (m[1] ^ m[2]); }$/;"	f
+dexp	MATRIX3.cpp	/^MATRIX3 MATRIX3::dexp(VEC3F omega)$/;"	f	class:MATRIX3
+diag	MATRIX3.cpp	/^MATRIX3 &MATRIX3::diag(Real d)$/;"	f	class:MATRIX3
+diag	MATRIX3.cpp	/^MATRIX3 diag(const VEC3F& v)$/;"	f
+diagonal	MATRIX.h	/^    static inline void diagonal( Real *A, Real *D, int rows )$/;"	f	class:MATRIX
+dim	VEC2.h	/^    static int dim() { return 2; }$/;"	f	class:TVEC2
+dim	VEC3.h	/^  static int dim() { return 3; }$/;"	f	class:TVEC3
+dims	MATRIX.h	/^    VECTOR dims() const { VECTOR final(2); final[0] = _rows; final[1] = _cols; return final; };$/;"	f	class:MATRIX
+dims	SPARSE_MATRIX.h	/^  VECTOR dims() const { VECTOR final(2); final[0] = _rows; final[1] = _cols; return final; };$/;"	f	class:SPARSE_MATRIX
+dims	SPARSE_MATRIX_ARRAY.h	/^  VECTOR dims() const { VECTOR final(2); final[0] = _rows; final[1] = _cols; return final; };$/;"	f	class:SPARSE_MATRIX_ARRAY
+divideAndConquerSVD	MATRIX.cpp	/^void MATRIX::divideAndConquerSVD(MATRIX& U, VECTOR& S, MATRIX& VT)$/;"	f	class:MATRIX
+doublereal	NNLS.h	/^typedef double doublereal;$/;"	t
+eigenMinMax	MATRIX.cpp	/^void MATRIX::eigenMinMax(Real& minEig, Real& maxEig)$/;"	f	class:MATRIX
+eigensystem	MATRIX.cpp	/^void MATRIX::eigensystem( Real *A, int rows,$/;"	f	class:MATRIX
+eigensystem	MATRIX.cpp	/^void MATRIX::eigensystem(VECTOR& eigenvalues, MATRIX& eigenvectors)$/;"	f	class:MATRIX
+eigensystem2x2	MATRIX.cpp	/^void MATRIX::eigensystem2x2( Real *matrix, Real *eigenvalues, Real *eigenvectors )$/;"	f	class:MATRIX
+eigensystem2x2	MATRIX.cpp	/^void MATRIX::eigensystem2x2(VECTOR& eigenvalues, MATRIX& eigenvectors)$/;"	f	class:MATRIX
+eigensystemSorted	MATRIX.cpp	/^void MATRIX::eigensystemSorted(VECTOR& eigenvalues, MATRIX& eigenvectors)$/;"	f	class:MATRIX
+eigensystemSymmetricRange	MATRIX.h	/^    inline int eigensystemSymmetricRange($/;"	f	class:MATRIX
+eigenvector	MATRIX.cpp	/^  VECTOR eigenvector;$/;"	m	struct:EIGENPAIR	file:
+element	VEC3.h	/^  T element[3];$/;"	m	class:TVEC3
+elt	VEC2.h	/^    T elt[2];$/;"	m	class:TVEC2
+equals	VEC3.h	/^  void equals(const TVEC3& v) {$/;"	f	class:TVEC3
+exp	MATRIX3.cpp	/^MATRIX3 MATRIX3::exp(VEC3F omega)$/;"	f	class:MATRIX3
+fabs	VEC3.h	/^template<class T> inline TVEC3<T> fabs(const TVEC3<T>& v)   $/;"	f
+factorCholesky	MATRIX.cpp	/^bool MATRIX::factorCholesky()$/;"	f	class:MATRIX
+factorLU	MATRIX.cpp	/^bool MATRIX::factorLU()$/;"	f	class:MATRIX
+fastMeanNormalizedPCA	MATRIX.cpp	/^void MATRIX::fastMeanNormalizedPCA(MATRIX& components, VECTOR& values)$/;"	f	class:MATRIX
+flattenedColumn	MATRIX.cpp	/^VECTOR MATRIX::flattenedColumn() const$/;"	f	class:MATRIX
+formatFortran	MATRIX.cpp	/^void MATRIX::formatFortran()$/;"	f	class:MATRIX
+g1	NNLS.cpp	/^int g1(double* a, double* b, double* cterm, double* sterm, double* sig)$/;"	f
+gemm	MATRIX.cpp	/^void MATRIX::gemm( const Real *A, const Real *B, Real *C,$/;"	f	class:MATRIX
+gemm	MATRIX.cpp	/^void MATRIX::gemm(Real alpha, const MATRIX& A, const MATRIX& B, Real beta,$/;"	f	class:MATRIX
+gemm	MATRIX.h	/^    void gemm(const MATRIX& A, const MATRIX& B) { gemm(1.0f, A, B); };$/;"	f	class:MATRIX
+gemv	MATRIX.cpp	/^VECTOR MATRIX::gemv(Real alpha, VEC3F& x)$/;"	f	class:MATRIX
+gemv	MATRIX.cpp	/^VECTOR MATRIX::gemv(VEC3F& x)$/;"	f	class:MATRIX
+gemvInplace	MATRIX.cpp	/^void MATRIX::gemvInplace(Real alpha, VEC3F &x, VECTOR &y,$/;"	f	class:MATRIX
+gemvInplace	MATRIX.cpp	/^void MATRIX::gemvInplace(Real alpha, const VECTOR &x, VECTOR &y,$/;"	f	class:MATRIX
+getColumn	MATRIX.cpp	/^VECTOR MATRIX::getColumn(int index) const$/;"	f	class:MATRIX
+getRow	MATRIX3.h	/^  inline VEC3F getRow(int i) const { return row[i]; };$/;"	f	class:MATRIX3
+getRows	EIGEN.cpp	/^MatrixXd EIGEN::getRows(const int rowBegin, const int totalRows, const MatrixXd& input)$/;"	f	class:EIGEN
+getSubmatrix	MATRIX.cpp	/^MATRIX MATRIX::getSubmatrix(int rowBegin, int totalRows, int colBegin, int totalCols)$/;"	f	class:MATRIX
+get_orthonormal_vector	VEC3.h	/^template<class T> inline TVEC3<T> get_orthonormal_vector (TVEC3<T> v)$/;"	f
+h12	NNLS.cpp	/^int h12(int mode, int* lpivot, int* l1, $/;"	f
+ident	MATRIX3.h	/^  MATRIX3& ident() { return diag(1.0); }$/;"	f	class:MATRIX3
+infty_norm	VEC2.h	/^template<class T> inline T infty_norm (const TVEC2<T>& v)   $/;"	f
+infty_norm	VEC3.h	/^template<class T> inline T infty_norm(const TVEC3<T>& v)   $/;"	f
+integer	NNLS.h	/^typedef int integer;$/;"	t
+inverse	MATRIX3.h	/^  MATRIX3 inverse() {$/;"	f	class:MATRIX3
+invert	MATRIX.cpp	/^bool MATRIX::invert()$/;"	f	class:MATRIX
+invertSymmetric	MATRIX.cpp	/^bool MATRIX::invertSymmetric()$/;"	f	class:MATRIX
+matrix	SPARSE_MATRIX.h	/^  const map<pair<int,int>, Real>& matrix() const { return _matrix; };$/;"	f	class:SPARSE_MATRIX
+maxAbsEntry	MATRIX.cpp	/^Real MATRIX::maxAbsEntry()$/;"	f	class:MATRIX
+maxElement	VEC3.h	/^  T maxElement() const {$/;"	f	class:TVEC3
+maxIter	NNLS.h	/^  int& maxIter() { return _maxIter; };$/;"	f	class:NNLS_SOLVER
+maxVal	VEC3.h	/^  T maxVal() { $/;"	f	class:TVEC3
+meanNormalizedPCA	MATRIX.cpp	/^void MATRIX::meanNormalizedPCA(MATRIX& components, VECTOR& values)$/;"	f	class:MATRIX
+multiplyInplace	MATRIX.cpp	/^void MATRIX::multiplyInplace(VECTOR& x, VECTOR& y) $/;"	f	class:MATRIX
+nnls	NNLS.cpp	/^int nnls(double* a,  int mda,  int m,  int n, double* b, $/;"	f
+nnls_abs	NNLS.h	/^#define nnls_abs(/;"	d
+nnls_max	NNLS.h	/^#define nnls_max(/;"	d
+norm	VEC2.h	/^template<class T> inline T norm(const TVEC2<T>& v)   { return sqrt(norm2(v)); }$/;"	f
+norm	VEC3.h	/^template<class T> inline T norm(const TVEC3<T>& v)   { return sqrt(norm2(v)); }$/;"	f
+norm1	MATRIX.cpp	/^Real MATRIX::norm1()$/;"	f	class:MATRIX
+norm2	VEC2.h	/^template<class T> inline T norm2(const TVEC2<T>& v)  { return v*v; }$/;"	f
+norm2	VEC3.h	/^template<class T> inline T norm2(const TVEC3<T>& v)  { return v*v; }$/;"	f
+norm2	VECTOR.cpp	/^Real VECTOR::norm2() const$/;"	f	class:VECTOR
+normInf	MATRIX.cpp	/^Real MATRIX::normInf()$/;"	f	class:MATRIX
+normalize	VEC3.h	/^  void normalize() {$/;"	f	class:TVEC3
+normalizeColumns	MATRIX.cpp	/^void MATRIX::normalizeColumns()$/;"	f	class:MATRIX
+operator ()	BIG_MATRIX.h	/^  inline Real operator()(int row, int col) const {$/;"	f	class:BIG_MATRIX
+operator ()	BIG_MATRIX.h	/^  inline Real& operator()(int row, int col) {$/;"	f	class:BIG_MATRIX
+operator ()	MATRIX.h	/^    inline Real operator()(int row, int col) const {$/;"	f	class:MATRIX
+operator ()	MATRIX.h	/^    inline Real& operator()(int row, int col) {$/;"	f	class:MATRIX
+operator ()	MATRIX3.h	/^  Real  operator()(int i, int j) const { return row[i][j]; }$/;"	f	class:MATRIX3
+operator ()	MATRIX3.h	/^  Real& operator()(int i, int j)       { return row[i][j]; }$/;"	f	class:MATRIX3
+operator ()	SPARSE_MATRIX.cpp	/^Real& SPARSE_MATRIX::operator()(int row, int col)$/;"	f	class:SPARSE_MATRIX
+operator ()	SPARSE_MATRIX_ARRAY.cpp	/^Real& SPARSE_MATRIX_ARRAY::operator()(int row, int col)$/;"	f	class:SPARSE_MATRIX_ARRAY
+operator ()	VECTOR.h	/^  inline Real& operator()(int index) { $/;"	f	class:VECTOR
+operator *	MATRIX.cpp	/^MATRIX operator*(const MATRIX& A, const MATRIX& B)$/;"	f
+operator *	MATRIX.cpp	/^MATRIX operator*(const MATRIX& A, const Real alpha) $/;"	f
+operator *	MATRIX.cpp	/^MATRIX operator*(const Real alpha, const MATRIX& A) $/;"	f
+operator *	MATRIX.cpp	/^VECTOR operator*(VECTOR& x, MATRIX& A)$/;"	f
+operator *	MATRIX.cpp	/^VECTOR operator*(const MATRIX& A, const VECTOR& x) $/;"	f
+operator *	MATRIX3.cpp	/^MATRIX3 operator*(const MATRIX3& n, const MATRIX3& m)$/;"	f
+operator *	MATRIX3.h	/^inline MATRIX3 operator*(Real s, const MATRIX3& m)$/;"	f
+operator *	MATRIX3.h	/^inline MATRIX3 operator*(const MATRIX3& m, Real s)$/;"	f
+operator *	MATRIX3.h	/^inline VEC3F operator*(const MATRIX3& m, const VEC3F& v)$/;"	f
+operator *	SPARSE_MATRIX.cpp	/^MATRIX operator*(const MATRIX& A, const SPARSE_MATRIX& B)$/;"	f
+operator *	SPARSE_MATRIX.cpp	/^MATRIX operator*(const SPARSE_MATRIX& A, const MATRIX& B)$/;"	f
+operator *	SPARSE_MATRIX.cpp	/^MatrixXd operator*(const MatrixXd& A, const SPARSE_MATRIX& B)$/;"	f
+operator *	SPARSE_MATRIX.cpp	/^MatrixXd operator*(const SPARSE_MATRIX& A, const MatrixXd& B)$/;"	f
+operator *	SPARSE_MATRIX.cpp	/^SPARSE_MATRIX operator*(SPARSE_MATRIX& A, Real& alpha) $/;"	f
+operator *	SPARSE_MATRIX.cpp	/^SPARSE_MATRIX operator*(const Real& alpha, const SPARSE_MATRIX& A) $/;"	f
+operator *	SPARSE_MATRIX.cpp	/^VECTOR operator*(const SPARSE_MATRIX& A, const VECTOR& x) $/;"	f
+operator *	SPARSE_MATRIX.cpp	/^VectorXd operator*(const SPARSE_MATRIX& A, const VectorXd& x) $/;"	f
+operator *	VEC2.h	/^  template<class T, class N> inline TVEC2<T> operator*(N s, const TVEC2<T> &v)$/;"	f
+operator *	VEC2.h	/^  template<class T, class N> inline TVEC2<T> operator*(const TVEC2<T> &v, N s)$/;"	f
+operator *	VEC2.h	/^  template<class T> inline TVEC2<T> operator*(T s, const TVEC2<T> &v)$/;"	f
+operator *	VEC2.h	/^  template<class T> inline TVEC2<T> operator*(const TVEC2<T> &v, T s)$/;"	f
+operator *	VEC2.h	/^template<class T> inline T operator*(const TVEC2<T> &u, const TVEC2<T>& v)$/;"	f
+operator *	VEC3.h	/^template<class T> inline T operator*(const TVEC3<T> &u, const TVEC3<T>& v)$/;"	f
+operator *	VEC3.h	/^template<class T> inline TVEC3<T> operator*(T s, const TVEC3<T> &v)$/;"	f
+operator *	VEC3.h	/^template<class T> inline TVEC3<T> operator*(const TVEC3<T> &v, T s)$/;"	f
+operator *	VECTOR.cpp	/^Real VECTOR::operator*(const VECTOR& vector) const$/;"	f	class:VECTOR
+operator *	VECTOR.cpp	/^VECTOR operator*(const Real& scalar, const VECTOR& x) $/;"	f
+operator *	VECTOR.cpp	/^VECTOR operator*(const VECTOR& x, const Real& scalar) $/;"	f
+operator *=	MATRIX.cpp	/^MATRIX& MATRIX::operator*=(const MATRIX& m)$/;"	f	class:MATRIX
+operator *=	MATRIX.cpp	/^MATRIX& MATRIX::operator*=(const Real& alpha)$/;"	f	class:MATRIX
+operator *=	MATRIX3.h	/^inline MATRIX3& MATRIX3::operator*=(Real s)$/;"	f	class:MATRIX3
+operator *=	SPARSE_MATRIX.cpp	/^SPARSE_MATRIX& SPARSE_MATRIX::operator*=(const Real& alpha) $/;"	f	class:SPARSE_MATRIX
+operator *=	VEC2.h	/^template<class T> inline TVEC2<T>& TVEC2<T>::operator*=(T s)$/;"	f	class:TVEC2
+operator *=	VEC3.h	/^template<class T> inline TVEC3<T>& TVEC3<T>::operator*=(T s)$/;"	f	class:TVEC3
+operator *=	VECTOR.cpp	/^VECTOR& VECTOR::operator*=(const Real& alpha)$/;"	f	class:VECTOR
+operator +	MATRIX.cpp	/^MATRIX operator+(const MATRIX& A, const MATRIX& B)$/;"	f
+operator +	MATRIX3.h	/^inline MATRIX3 operator+(const MATRIX3& n, const MATRIX3& m)$/;"	f
+operator +	VEC2.h	/^inline TVEC2<T> operator+(const TVEC2<T> &u, const TVEC2<T> &v)$/;"	f
+operator +	VEC3.h	/^inline TVEC3<T> operator+(const TVEC3<T> &u, const TVEC3<T>& v)$/;"	f
+operator +	VECTOR.cpp	/^VECTOR operator+(const VECTOR& x, const VECTOR& y) $/;"	f
+operator +=	MATRIX.cpp	/^MATRIX& MATRIX::operator+=(const MATRIX& m)$/;"	f	class:MATRIX
+operator +=	MATRIX3.h	/^inline MATRIX3& MATRIX3::operator+=(const MATRIX3& m)$/;"	f	class:MATRIX3
+operator +=	SPARSE_MATRIX.cpp	/^SPARSE_MATRIX& SPARSE_MATRIX::operator+=(const SPARSE_MATRIX& A) $/;"	f	class:SPARSE_MATRIX
+operator +=	VEC2.h	/^template<class T> inline TVEC2<T>& TVEC2<T>::operator+=(const TVEC2<T>& v)$/;"	f	class:TVEC2
+operator +=	VEC3.h	/^template<class T> inline TVEC3<T>& TVEC3<T>::operator+=(const TVEC3<T>& v)$/;"	f	class:TVEC3
+operator +=	VECTOR.cpp	/^VECTOR& VECTOR::operator+=(const VECTOR& m)$/;"	f	class:VECTOR
+operator -	MATRIX.cpp	/^MATRIX operator-(const MATRIX& A, const MATRIX& B)$/;"	f
+operator -	MATRIX3.h	/^inline MATRIX3 operator-(const MATRIX3& m)$/;"	f
+operator -	MATRIX3.h	/^inline MATRIX3 operator-(const MATRIX3& n, const MATRIX3& m)$/;"	f
+operator -	SPARSE_MATRIX.cpp	/^SPARSE_MATRIX operator-(const SPARSE_MATRIX& A, const SPARSE_MATRIX& B)$/;"	f
+operator -	VEC2.h	/^inline TVEC2<T> operator-(const TVEC2<T> &u, const TVEC2<T> &v)$/;"	f
+operator -	VEC2.h	/^template<class T> inline TVEC2<T> operator-(const TVEC2<T> &v)$/;"	f
+operator -	VEC3.h	/^inline TVEC3<T> operator-(const TVEC3<T> &u, const TVEC3<T>& v)$/;"	f
+operator -	VEC3.h	/^template<class T> inline TVEC3<T> operator-(const TVEC3<T> &v)$/;"	f
+operator -	VECTOR.cpp	/^VECTOR operator-(const VECTOR& x, const VECTOR& y) $/;"	f
+operator -=	MATRIX.cpp	/^MATRIX& MATRIX::operator-=(const MATRIX& m)$/;"	f	class:MATRIX
+operator -=	MATRIX3.h	/^inline MATRIX3& MATRIX3::operator-=(const MATRIX3& m)$/;"	f	class:MATRIX3
+operator -=	SPARSE_MATRIX.cpp	/^SPARSE_MATRIX& SPARSE_MATRIX::operator-=(const SPARSE_MATRIX& A) $/;"	f	class:SPARSE_MATRIX
+operator -=	VEC2.h	/^template<class T> inline TVEC2<T>& TVEC2<T>::operator-=(const TVEC2<T>& v)$/;"	f	class:TVEC2
+operator -=	VEC3.h	/^template<class T> inline TVEC3<T>& TVEC3<T>::operator-=(const TVEC3<T>& v)$/;"	f	class:TVEC3
+operator -=	VECTOR.cpp	/^VECTOR& VECTOR::operator-=(const VECTOR& m)$/;"	f	class:VECTOR
+operator /	MATRIX3.h	/^inline MATRIX3 operator\/(const MATRIX3& m, Real s)$/;"	f
+operator /	VEC2.h	/^  template<class T, class N> inline TVEC2<T> operator\/(const TVEC2<T> &v, N s)$/;"	f
+operator /	VEC2.h	/^  template<class T> inline TVEC2<T> operator\/(const TVEC2<T> &v, T s)$/;"	f
+operator /	VEC3.h	/^template<class T> inline TVEC3<T> operator\/(const TVEC3<T> &v, T s)$/;"	f
+operator /=	MATRIX.cpp	/^MATRIX& MATRIX::operator\/=(const MATRIX& m)$/;"	f	class:MATRIX
+operator /=	MATRIX3.h	/^inline MATRIX3& MATRIX3::operator\/=(Real s)$/;"	f	class:MATRIX3
+operator /=	VEC2.h	/^template<class T> inline TVEC2<T>& TVEC2<T>::operator\/=(T s)$/;"	f	class:TVEC2
+operator /=	VEC3.h	/^template<class T> inline TVEC3<T>& TVEC3<T>::operator\/=(T s)$/;"	f	class:TVEC3
+operator <	MATRIX.cpp	/^bool operator<(const EIGENPAIR& a, const EIGENPAIR& b) {$/;"	f
+operator <<	BIG_MATRIX.cpp	/^ostream& operator<<(ostream &out, const BIG_MATRIX& matrix)$/;"	f
+operator <<	MATRIX.cpp	/^ostream& operator<<(ostream &out, const MATRIX& matrix)$/;"	f
+operator <<	MATRIX3.h	/^inline std::ostream &operator<<(std::ostream &out, const MATRIX3& M)$/;"	f
+operator <<	SPARSE_MATRIX.cpp	/^ostream& operator<<(ostream &out, SPARSE_MATRIX& matrix)$/;"	f
+operator <<	VEC2.h	/^inline std::ostream &operator<<(std::ostream &out, const TVEC2<T> &v)$/;"	f
+operator <<	VEC3.h	/^inline std::ostream &operator<<(std::ostream &out, const TVEC3<T>& v)$/;"	f
+operator <<	VECTOR.h	/^inline ostream &operator<<(ostream &out, VECTOR vector)$/;"	f
+operator =	BIG_MATRIX.cpp	/^BIG_MATRIX& BIG_MATRIX::operator=(const BIG_MATRIX m)$/;"	f	class:BIG_MATRIX
+operator =	MATRIX.cpp	/^MATRIX& MATRIX::operator=(const MATRIX m)$/;"	f	class:MATRIX
+operator =	MATRIX.cpp	/^MATRIX& MATRIX::operator=(const MATRIX3 m)$/;"	f	class:MATRIX
+operator =	MATRIX3.h	/^inline MATRIX3& MATRIX3::operator=(Real s)$/;"	f	class:MATRIX3
+operator =	MATRIX3.h	/^inline MATRIX3& MATRIX3::operator=(const MATRIX3& m)$/;"	f	class:MATRIX3
+operator =	VEC2.h	/^    TVEC2& operator=(T s) { elt[0]=elt[1]=s; return *this; }$/;"	f	class:TVEC2
+operator =	VEC2.h	/^    template<class U> TVEC2& operator=(const TVEC2<U>& v)$/;"	f	class:TVEC2
+operator =	VEC3.h	/^  TVEC3& operator=(T s) { element[0]=element[1]=element[2]=s; return *this; }$/;"	f	class:TVEC3
+operator =	VEC3.h	/^  template<class U> TVEC3& operator=(const TVEC3<U>& v)$/;"	f	class:TVEC3
+operator =	VECTOR.cpp	/^VECTOR& VECTOR::operator=(const VECTOR& m)$/;"	f	class:VECTOR
+operator =	VECTOR.cpp	/^VECTOR& VECTOR::operator=(const double& m)$/;"	f	class:VECTOR
+operator =	VECTOR.cpp	/^VECTOR& VECTOR::operator=(const float& m)$/;"	f	class:VECTOR
+operator =	VECTOR.cpp	/^VECTOR& VECTOR::operator=(const int& m)$/;"	f	class:VECTOR
+operator =	VECTOR.cpp	/^VECTOR& VECTOR::operator=(vector<Real> m)$/;"	f	class:VECTOR
+operator >>	MATRIX3.h	/^inline std::istream &operator>>(std::istream &in, MATRIX3& M)$/;"	f
+operator >>	VEC2.h	/^inline std::istream &operator>>(std::istream &in, TVEC2<T>& v)$/;"	f
+operator >>	VEC3.h	/^inline std::istream &operator>>(std::istream &in, TVEC3<T>& v)$/;"	f
+operator Real*	MATRIX3.h	/^  operator       Real*()       { return row[0]; }$/;"	f	class:MATRIX3
+operator T*	VEC2.h	/^    operator       T*()       { return elt; }$/;"	f	class:TVEC2
+operator T*	VEC3.h	/^  operator       T*()       { return element; }$/;"	f	class:TVEC3
+operator []	BIG_MATRIX.h	/^  inline VECTOR& operator[](int col) { return _columns[col]; };$/;"	f	class:BIG_MATRIX
+operator []	BIG_MATRIX.h	/^  inline const VECTOR& operator[](int col) const { return _columns[col]; };$/;"	f	class:BIG_MATRIX
+operator []	MATRIX3.h	/^  VEC3F&       operator[](int i)       { return row[i]; }$/;"	f	class:MATRIX3
+operator []	MATRIX3.h	/^  const VEC3F& operator[](int i) const { return row[i]; }$/;"	f	class:MATRIX3
+operator []	VEC2.h	/^    T  operator[](int i) const { return elt[i]; }$/;"	f	class:TVEC2
+operator []	VEC2.h	/^    T& operator[](int i)       { return elt[i]; }$/;"	f	class:TVEC2
+operator []	VEC3.h	/^  T  operator[](int i) const { return element[i]; }$/;"	f	class:TVEC3
+operator []	VEC3.h	/^  T& operator[](int i)       { return element[i]; }$/;"	f	class:TVEC3
+operator []	VECTOR.h	/^  inline Real operator[] (int index) const { $/;"	f	class:VECTOR
+operator []	VECTOR.h	/^  inline Real& operator[](int index) { $/;"	f	class:VECTOR
+operator ^	MATRIX.cpp	/^MATRIX operator^(const MATRIX& A, const MATRIX& B) $/;"	f
+operator ^	MATRIX.cpp	/^VECTOR operator^(const MATRIX& A, const VECTOR& x) $/;"	f
+operator ^	SPARSE_MATRIX.cpp	/^MATRIX operator^(const MATRIX& A, const SPARSE_MATRIX& B)$/;"	f
+operator ^	SPARSE_MATRIX.cpp	/^MatrixXd operator^(const MatrixXd& A, const SPARSE_MATRIX& B)$/;"	f
+operator ^	SPARSE_MATRIX.cpp	/^VECTOR operator^(const SPARSE_MATRIX& A, const VECTOR& x) $/;"	f
+operator ^	VEC3.h	/^inline TVEC3<T> operator^(const TVEC3<T>& u, const TVEC3<T>& v)$/;"	f
+operator ^	VECTOR.cpp	/^Real operator^(const VECTOR& x, const VECTOR& y)$/;"	f
+operator const Real*	MATRIX3.h	/^  operator const Real*()       { return row[0]; }$/;"	f	class:MATRIX3
+operator const Real*	MATRIX3.h	/^  operator const Real*() const { return row[0]; }$/;"	f	class:MATRIX3
+operator const T*	VEC2.h	/^    operator const T*()       { return elt; }$/;"	f	class:TVEC2
+operator const T*	VEC2.h	/^    operator const T*() const { return elt; }$/;"	f	class:TVEC2
+operator const T*	VEC3.h	/^  operator const T*()        { return element; }$/;"	f	class:TVEC3
+operator const T*	VEC3.h	/^  operator const T*() const { return element; }$/;"	f	class:TVEC3
+orthogonalize	MATRIX.cpp	/^void MATRIX::orthogonalize()$/;"	f	class:MATRIX
+outOfCoreQR	BIG_MATRIX.cpp	/^MATRIX BIG_MATRIX::outOfCoreQR(const string& filenamePrefix, int& qRows, int& qCols)$/;"	f	class:BIG_MATRIX
+outOfCoreSVD	BIG_MATRIX.cpp	/^void BIG_MATRIX::outOfCoreSVD(const string& filenamePrefix, const string& reducedPath, const Real& discardThreshold)$/;"	f	class:BIG_MATRIX
+outer_product	MATRIX3.cpp	/^MATRIX3 MATRIX3::outer_product(const VEC3F& u, const VEC3F& v)$/;"	f	class:MATRIX3
+outer_product	MATRIX3.cpp	/^MATRIX3 MATRIX3::outer_product(const VEC3F& v)$/;"	f	class:MATRIX3
+perp	VEC2.h	/^template<class T> inline TVEC2<T> perp(const TVEC2<T> &v)$/;"	f
+printVertical	VECTOR.cpp	/^bool VECTOR::printVertical = true;$/;"	m	class:VECTOR	file:
+printVertical	VECTOR.h	/^  static bool printVertical;$/;"	m	class:VECTOR
+project	SPARSE_MATRIX.cpp	/^MatrixXd SPARSE_MATRIX::project(const MatrixXd& left, const MatrixXd& right) const$/;"	f	class:SPARSE_MATRIX
+projectVerySparse	SPARSE_MATRIX_ARRAY.cpp	/^MatrixXd SPARSE_MATRIX_ARRAY::projectVerySparse(const MatrixXd& left, const MatrixXd& right) const$/;"	f	class:SPARSE_MATRIX_ARRAY
+project_onto	VEC3.h	/^template<class T> inline TVEC3<T> project_onto (const TVEC3<T>& vec_to_project, const TVEC3<T> vec_to_project_onto)$/;"	f
+pseudoInverse	MATRIX.cpp	/^void MATRIX::pseudoInverse(MATRIX& inverse)$/;"	f	class:MATRIX
+qr	MATRIX.cpp	/^void MATRIX::qr()$/;"	f	class:MATRIX
+qr	MATRIX.cpp	/^void MATRIX::qr(MATRIX& Q, MATRIX& R) const$/;"	f	class:MATRIX
+read	BIG_MATRIX.cpp	/^void BIG_MATRIX::read(const string& filename)$/;"	f	class:BIG_MATRIX
+read	EIGEN.cpp	/^bool EIGEN::read(const string& filename, MatrixXd& input)$/;"	f	class:EIGEN
+read	EIGEN.cpp	/^void EIGEN::read(FILE* file, MatrixXd& input)$/;"	f	class:EIGEN
+read	MATRIX.cpp	/^bool MATRIX::read(const char* filename)$/;"	f	class:MATRIX
+read	MATRIX.cpp	/^void MATRIX::read(FILE* file)$/;"	f	class:MATRIX
+read	MATRIX3.cpp	/^void MATRIX3::read(FILE* file)$/;"	f	class:MATRIX3
+read	VEC3.h	/^template<class T> void TVEC3<T>::read(FILE* file)$/;"	f	class:TVEC3
+read	VECTOR.cpp	/^bool VECTOR::read(const char* filename)$/;"	f	class:VECTOR
+read	VECTOR.cpp	/^void VECTOR::read(FILE* file)$/;"	f	class:VECTOR
+readBig	EIGEN.cpp	/^bool EIGEN::readBig(const string& filename, MatrixXd& input)$/;"	f	class:EIGEN
+readColumns	BIG_MATRIX.cpp	/^bool BIG_MATRIX::readColumns(const int rows, const int totalColumns, FILE* file)$/;"	f	class:BIG_MATRIX
+readDimensions	BIG_MATRIX.cpp	/^void BIG_MATRIX::readDimensions(const string filename, int& rows, int& cols)$/;"	f	class:BIG_MATRIX
+readGz	MATRIX.cpp	/^bool MATRIX::readGz(const string& filename)$/;"	f	class:MATRIX
+readGz	MATRIX.cpp	/^void MATRIX::readGz(gzFile& file)$/;"	f	class:MATRIX
+readGz	SPARSE_MATRIX.cpp	/^void SPARSE_MATRIX::readGz(gzFile& file)$/;"	f	class:SPARSE_MATRIX
+readGz	VEC3.h	/^template<class T> void TVEC3<T>::readGz(gzFile& file)$/;"	f	class:TVEC3
+readRaw	EIGEN.cpp	/^void EIGEN::readRaw(FILE* file, const int size, VectorXd& input)$/;"	f	class:EIGEN
+readSingle	MATRIX.cpp	/^void MATRIX::readSingle(const char* filename)$/;"	f	class:MATRIX
+readSingleText	MATRIX.cpp	/^void MATRIX::readSingleText(const char* filename)$/;"	f	class:MATRIX
+readSubcols	MATRIX.cpp	/^bool MATRIX::readSubcols(const char* filename, int maxCols)$/;"	f	class:MATRIX
+resize	SPARSE_MATRIX.h	/^  void resize(int rows, int cols) { _rows = rows; _cols = cols; };$/;"	f	class:SPARSE_MATRIX
+resizeAndWipe	MATRIX.cpp	/^void MATRIX::resizeAndWipe(int rows, int cols)$/;"	f	class:MATRIX
+resizeAndWipe	VECTOR.cpp	/^void VECTOR::resizeAndWipe(int size)$/;"	f	class:VECTOR
+rotation	MATRIX3.h	/^  static MATRIX3 rotation(VEC3F axis, Real theta)$/;"	f	class:MATRIX3
+row	MATRIX.h	/^    Real* row(int index) { return &_matrix[index * _cols]; };$/;"	f	class:MATRIX
+row	MATRIX.h	/^    const Real *row(int index) const { return &_matrix[index * _cols]; };$/;"	f	class:MATRIX
+row	MATRIX3.h	/^  VEC3F row[3];$/;"	m	class:MATRIX3
+row	SPARSE_MATRIX_ARRAY.h	/^  const vector<pair<int, Real> >& row(int index) const { return _matrix[index]; };$/;"	f	class:SPARSE_MATRIX_ARRAY
+rowSums	MATRIX.cpp	/^VECTOR MATRIX::rowSums()$/;"	f	class:MATRIX
+rows	BIG_MATRIX.h	/^  int rows() const { return _rows; };$/;"	f	class:BIG_MATRIX
+rows	BIG_MATRIX.h	/^  int& rows() { return _rows; };$/;"	f	class:BIG_MATRIX
+rows	MATRIX.h	/^    int rows() const { return _rows; };$/;"	f	class:MATRIX
+rows	MATRIX.h	/^    int& rows() { return _rows; };$/;"	f	class:MATRIX
+rows	SPARSE_MATRIX.h	/^  const int& rows() const { return _rows; };$/;"	f	class:SPARSE_MATRIX
+rows	SPARSE_MATRIX_ARRAY.h	/^  const int rows() const { return _rows; };$/;"	f	class:SPARSE_MATRIX_ARRAY
+scale	MATRIX.cpp	/^void MATRIX::scale( Real *A, int rows, int cols, Real alpha )$/;"	f	class:MATRIX
+scaleColumns	MATRIX.cpp	/^void MATRIX::scaleColumns(VECTOR scale)$/;"	f	class:MATRIX
+scratchPath	BIG_MATRIX.h	/^  static string& scratchPath() { return _scratchPath; };$/;"	f	class:BIG_MATRIX
+setColumn	MATRIX.cpp	/^void MATRIX::setColumn(const VECTOR& column, int index)$/;"	f	class:MATRIX
+setSubmatrix	MATRIX.cpp	/^void MATRIX::setSubmatrix(MATRIX& matrix, int row)$/;"	f	class:MATRIX
+setSubmatrix	MATRIX.cpp	/^void MATRIX::setSubmatrix(MATRIX& matrix, int row, int col)$/;"	f	class:MATRIX
+setToIdentity	MATRIX.cpp	/^void MATRIX::setToIdentity()$/;"	f	class:MATRIX
+setToIdentity	MATRIX3.h	/^  void setToIdentity()$/;"	f	class:MATRIX3
+setToIdentity	SPARSE_MATRIX.cpp	/^void SPARSE_MATRIX::setToIdentity()$/;"	f	class:SPARSE_MATRIX
+size	SPARSE_MATRIX.h	/^  virtual int size() { return _matrix.size(); };$/;"	f	class:SPARSE_MATRIX
+size	VECTOR.h	/^  int size() const { return _size; };$/;"	f	class:VECTOR
+solve	MATRIX.cpp	/^void MATRIX::solve(VECTOR& b)$/;"	f	class:MATRIX
+solve	NNLS.cpp	/^VectorXd NNLS_SOLVER::solve(const MatrixXd& A, const VectorXd& b)$/;"	f	class:NNLS_SOLVER
+solve	NNLS.cpp	/^VectorXd NNLS_SOLVER::solve(const vector<VectorXd>& columns, const VectorXd& b)$/;"	f	class:NNLS_SOLVER
+solve	NNLS.h	/^	bool solve(double* A, int numCols, double* b, double* x, double& rNorm)$/;"	f	class:NNLS_SOLVER
+solveCholesky	MATRIX.cpp	/^void MATRIX::solveCholesky(VECTOR& b)$/;"	f	class:MATRIX
+solveLU	MATRIX.cpp	/^void MATRIX::solveLU(MATRIX& B)$/;"	f	class:MATRIX
+solveLU	MATRIX.cpp	/^void MATRIX::solveLU(VECTOR& b)$/;"	f	class:MATRIX
+solveLeastSquares	MATRIX.cpp	/^bool MATRIX::solveLeastSquares(VECTOR& b)$/;"	f	class:MATRIX
+solveSPD	MATRIX.cpp	/^void MATRIX::solveSPD(VECTOR& b)$/;"	f	class:MATRIX
+squaredSum	MATRIX3.h	/^  Real squaredSum() {$/;"	f	class:MATRIX3
+subtractRowMeans	MATRIX.cpp	/^void MATRIX::subtractRowMeans()$/;"	f	class:MATRIX
+subtractSubmatrix	MATRIX.cpp	/^void MATRIX::subtractSubmatrix(MATRIX& matrix, int row)$/;"	f	class:MATRIX
+sum	MATRIX.cpp	/^Real MATRIX::sum()$/;"	f	class:MATRIX
+sum2	MATRIX.cpp	/^Real MATRIX::sum2()$/;"	f	class:MATRIX
+trace	MATRIX.cpp	/^Real MATRIX::trace()$/;"	f	class:MATRIX
+trace	MATRIX3.h	/^inline Real trace(const MATRIX3& m) { return m(0,0) + m(1,1) + m(2,2); }$/;"	f
+transpose	MATRIX.cpp	/^MATRIX MATRIX::transpose() const$/;"	f	class:MATRIX
+transpose	MATRIX.cpp	/^void MATRIX::transpose( MATRIX &output )$/;"	f	class:MATRIX
+transpose	MATRIX.cpp	/^void MATRIX::transpose( Real *A, const Real *B, int rows, int cols )$/;"	f	class:MATRIX
+transpose	MATRIX.cpp	/^void MATRIX::transpose( Real *A, int rows )$/;"	f	class:MATRIX
+transpose	MATRIX3.h	/^  MATRIX3 transpose() const {$/;"	f	class:MATRIX3
+transposeProduct	EIGEN.cpp	/^void EIGEN::transposeProduct(const MatrixXd& left, const MatrixXd& right, MatrixXd& output)$/;"	f	class:EIGEN
+unformatFortran	MATRIX.cpp	/^void MATRIX::unformatFortran()$/;"	f	class:MATRIX
+unitize	VEC2.h	/^template<class T> inline void unitize(TVEC2<T>& v)$/;"	f
+unitize	VEC3.h	/^template<class T> inline void unitize(TVEC3<T>& v)$/;"	f
+value	MATRIX.cpp	/^  float value;$/;"	m	struct:EIGENPAIR	file:
+value_type	VEC2.h	/^    typedef T value_type;$/;"	t	class:TVEC2
+value_type	VEC3.h	/^  typedef T value_type;$/;"	t	class:TVEC3
+vec_max	VEC3.h	/^template<class T> inline TVEC3<T> vec_max (const TVEC3<T>& u, const TVEC3<T>& v)   $/;"	f
+vec_min	VEC3.h	/^template<class T> inline TVEC3<T> vec_min (const TVEC3<T>& u, const TVEC3<T>& v)   $/;"	f
+verbosePCA	MATRIX.cpp	/^void MATRIX::verbosePCA(MATRIX& components, VECTOR& values, MATRIX& U, VECTOR& S, MATRIX& VT)$/;"	f	class:MATRIX
+write	BIG_MATRIX.cpp	/^void BIG_MATRIX::write(const string& filename)$/;"	f	class:BIG_MATRIX
+write	EIGEN.cpp	/^bool EIGEN::write(const string& filename, const MatrixXd& input)$/;"	f	class:EIGEN
+write	EIGEN.cpp	/^void EIGEN::write(FILE* file, const MatrixXd& input)$/;"	f	class:EIGEN
+write	EIGEN.cpp	/^void EIGEN::write(FILE* file, const VectorXd& input)$/;"	f	class:EIGEN
+write	MATRIX.cpp	/^void MATRIX::write(const char* filename)$/;"	f	class:MATRIX
+write	SPARSE_MATRIX.cpp	/^void SPARSE_MATRIX::write(FILE* file) const$/;"	f	class:SPARSE_MATRIX
+write	VEC3.h	/^template<class T> void TVEC3<T>::write(FILE* file) const$/;"	f	class:TVEC3
+write	VECTOR.cpp	/^void VECTOR::write(FILE* file)$/;"	f	class:VECTOR
+write	VECTOR.cpp	/^void VECTOR::write(const char* filename)$/;"	f	class:VECTOR
+write	VECTOR.h	/^  void write(const string& filename) { write(filename.c_str()); };$/;"	f	class:VECTOR
+writeDimensions	BIG_MATRIX.cpp	/^void BIG_MATRIX::writeDimensions(const string filename, const int& rows, const int& cols)$/;"	f	class:BIG_MATRIX
+writeFinalU	BIG_MATRIX.cpp	/^void BIG_MATRIX::writeFinalU(const string& filename)$/;"	f	class:BIG_MATRIX
+writeGz	SPARSE_MATRIX.cpp	/^void SPARSE_MATRIX::writeGz(gzFile& file) const$/;"	f	class:SPARSE_MATRIX
+writeGz	VEC3.h	/^template<class T> void TVEC3<T>::writeGz(gzFile& file) const$/;"	f	class:TVEC3
+writeMatlab	MATRIX.cpp	/^void MATRIX::writeMatlab(string filename, string varname)$/;"	f	class:MATRIX
+~BIG_MATRIX	BIG_MATRIX.h	/^  virtual ~BIG_MATRIX() {};$/;"	f	class:BIG_MATRIX
+~MATRIX	MATRIX.cpp	/^MATRIX::~MATRIX()$/;"	f	class:MATRIX
+~NNLS_SOLVER	NNLS.h	/^	~NNLS_SOLVER()$/;"	f	class:NNLS_SOLVER
+~SPARSE_MATRIX	SPARSE_MATRIX.h	/^  virtual ~SPARSE_MATRIX() {};$/;"	f	class:SPARSE_MATRIX
+~SPARSE_MATRIX_ARRAY	SPARSE_MATRIX_ARRAY.h	/^  virtual ~SPARSE_MATRIX_ARRAY() { if (_matrix) delete[] _matrix; };$/;"	f	class:SPARSE_MATRIX_ARRAY
+~VECTOR	VECTOR.cpp	/^VECTOR::~VECTOR()$/;"	f	class:VECTOR
