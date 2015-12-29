@@ -310,7 +310,6 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::stepReorderedCubatureStam()
     // diff the current sim results against ground truth
     diffGroundTruth();
   }
-
 //////////////////////////////////////////////////////////////////////
 // The reduced solver, with IOP, with peeled boundaries, 
 // with cubature enabled
@@ -372,6 +371,80 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::stepWithObstacle()
   // then pressure project
   reducedStagedProject();
 
+
+  // come back to full space
+  TIMER unprojectionTimer("Velocity unprojection");
+  PeeledCompressedUnprojectTransform(&_U_final_data, _qDot, &_velocity);
+  unprojectionTimer.stop();
+
+  currentTime += _dt;
+
+  cout << " Simulation step " << _totalSteps << " done. " << endl;
+
+  _totalTime += goalTime;
+  _totalSteps++;
+
+  // diff the current sim results against ground truth
+  diffGroundTruth();
+}
+
+//////////////////////////////////////////////////////////////////////
+// The reduced solver, no obstacle, no reorder
+//////////////////////////////////////////////////////////////////////
+
+void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::stepPlume()
+{
+  TIMER functionTimer(__FUNCTION__);
+  Real goalTime = 0.1;
+  Real currentTime = 0;
+
+  // compute the CFL condition
+  _dt = goalTime;
+
+  // wipe forces
+  _force.clear();
+
+  // wipe boundaries
+  _velocity.setZeroBorder();
+
+  // compute the forces
+  addBuoyancy(_heat.data());
+  _velocity.axpy(_dt, _force);
+
+  _force.clear();
+  addVorticity();
+  _velocity.axpy(_dt, _force);
+
+  TIMER projectionTimer("Velocity projection");
+
+  // project into the subspace
+  PeeledCompressedProjectTransformNoSVD(_velocity, &_U_preadvect_data, &_qDot);
+  cout << "finished projection! " << endl;
+  projectionTimer.stop();
+
+  // then advect
+
+  // full-space advect heat and density
+  advectHeatAndDensityStam();
+  cout << "finished advect heat and density!" << endl;
+
+  // reduced advect velocity
+
+  cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " : " << endl;
+  reducedAdvectCompressionFriendly();
+  cout << "finished compression-friendly advection!" << endl;
+  cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " : " << endl;
+  
+  //cout << " post advection qDot: " << _qDot << endl;
+  //exit(0);
+
+  // then diffuse 
+  TIMER diffusionProjectionTimer("Reduced diffusion");
+  reducedPeeledDiffusion();
+  diffusionProjectionTimer.stop();
+
+  // then pressure project
+  reducedStagedProject();
 
   // come back to full space
   TIMER unprojectionTimer("Velocity unprojection");

@@ -55,22 +55,6 @@ bool captureMovie = true;
 // fluid being simulated
 SUBSPACE_FLUID_3D_COMPRESSED_EIGEN* fluid = NULL;
 
-// moving obstacle instantiation
-BOX* box = NULL;
-
-// box parameters
-const VEC3F boxCenter(0.5, 0.5, 0.5);
-const VEC3F boxLengths(0.4, 0.05, 0.15);
-
-// period over which the box revolves
-const double period = 4.0;
-
-// period over which the box translates
-const double translationPeriod = 10.0;
-
-// ground truth
-FLUID_3D_MIC* ground = NULL;
-
 // Quicktime movie to capture to
 QUICKTIME_MOVIE movie;
 
@@ -175,10 +159,6 @@ void glutDisplay()
       /////////////////////////////////////////////////////////////////
     glPopMatrix();
    
-    // draw the obstacle
-    glPushMatrix();
-      box->draw();
-    glPopMatrix();  
 
   glvu.EndFrame();
   // if we're recording a movie, capture a frame
@@ -384,8 +364,6 @@ int main(int argc, char *argv[])
   fluid->fullRankPath() = snapshotPath;
   fluid->vorticityEps() = vorticity;
 
-  box = new BOX(boxCenter, boxLengths, period, translationPeriod);
-  box->set_dt(fluid->dt());
 
   // set the FIELD_3D static
   FIELD_3D::usingFastPow() = fastPow;
@@ -414,20 +392,17 @@ void runEverytime()
   {
     static int step = 0;
     cout << " Simulation step " << 1 + step << endl;
+    fluid->addSmokeColumn();
+    fluid->stepPlume();
 
-    if (step == 0) {
-      fluid->addSmokeSphere();
-      fluid->setInitialVelocity(box);
-    }
+
+    char buffer[256];
+    const char* path = "./pbrt/";
+    sprintf(buffer, "%sfluidPlume.%04i.pbrt", path, step);
+    FIELD_3D::exportPbrt(fluid->density(), buffer);
 
     // Use the Debug routine with loadReducedIOPAll above
-    // fluid->stepMovingObstacleDebug(box);
-    fluid->stepMovingObstacle(box);
 
-    box->translate_center();
-    box->spin();
-
-    box->update_time();
 
     /* 
     char buffer[256];

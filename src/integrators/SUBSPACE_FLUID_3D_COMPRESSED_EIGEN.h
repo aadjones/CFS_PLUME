@@ -55,6 +55,7 @@ public:
   unsigned int& domainBcBottom() { return _domainBcBottom; };
 
   void stepReorderedCubatureStam();
+  void stepPlume();
   void stepWithObstacle();
   void stepMovingObstacle(BOX* box);
   void stepMovingObstacleDebug(BOX* box);
