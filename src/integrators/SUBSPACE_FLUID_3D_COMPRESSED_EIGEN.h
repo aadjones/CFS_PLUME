@@ -54,6 +54,8 @@ public:
   unsigned int& domainBcTop()    { return _domainBcTop; };
   unsigned int& domainBcBottom() { return _domainBcBottom; };
 
+  const VectorXd& l2Error() { return _l2Error; };
+
   void stepReorderedCubatureStam();
   void stepPlume();
   void stepWithObstacle();
@@ -87,6 +89,15 @@ public:
 
   void reducedSetMovingBox(BOX* box);
 
+  // write the dims of the subspace error matrix to its file
+  void writeCompressedErrorMatrixDims(int simulationSnapshots);
+
+  // write out the most recent compressed subspace vector to the compressed subspace matrix file
+  void appendCompressedSubspaceVectors();
+
+  // compare the compressed qDot to the uncompressed qDot
+  void compareSubspace();
+
 private:
   struct CUBATURE_DATA {
     int index;
@@ -114,6 +125,12 @@ public:
   void loadReducedRuntimeBases(string path = string(""));
   void loadReducedIOP(string path = string(""));
   void loadReducedIOPAll(string path = string(""));
+
+  // load the qDotMatrix for error comparison
+  void loadSubspaceComparisonMatrix();
+
+  // compare the current compressed qDot against the uncompressed subspace reference
+  void compareSubspace(int step);
 
   // read in a cubature scheme
   void readAdvectionCubature();
@@ -254,6 +271,11 @@ protected:
   MatrixXd _preprojectToPreadvect;
   MatrixXd _preprojectToFinal;
   MatrixXd _inverseProduct;
+
+  // subspace error matrix to compare against
+  MatrixXd _qDotMatrix;
+  // list of the relative l2 errors against _qDotMatrix
+  VectorXd _l2Error;
 
   // domain boundary conditions
   unsigned int _domainBcFront;

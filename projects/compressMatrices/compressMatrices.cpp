@@ -366,7 +366,9 @@ void GetCompressionRatios(const string& preadvectFilename, const string& finalFi
 
   double preadvectCompression = preadvectSize / (double) (preadvectSize0 + preadvectSize1 + preadvectSize2);
   double finalCompression = finalSize / (double) (finalSize0 + finalSize1 + finalSize2);
+  double overallCompression = 0.5 * (preadvectCompression + finalCompression);
 
   printf("U.preadvect compression ratio is %f : 1\n", preadvectCompression);
   printf("U.final compression ratio is %f : 1\n", finalCompression);
+  printf("Overall compression ratio is %f: 1\n", overallCompression);
 }

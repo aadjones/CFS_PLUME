@@ -114,6 +114,12 @@ public:
   // build and write out per-frame obstacle matrices starting at 'start'
   void buildRemainingObstacleMatrices(int start);
 
+  // write the dims of the subspace error matrix to its file
+  void writeSubspaceErrorMatrixDims(int simulationSnapshots);
+
+  // write out the most recent subspace vector to the subspace matrix file
+  void appendSubspaceVectors();
+
 protected: 
 
   BOX _box;

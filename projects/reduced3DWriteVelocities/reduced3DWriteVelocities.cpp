@@ -362,6 +362,7 @@ int main(int argc, char *argv[])
 void runOnce()
   {
     // precache something here if needed
+    
   }
 
 void runEverytime()
@@ -369,15 +370,13 @@ void runEverytime()
   if (animate)
   {
     static int step = 0;
+    if (step == 0) { fluid->writeSubspaceErrorMatrixDims(simulationSnapshots); }
     cout << " Simulation step " << 1 + step << endl;
 
     fluid->addSmokeColumn();
     fluid->stepReorderedCubatureStam();
 
-    char buffer[256];
-    const char* path = "./pbrt/";
-    sprintf(buffer, "%splume.%04i.pbrt", path, step);
-    FIELD_3D::exportPbrt(fluid->density(), buffer); 
+    fluid->appendSubspaceVectors();
 
     // print timings periodically
     if (step % 10 == 0) {
