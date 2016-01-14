@@ -793,15 +793,18 @@ void SUBSPACE_FLUID_3D_EIGEN::diffGroundTruth()
   cout << "=====================================================" << endl;
   VectorXd diff = _velocity.peelBoundary().flattenedEigen() - ground.velocity().peelBoundary().flattenedEigen();
   _velocityErrorAbs.push_back(diff.norm());
-  _velocityErrorRelative.push_back(diff.norm() / _velocity.peelBoundary().flattened().norm2());
+  _velocityErrorRelative.push_back(diff.norm() / _velocity.peelBoundary().flattenedEigen().norm());
   cout << " velocity abs error:      " << _velocityErrorAbs.back() << endl;
   cout << " velocity relative error: " << _velocityErrorRelative.back() << endl;
 
+  // ADJ: Forget density for now.
+  /*
   diff = _density.peelBoundary().flattenedEigen() - ground.density().peelBoundary().flattenedEigen();
   _densityErrorAbs.push_back(diff.norm());
   _densityErrorRelative.push_back(diff.norm() / _density.peelBoundary().flattened().norm2());
   cout << " density abs error:      " << _densityErrorAbs.back() << endl;
   cout << " density relative error: " << _densityErrorRelative.back() << endl;
+  */
 }
 
 //////////////////////////////////////////////////////////////////////

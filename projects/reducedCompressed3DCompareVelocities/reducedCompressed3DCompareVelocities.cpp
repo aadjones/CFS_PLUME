@@ -74,6 +74,7 @@ vector<VECTOR> snapshots;
 
 // user configuration
 string reducedPath;
+string compressionPath;
 string snapshotPath;
 string previewReducedMovie;
 int simulationSnapshots;
@@ -316,8 +317,10 @@ int main(int argc, char *argv[])
   int yRes = parser.getInt("yRes", 64);
   int zRes = parser.getInt("zRes", 48);
   reducedPath = parser.getString("reduced path", "./data/reduced.dummy/");
+  compressionPath = parser.getString("compression path", "./data/reduced.dummy/");
+  printf(" Using compression path: %s\n", compressionPath.c_str());
   snapshotPath = parser.getString("snapshot path", "./data/dummy/");
-  previewReducedMovie = parser.getString("preview movie", "./data/movie.mov");
+  previewReducedMovie = parser.getString("preview movie", "./movies/movie.mov");
   cout << "Reduced movie is written to: " << previewReducedMovie << endl;
   simulationSnapshots = parser.getInt("simulation snapshots", 20);
   Real vorticity = parser.getFloat("vorticity", 0);
@@ -354,7 +357,9 @@ int main(int argc, char *argv[])
   bool debug = parser.getBool("debug", 0);
   cout << "Debug: " << debug << endl;
 
+
 	fluid = new SUBSPACE_FLUID_3D_COMPRESSED_EIGEN(xRes, yRes, zRes, reducedPath, &boundaries[0], usingIOP);
+  fluid->setCompressionPath(compressionPath);
   fluid->loadReducedIOP(string(""));
   // For debugging, use loadReducedIOPAll here and stepMovingDebug in runEverytime.
   // fluid->loadReducedIOPAll(string(""));
@@ -401,6 +406,12 @@ void runEverytime()
     fluid->addSmokeColumn();
     fluid->stepPlume();
 
+    // write to pbrt
+    char buffer[256];
+    string pbrtPath = compressionPath + string("pbrt/");
+    sprintf(buffer, "%splume.compressed.%04i.pbrt", pbrtPath.c_str(), step);
+    FIELD_3D::exportPbrt(fluid->density(), buffer);
+
     fluid->appendCompressedSubspaceVectors();
     fluid->compareSubspace(step);
 
@@ -415,14 +426,21 @@ void runEverytime()
     // check if we're done
     if (step == simulationSnapshots - 1) 
     {
-      string path = reducedPath + string("compression.l2error.vector");
+      string path = compressionPath + string("compression.relative.L2.subspace.error.vector");
       EIGEN::write(path.c_str(), fluid->l2Error());
+      path = compressionPath + string("compression.relative.L2.ground.error.vector");
+      // convert from vector<Real> to VECTOR
+      VECTOR groundRelativeError(fluid->velocityErrorRelative());
+      groundRelativeError.write(path);
 
       TIMER::printTimings();
       // if we were already capturing a movie
       if (captureMovie) {
-        writeToQuicktime();
+        // writeToQuicktime();
+        movie.writeMovie(previewReducedMovie.c_str());
+
         // stop capturing frames
+
         captureMovie = false;
       }
       exit(0);

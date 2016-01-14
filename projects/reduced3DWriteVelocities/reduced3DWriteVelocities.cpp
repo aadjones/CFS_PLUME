@@ -72,6 +72,7 @@ vector<VECTOR> snapshots;
 
 // user configuration
 string snapshotPath;
+string reducedPath;
 string previewReducedMovie;
 int simulationSnapshots;
 
@@ -310,7 +311,8 @@ int main(int argc, char *argv[])
   xRes = parser.getInt("xRes", 48);
   yRes = parser.getInt("yRes", 64);
   zRes = parser.getInt("zRes", 48);
-  string reducedPath = parser.getString("reduced path", "./data/reduced.dummy/");
+  previewReducedMovie = parser.getString("preview movie", "./movies/movie.mov");
+  reducedPath = parser.getString("reduced path", "./data/reduced.dummy/");
   snapshotPath = parser.getString("snapshot path", "./data/dummy/");
   simulationSnapshots = parser.getInt("simulation snapshots", 20);
   Real vorticity = parser.getFloat("vorticity", 0);
@@ -376,6 +378,12 @@ void runEverytime()
     fluid->addSmokeColumn();
     fluid->stepReorderedCubatureStam();
 
+    // write to pbrt
+    char buffer[256];
+    string pbrtPath = reducedPath + string("pbrt/");
+    sprintf(buffer, "%splume.uncompressed.%04i.pbrt", pbrtPath.c_str(), step);
+    FIELD_3D::exportPbrt(fluid->density(), buffer);
+
     fluid->appendSubspaceVectors();
 
     // print timings periodically
@@ -390,10 +398,15 @@ void runEverytime()
 
     // check if we're done
     if (step == simulationSnapshots - 1) {    
+      string path = reducedPath + string("uncompressed.relative.L2.error.ground.vector");
+      VECTOR relativeError(fluid->velocityErrorRelative());
+      relativeError.write(path);
+
       TIMER::printTimings();      
       // if we were already capturing a movie
       if (captureMovie) {
-       writeToQuicktime();
+       //writeToQuicktime();
+       movie.writeMovie(previewReducedMovie.c_str());
        // stop capturing frames
        captureMovie = false;
       }

@@ -56,6 +56,8 @@ public:
 
   const VectorXd& l2Error() { return _l2Error; };
 
+  void setCompressionPath(const string& path) { _compressionPath = path; };
+
   void stepReorderedCubatureStam();
   void stepPlume();
   void stepWithObstacle();
@@ -169,6 +171,7 @@ protected:
 
   // file paths
   string _reducedPath;
+  string _compressionPath;
   
   // cache the damping matrix
   MatrixXd _dampingMatrixReduced;

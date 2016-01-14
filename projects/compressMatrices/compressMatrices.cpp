@@ -60,7 +60,7 @@ bool fileExists(const string& filename);
 unsigned long long FileSize(const string& filename);
 
 // compute and print the compression ratios
-void GetCompressionRatios(const string& preadvectFilename, const string& finalFilename);
+double GetCompressionRatios(const string& preadvectFilename, const string& finalFilename);
 
 string preadvectPath;
 string finalPath;
@@ -189,8 +189,10 @@ int main(int argc, char* argv[]) {
 
   // write a binary file for each scalar field component
 
-  string preadvectFilename = reducedPath + string("U.preadvect.component");
-  string finalFilename = reducedPath + string("U.final.component");
+  string command = string("mkdir ") + reducedPath + string("tmp");
+  system(command.c_str());
+  string preadvectFilename = reducedPath + string("tmp/U.preadvect.component");
+  string finalFilename = reducedPath + string("tmp/U.final.component");
 
 
   // write out the compressed matrix files
@@ -225,7 +227,14 @@ int main(int argc, char* argv[]) {
 
     }
 
-  GetCompressionRatios(preadvectFilename, finalFilename);
+  double ratio = GetCompressionRatios(preadvectFilename, finalFilename);
+  int roundedRatio = rint(ratio);
+  string newName = reducedPath + to_string(roundedRatio) + string("to1");
+  string rename = string("mv ") + reducedPath + string("tmp ") + newName;
+  system(rename.c_str());
+  string mkdir = string("mkdir ") + newName + string("/pbrt");
+  system(mkdir.c_str()); 
+
 
   TIMER::printTimings();
   
@@ -342,7 +351,7 @@ unsigned long long FileSize(const string& filename)
 //////////////////////////////////////////////////////////////////////
 // compute and print the compression ratios
 //////////////////////////////////////////////////////////////////////
-void GetCompressionRatios(const string& preadvectFilename, const string& finalFilename)
+double GetCompressionRatios(const string& preadvectFilename, const string& finalFilename)
 {
   TIMER functionTimer(__FUNCTION__);
   puts("Computing compression ratios...");
@@ -371,4 +380,5 @@ void GetCompressionRatios(const string& preadvectFilename, const string& finalFi
   printf("U.preadvect compression ratio is %f : 1\n", preadvectCompression);
   printf("U.final compression ratio is %f : 1\n", finalCompression);
   printf("Overall compression ratio is %f: 1\n", overallCompression);
+  return overallCompression;
 }
