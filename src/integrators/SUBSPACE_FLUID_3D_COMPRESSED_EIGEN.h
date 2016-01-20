@@ -97,9 +97,6 @@ public:
   // write out the most recent compressed subspace vector to the compressed subspace matrix file
   void appendCompressedSubspaceVectors();
 
-  // compare the compressed qDot to the uncompressed qDot
-  void compareSubspace();
-
 private:
   struct CUBATURE_DATA {
     int index;

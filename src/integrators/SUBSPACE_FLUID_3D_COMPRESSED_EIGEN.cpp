@@ -227,7 +227,7 @@ SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::~SUBSPACE_FLUID_3D_COMPRESSED_EIGEN()
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::writeCompressedErrorMatrixDims(int simulationSnapshots)
 {
   FILE* matrixFile;
-  string filename = _reducedPath + string("qDot.compressed.matrix");
+  string filename = _compressionPath + string("qDot.compressed.matrix");
 
   matrixFile = fopen(filename.c_str(), "wb");
   if (matrixFile==NULL) {

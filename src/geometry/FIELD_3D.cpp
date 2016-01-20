@@ -2423,6 +2423,13 @@ void FIELD_3D::toFastPower(double power)
   TIMER functionTimer(__FUNCTION__);
   for (int index = 0; index < _totalCells; index++) {
     _data[index] = fastPow(_data[index], power);
+    // ADJ: for our purposes, we *never* want the damping to be less than 1 since we are dividing
+    // by it and expecting to get a smaller number.
+    if (_data[index] < 1.0) {
+      // DEBUG
+      // printf("Computed a fastPow to be %f; this could be dangerous!\n", _data[index]);
+      _data[index] = 1.0; 
+    }
   }
 }
 

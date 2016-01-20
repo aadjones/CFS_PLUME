@@ -127,9 +127,7 @@ class COMPRESSION_DATA {
   
   void set_dampingArrayList() {
     TIMER functionTimer(__FUNCTION__);
-    //cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " : " << endl;
     assert(_dampingArrayBuilt);
-    //cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " : " << endl;
     //cout << "original damping array built: " << _dampingArrayBuilt << endl;
     //if (_dampingArrayList.size() > 0) { return; }
     if (_dampingArrayListBuilt) { return; }
