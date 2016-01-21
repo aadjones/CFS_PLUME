@@ -1061,7 +1061,7 @@ void TuneGammaQuantized(const FIELD_3D& F, int blockNumber, int col,
   // QUESTION: how should we define upper?
   double upper = nBits;
   // arbitrarily set epsilon to be very small
-  double epsilon = 0.0001;
+  double epsilon = 0.000001;
   // double gamma = 0.5 * (upper + lower);
   double gamma = 0.0;
   damp->toFastPower(gamma);
