@@ -372,7 +372,12 @@ void runEverytime()
   if (animate)
   {
     static int step = 0;
-    if (step == 0) { fluid->writeSubspaceErrorMatrixDims(simulationSnapshots); }
+    if (step == 0) { 
+      fluid->writeSubspaceErrorMatrixDims(simulationSnapshots); 
+      string cmd = string("mkdir ") + reducedPath + string("pbrt");
+      system(cmd.c_str());
+    }
+
     cout << " Simulation step " << 1 + step << endl;
 
     fluid->addSmokeColumn();
