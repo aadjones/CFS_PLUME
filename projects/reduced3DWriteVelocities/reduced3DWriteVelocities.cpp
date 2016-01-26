@@ -403,9 +403,13 @@ void runEverytime()
 
     // check if we're done
     if (step == simulationSnapshots - 1) {    
-      string path = reducedPath + string("uncompressed.relative.L2.error.ground.vector");
+      string path = reducedPath + string("uncompressed.relative.velocity.L2.error.ground.vector");
       VECTOR relativeError(fluid->velocityErrorRelative());
       relativeError.write(path);
+
+      path = reducedPath + string("uncompressed.relative.density.L2.error.ground.vector");
+      VECTOR densityError(fluid->densityErrorRelative());
+      densityError.write(path);
 
       TIMER::printTimings();      
       // if we were already capturing a movie

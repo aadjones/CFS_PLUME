@@ -1062,14 +1062,11 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::diffGroundTruth()
   cout << " velocity abs error:      " << _velocityErrorAbs.back() << endl;
   cout << " velocity relative error: " << _velocityErrorRelative.back() << endl;
 
-  // ADJ: not sure I care that much about the density
-  /*
   diff = _density.peelBoundary().flattenedEigen() - ground.density().peelBoundary().flattenedEigen();
   _densityErrorAbs.push_back(diff.norm());
-  _densityErrorRelative.push_back(diff.norm() / _density.peelBoundary().flattened().norm2());
+  _densityErrorRelative.push_back(diff.norm() / _density.peelBoundary().flattenedEigen().norm());
   cout << " density abs error:      " << _densityErrorAbs.back() << endl;
   cout << " density relative error: " << _densityErrorRelative.back() << endl;
-  */
 }
 
 //////////////////////////////////////////////////////////////////////

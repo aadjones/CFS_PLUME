@@ -433,6 +433,10 @@ void runEverytime()
       VECTOR groundRelativeError(fluid->velocityErrorRelative());
       groundRelativeError.write(path);
 
+      path = compressionPath + string("compression.density.relative.L2.ground.error.vector");
+      VECTOR densityRelativeError(fluid->densityErrorRelative());
+      densityRelativeError.write(path);
+
       TIMER::printTimings();
       // if we were already capturing a movie
       if (captureMovie) {
