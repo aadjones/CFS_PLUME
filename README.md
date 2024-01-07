@@ -1,6 +1,6 @@
 # Compressing Fluid Subspaces Reference Implementation
 
-This is a reference implementation of the algorithm described in the paper *Compressing Fluid Subspaces*. It is intended to be the simplest possible working example of a DCT-based fluid subspace compression codec. In keeping with this simplicity, extra features such as obstacle handling and multithread support have been removed.
+This is a reference implementation of the algorithm described in the paper [*Compressing Fluid Subspaces*](https://www.tkim.graphics/COMPRESSING/JonesSenKim2016.pdf). It is intended to be the simplest possible working example of a DCT-based fluid subspace compression codec. In keeping with this simplicity, extra features such as obstacle handling and multithread support have been removed.
 
 ## Building the Code
 
