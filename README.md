@@ -60,3 +60,6 @@ Note that the simulations will not run as fast as they otherwise could, since th
 then your installation has succeeded.
 
 If you would like to vary the amount of compression, you must edit the percent parameter in the configuration ./cfg/stam.64.cfg. In practice, values quite close to 1.0, e.g., 0.999, 0.99, etc., are generally advised for high quality results.
+
+## Credits
+Aaron Demby Jones, Pradeep Sen, and Theodore Kim
