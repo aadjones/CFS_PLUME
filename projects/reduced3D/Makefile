@@ -1,7 +1,7 @@
 include ../include.mk
 
 # calls:
-CC         = g++
+CC         = gcc-13
 CFLAGS     = ${CFLAGS_COMMON} 
 LDFLAGS    = ${LDFLAGS_COMMON} 
 EXECUTABLE = ../../bin/reduced3D

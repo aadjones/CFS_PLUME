@@ -3,8 +3,13 @@ import subprocess
 import sys
 
 def findReplace(filename, toReplace, replacement):
+    # Ensure arguments are strings
+    toReplace = toReplace.decode('utf-8') if isinstance(toReplace, bytes) else toReplace
+    replacement = replacement.decode('utf-8') if isinstance(replacement, bytes) else replacement
+    
     for line in fileinput.input(filename, inplace=True):
-        print line.replace(toReplace, replacement),
+        # Print replaced line; end='' to avoid adding newlines
+        print(line.replace(toReplace, replacement), end='')
 
 def getCompressionLine(filename, suffix):
     cmd = "cat " + filename + " | " + "grep " + suffix
@@ -14,7 +19,7 @@ def getCompressionLine(filename, suffix):
 ################################################################################
 argc = len(sys.argv)
 if argc != 3:
-    print "You must pass two command line arguments: a filename, and a compression ratio!"
+    print("You must pass two command line arguments: a filename, and a compression ratio!")
     sys.exit(-1)
 
 # Get the arguments list 

@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
   fluid->setObstacle(*box);
 
   int start = 150;
-  fluid->buildRemainingObstacleMatrices(start);
+  // fluid->buildRemainingObstacleMatrices(start);
 
   delete fluid;
   delete box;

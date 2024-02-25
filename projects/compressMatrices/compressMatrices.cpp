@@ -392,6 +392,6 @@ double GetCompressionRatios(const string& preadvectFilename, const string& final
 // automatically update the compression and movie paths based on compression ratio. calls a python script inside ./cfg
 void UpdateCfgFile(int roundedOverallCompression)
 {
-  string cmd = string("python ./cfg/findReplace.py ") + cfgFilename + string(" ") + to_string(roundedOverallCompression);
+  string cmd = string("python3 ./cfg/findReplace.py ") + cfgFilename + string(" ") + to_string(roundedOverallCompression);
   system(cmd.c_str());
 }

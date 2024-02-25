@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Define an array of your executable names
+executables=("fluid3D" "svdOutOfCoreMultiple" "cubatureGeneratorStamStaged" "compressMatrices" "buildProducts")
+
+
+arguments="stam.64.cfg" 
+
+# Loop through the executables
+for i in "${!executables[@]}"; do
+    echo "Running ${executables[$i]} with arguments: ${arguments[$i]}"
+    ./bin/${executables[$i]} cfg/${arguments}
+    
+    # Check if the program exited with an error
+    if [ $? -ne 0 ]; then
+        echo "${executables[$i]} failed to run successfully."
+        exit 1
+    fi
+    
+    echo "${executables[$i]} completed successfully."
+done
+
+echo "All programs have been run."
