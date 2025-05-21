@@ -33,8 +33,35 @@
 #include "FLUID_3D_MIC.h"
 #include "MATRIX.h"
 #include "SIMPLE_PARSER.h"
+#include <filesystem>  // for current_path()
 
 using namespace std;
+
+// Helper function to create directories recursively
+void ensureDirectoryExists(const string& path) {
+  // Get the current working directory
+  string cwd = filesystem::current_path().string();
+  
+  // Convert relative path to absolute path
+  string absPath = path;
+  if (path[0] == '.') {
+    // Remove leading ./ if present
+    if (path[1] == '/') {
+      absPath = cwd + "/" + path.substr(2);
+    } else {
+      absPath = cwd + "/" + path.substr(1);
+    }
+  }
+  
+  // Create the directory with absolute path
+  string cmd = "mkdir -p '" + absPath + "'";
+  int result = system(cmd.c_str());
+  if (result != 0) {
+    cerr << "Failed to create directory: " << absPath << endl;
+    cerr << "Command was: " << cmd << endl;
+    cerr << "Error code: " << result << endl;
+  }
+}
 
 GLVU glvu;
 
@@ -327,6 +354,9 @@ int main(int argc, char *argv[])
   }
 
   snapshotPath = parser.getString("snapshot path", "./data/dummy/");
+  // Ensure both data/ and the snapshot directory exist
+  ensureDirectoryExists(snapshotPath);
+  
   simulationSnapshots = parser.getInt("simulation snapshots", 20);
   
 	fluid = new FLUID_3D_MIC(xRes, yRes, zRes, amplify, &boundaries[0]);
@@ -346,10 +376,7 @@ void runEverytime()
   static bool firstTime = true;
 
   if (firstTime) {
-    string mkdir("mkdir ");
-    mkdir = mkdir + snapshotPath;
-    system(mkdir.c_str());
-
+    // No need to create directory here anymore since we do it in main()
     firstTime = false;
   }
 

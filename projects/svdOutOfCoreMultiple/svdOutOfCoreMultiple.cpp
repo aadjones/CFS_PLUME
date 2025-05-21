@@ -26,6 +26,12 @@
 #include "BIG_MATRIX.h"
 #include "SIMPLE_PARSER.h"
 
+// Helper function to create directories recursively
+void ensureDirectoryExists(const string& path) {
+  string cmd = "mkdir -p " + path;
+  system(cmd.c_str());
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Fix up the slashes in a string to play nice with Perl
 //////////////////////////////////////////////////////////////////////////////
@@ -100,19 +106,23 @@ int main(int argc, char *argv[])
 
   cout << " Using discard threshold: " << discardThreshold << endl;
 
-  // set scratch path
+  // set scratch path and ensure directories exist
   cout << " Using scratch path: " << scratchPath.c_str() << endl;
+  
+  // Set the BIG_MATRIX scratch path to match our configured path
+  BIG_MATRIX::scratchPath() = scratchPath;
+  
+  // Ensure the scratch directory exists
+  string cmd = "mkdir -p '" + scratchPath + "'";
+  system(cmd.c_str());
+
+  ensureDirectoryExists(reducedPath);
 
   if (reducedSnapshots > simulationSnapshots)
   {
     cout << " You asked to use more snapshots than were simulated! " << endl;
     exit(0);
   }
-
-  // make sure the reduced directory in fact exists
-  string mkdir("mkdir ");
-  mkdir = mkdir + reducedPath;
-  system(mkdir.c_str());
 
   vector<string> filenamePrefixes;
   vector<string> finalFilenames;

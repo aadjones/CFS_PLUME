@@ -8,6 +8,9 @@ cmake-build-*/
 data/
 scratch/
 
+# Movie files
+*.mov
+
 # Compiled Object files
 *.slo
 *.lo
