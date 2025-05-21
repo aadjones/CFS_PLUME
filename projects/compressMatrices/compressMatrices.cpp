@@ -38,6 +38,8 @@
 #include <cfenv>
 #include <climits>
 #include "VECTOR3_FIELD_3D.h"
+#include <sys/stat.h>
+#include <errno.h>
 
 using std::vector;
 using std::string;
@@ -65,6 +67,9 @@ double GetCompressionRatios(const string& preadvectFilename, const string& final
 // update the cfg file to point to the correct compression path
 void UpdateCfgFile(int roundedOverallCompression);
 
+// Helper function to create directory if it doesn't exist
+bool createDirectoryIfNotExists(const string& path);
+
 string preadvectPath;
 string finalPath;
 string cfgFilename;
@@ -85,6 +90,13 @@ int main(int argc, char* argv[]) {
   SIMPLE_PARSER parser(argv[1]);
   cfgFilename = argv[1];
   string reducedPath = parser.getString("reduced path", "./data/reduced.dummy/"); 
+  
+  // Create reduced path directory if it doesn't exist
+  if (!createDirectoryIfNotExists(reducedPath)) {
+    cout << "Failed to create reduced path directory. Exiting." << endl;
+    return 1;
+  }
+
   int xRes = parser.getInt("xRes", 48);
   int yRes = parser.getInt("yRes", 64);
   int zRes = parser.getInt("zRes", 48);
@@ -151,6 +163,12 @@ int main(int argc, char* argv[]) {
   // ADJ: change the scratch path to SSD for big runs!
   string scratchPath = "./scratch/";
   
+  // Create scratch directory if it doesn't exist
+  if (!createDirectoryIfNotExists(scratchPath)) {
+    cout << "Failed to create scratch directory. Exiting." << endl;
+    return 1;
+  }
+
   string preadvectSingularFilename = scratchPath + string("velocity.preadvect.matrix.singularValues.vector");
 
   /*
@@ -193,9 +211,12 @@ int main(int argc, char* argv[]) {
       maxIterations, finalSingularFilename.c_str());
 
   // write a binary file for each scalar field component
+  string tmpDir = reducedPath + string("tmp");
+  if (!createDirectoryIfNotExists(tmpDir)) {
+    cout << "Failed to create tmp directory. Exiting." << endl;
+    return 1;
+  }
 
-  string command = string("mkdir ") + reducedPath + string("tmp");
-  system(command.c_str());
   string preadvectFilename = reducedPath + string("tmp/U.preadvect.component");
   string finalFilename = reducedPath + string("tmp/U.final.component");
 
@@ -237,8 +258,13 @@ int main(int argc, char* argv[]) {
   string newName = reducedPath + to_string(roundedRatio) + string("to1");
   string rename = string("mv ") + reducedPath + string("tmp ") + newName;
   system(rename.c_str());
-  string mkdir = string("mkdir ") + newName + string("/pbrt");
-  system(mkdir.c_str()); 
+  
+  // Create pbrt directory in the new location
+  string pbrtDir = newName + string("/pbrt");
+  if (!createDirectoryIfNotExists(pbrtDir)) {
+    cout << "Failed to create pbrt directory. Exiting." << endl;
+    return 1;
+  }
 
   UpdateCfgFile(roundedRatio);
 
@@ -394,4 +420,26 @@ void UpdateCfgFile(int roundedOverallCompression)
 {
   string cmd = string("python3 ./cfg/findReplace.py ") + cfgFilename + string(" ") + to_string(roundedOverallCompression);
   system(cmd.c_str());
+}
+
+// Helper function to create directory if it doesn't exist
+bool createDirectoryIfNotExists(const string& path) {
+    struct stat info;
+    if (stat(path.c_str(), &info) != 0) {
+        // Directory doesn't exist, try to create it
+        #ifdef _WIN32
+            int status = mkdir(path.c_str());
+        #else
+            int status = mkdir(path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        #endif
+        if (status != 0) {
+            cout << "Error creating directory " << path << ": " << strerror(errno) << endl;
+            return false;
+        }
+        cout << "Created directory: " << path << endl;
+    } else if (!(info.st_mode & S_IFDIR)) {
+        cout << "Error: " << path << " exists but is not a directory" << endl;
+        return false;
+    }
+    return true;
 }

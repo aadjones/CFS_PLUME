@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Default config file
+DEFAULT_CONFIG="cfg/stam.64.cfg"
+
+# Use provided config file if given, otherwise use default
+CONFIG_FILE=${1:-$DEFAULT_CONFIG}
+
+# Create base data directory
+mkdir -p ./data/reduced.stam.64
+
+# Extract the reduced path from the config file
+REDUCED_PATH=$(grep "reduced path" "$CONFIG_FILE" | cut -d'=' -f2 | tr -d ' ')
+
+if [ -z "$REDUCED_PATH" ]; then
+    echo "Error: Could not find reduced path in config file"
+    exit 1
+fi
+
+# Create a temporary modified config file
+TMP_CONFIG=$(mktemp)
+cp "$CONFIG_FILE" "$TMP_CONFIG"
+
+# Debug output
+echo "Original config file: $CONFIG_FILE"
+echo "Temporary config file: $TMP_CONFIG"
+echo "Reduced path from config: $REDUCED_PATH"
+echo "Compression path in temp config:"
+grep "compression path" "$TMP_CONFIG"
+
+# Run the reduced3D_compressed executable with the modified config file
+echo "Using config file: $TMP_CONFIG"
+echo "Using reduced path: $REDUCED_PATH"
+
+./bin/reducedCompressed3D "$TMP_CONFIG"
+
+# Clean up
+rm "$TMP_CONFIG" 

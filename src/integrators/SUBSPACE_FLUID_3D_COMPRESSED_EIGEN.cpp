@@ -1747,10 +1747,13 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::loadReducedIOP(string path)
   COMPRESSION_DATA compression_data2;
 
   string preadvectFile = _compressionPath + string("U.preadvect.component0");
+  cout << "Trying to open file: " << preadvectFile << endl;
   int* allData0 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data0);
   preadvectFile = _compressionPath + string("U.preadvect.component1");
+  cout << "Trying to open file: " << preadvectFile << endl;
   int* allData1 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data1);
   preadvectFile = _compressionPath + string("U.preadvect.component2");
+  cout << "Trying to open file: " << preadvectFile << endl;
   int* allData2 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data2);
 
   _U_preadvect_data = MATRIX_COMPRESSION_DATA(allData0, allData1, allData2,

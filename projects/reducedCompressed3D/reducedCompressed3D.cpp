@@ -353,7 +353,12 @@ int main(int argc, char *argv[])
   bool debug = parser.getBool("debug", 0);
   cout << "Debug: " << debug << endl;
 
+  string compressionPath = parser.getString("compression path", "./data/compression/");
+  cout << "Compression path set to: " << compressionPath << endl;
+
 	fluid = new SUBSPACE_FLUID_3D_COMPRESSED_EIGEN(xRes, yRes, zRes, reducedPath, &boundaries[0], usingIOP);
+  fluid->setCompressionPath(compressionPath);
+  cout << "Compression path set to: " << compressionPath << endl;
   fluid->loadReducedIOP(string(""));
   // For debugging, use loadReducedIOPAll here and stepMovingDebug in runEverytime.
   // fluid->loadReducedIOPAll(string(""));
