@@ -4,6 +4,10 @@ build/
 out/
 cmake-build-*/
 
+# Data and scratch directories
+data/
+scratch/
+
 # Compiled Object files
 *.slo
 *.lo

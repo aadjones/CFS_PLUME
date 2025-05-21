@@ -1,7 +1,6 @@
 include ../include.mk
 
 # calls:
-CC         = gcc-13
 CFLAGS     = ${CFLAGS_COMMON} -I../../src/Eigen/
 LDFLAGS    = ${LDFLAGS_COMMON}
 EXECUTABLE = ../../bin/svdOutOfCoreMultiple

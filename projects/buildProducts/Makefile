@@ -1,9 +1,8 @@
 include ../include.mk
 
 # calls:
-CC         = gcc-13
-CFLAGS     = ${CFLAGS_COMMON} -Wno-deprecated
-LDFLAGS    = ${LDFLAGS_COMMON} 
+CFLAGS     = ${CFLAGS_COMMON} 
+LDFLAGS    = ${LDFLAGS_COMMON}
 EXECUTABLE = ../../bin/buildProducts
 
 SOURCES    = buildProducts.cpp \

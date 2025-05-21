@@ -1,7 +1,6 @@
 include ../include.mk
 
 # calls:
-CC         = gcc-13
 CFLAGS     = ${CFLAGS_COMMON} -I../../src/cubature -I../../src/Eigen/ -I../../src/compression
 LDFLAGS    = ${LDFLAGS_COMMON}
 EXECUTABLE = ../../bin/compressMatrices
