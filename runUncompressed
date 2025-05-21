@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Default config file
+DEFAULT_CONFIG="cfg/stam.64.cfg"
+
+# Use provided config file if given, otherwise use default
+CONFIG_FILE=${1:-$DEFAULT_CONFIG}
+
+# Run the reduced3D executable with the config file
+echo "Using config file: $CONFIG_FILE"
+./bin/reduced3D "$CONFIG_FILE" 
