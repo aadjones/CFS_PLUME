@@ -24,6 +24,12 @@
 #include "BIG_MATRIX.h"
 #include "MATRIX_COMPRESSION_DATA.h"
 #include "COMPRESSION.h"
+#include <sys/stat.h>
+#include <string>
+#include <fstream>
+
+// Function declarations
+size_t getFileSize(const string& filename);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -86,12 +92,27 @@ SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::SUBSPACE_FLUID_3D_COMPRESSED_EIGEN(int xRes,
 //////////////////////////////////////////////////////////////////////
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::initOutOfCore()
 {
+  cout << "Starting initOutOfCore..." << endl;
+  cout << "_reducedPath length: " << _reducedPath.length() << endl;
+  cout << "_reducedPath contents: '" << _reducedPath << "'" << endl;
+  
   // init the peeled dimensions
   _xPeeled = _xRes - 2;
   _yPeeled = _yRes - 2;
   _zPeeled = _zRes - 2;
   _slabPeeled = _xPeeled * _yPeeled;
 
+  cout << "Checking for required files..." << endl;
+  string ptofPath = _reducedPath + string("projected.ptof.matrix");
+  string vtodPath = _reducedPath + string("projected.vtod.matrix");
+  string ptovPath = _reducedPath + string("projected.ptov.matrix");
+  string aPath = _reducedPath + string("projected.A.matrix");
+  string dampingPath = _reducedPath + string("damping.peeled.matrix");
+  string inversePath = _reducedPath + string("inverseProduct.matrix");
+  
+  cout << "Checking ptof path: '" << ptofPath << "'" << endl;
+  cout << "ptof path length: " << ptofPath.length() << endl;
+  
   bool pcaBuilt = fileExists(_reducedPath + string("U.final.componentX")) &&
                   fileExists(_reducedPath + string("U.final.componentY")) &&
                   fileExists(_reducedPath + string("U.final.componentZ")) &&
@@ -101,13 +122,18 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::initOutOfCore()
                   fileExists(_reducedPath + string("U.preadvect.componentZ")) &&
                   fileExists(_reducedPath + string("U.pressure.matrix"));
 
+  cout << "PCA files built: " << pcaBuilt << endl;
+
   // check if pre-built matrices exist
-  bool filesBuilt = fileExists(_reducedPath + string("projected.A.matrix")) &&
-                    fileExists(_reducedPath + string("projected.ptof.matrix")) &&
-                    fileExists(_reducedPath + string("projected.vtod.matrix")) &&
-                    fileExists(_reducedPath + string("damping.peeled.matrix")) &&
-                    fileExists(_reducedPath + string("projected.ptov.matrix")) &&
-                    fileExists(_reducedPath + string("inverseProduct.matrix"));
+  cout << "Checking for pre-built matrices..." << endl;
+  bool filesBuilt = fileExists(aPath) &&
+                    fileExists(ptofPath) &&
+                    fileExists(vtodPath) &&
+                    fileExists(dampingPath) &&
+                    fileExists(ptovPath) &&
+                    fileExists(inversePath);
+
+  cout << "Pre-built matrices exist: " << filesBuilt << endl;
 
   if (!filesBuilt) {
     cout << "Error: pre-built matrices do not yet exist!" << endl;
@@ -116,37 +142,66 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::initOutOfCore()
   }
   else
   {
-    string filename;
+    cout << "Reading projected.ptof.matrix..." << endl;
+    cout << "Full path: '" << ptofPath << "'" << endl;
+    cout << "File exists: " << fileExists(ptofPath) << endl;
+    cout << "File size: " << getFileSize(ptofPath) << " bytes" << endl;
     
-    filename = _reducedPath + string("projected.ptof.matrix");
-    EIGEN::read(filename, _preprojectToFinal);
-    cout << "Read projected.ptof.matrix into _preprojectToFinal. " << endl;
+    try {
+      // Verify string is properly terminated
+      const char* cstr = ptofPath.c_str();
+      cout << "C string length: " << strlen(cstr) << endl;
+      cout << "First 10 chars of path: ";
+      for(int i = 0; i < 10 && cstr[i] != '\0'; i++) {
+        cout << "'" << cstr[i] << "' ";
+      }
+      cout << endl;
+      
+      EIGEN::read(ptofPath, _preprojectToFinal);
+      cout << "Successfully read projected.ptof.matrix" << endl;
+      cout << "Matrix dimensions: (" << _preprojectToFinal.rows() << ", " << _preprojectToFinal.cols() << ")" << endl;
+    } catch (const std::exception& e) {
+      cout << "Error reading projected.ptof.matrix: " << e.what() << endl;
+      cout << "Error type: " << typeid(e).name() << endl;
+      throw;
+    } catch (...) {
+      cout << "Unknown error occurred while reading projected.ptof.matrix" << endl;
+      throw;
+    }
 
-    filename = _reducedPath + string("projected.vtod.matrix");
-    EIGEN::read(filename, _reducedVelocityToDivergence);
+    cout << "Reading projected.vtod.matrix..." << endl;
+    EIGEN::read(vtodPath, _reducedVelocityToDivergence);
 
-    filename = _reducedPath + string("projected.ptov.matrix");
-    EIGEN::read(filename, _reducedPressureToVelocity);
+    cout << "Reading projected.ptov.matrix..." << endl;
+    EIGEN::read(ptovPath, _reducedPressureToVelocity);
 
-    filename = _reducedPath + string("projected.A.matrix");
-    EIGEN::read(filename, _reducedA);
+    cout << "Reading projected.A.matrix..." << endl;
+    EIGEN::read(aPath, _reducedA);
 
-    filename = _reducedPath + string("damping.peeled.matrix");
-    EIGEN::read(filename, _dampingMatrixReduced);
+    cout << "Reading damping.peeled.matrix..." << endl;
+    EIGEN::read(dampingPath, _dampingMatrixReduced);
     
-    filename = _reducedPath + string("inverseProduct.matrix");
-    bool success = EIGEN::read(filename, _inverseProduct);
+    cout << "Reading inverseProduct.matrix..." << endl;
+    bool success = EIGEN::read(inversePath, _inverseProduct);
 
     if (!success)
     {
       // Needs everything prior to be built already
       MatrixXd inverse = _reducedA.inverse();
       _inverseProduct = _reducedPressureToVelocity * inverse * _reducedVelocityToDivergence;
-      filename = _reducedPath + string("inverseProduct.matrix");
-      EIGEN::write(filename, _inverseProduct);
+      EIGEN::write(inversePath, _inverseProduct);
       TIMER::printTimings();
     }
   }
+}
+
+// Helper function to get file size
+size_t getFileSize(const string& filename) {
+  struct stat st;
+  if (stat(filename.c_str(), &st) == 0) {
+    return st.st_size;
+  }
+  return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -504,42 +559,38 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::stepPlume()
   addVorticity();
   _velocity.axpy(_dt, _force);
 
-  TIMER projectionTimer("Velocity projection");
-
-  // project into the subspace
+  puts("DEBUG: Starting projection into subspace");
+  // Projection into subspace
   PeeledCompressedProjectTransformNoSVD(_velocity, &_U_preadvect_data, &_qDot);
-  // cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " : " << endl;
-  // PeeledCompressedProject(_velocity, &_U_preadvect_data, &_qDot);
-  cout << "Finished projection! " << endl;
-  projectionTimer.stop();
+  puts("DEBUG: Finished projection into subspace");
+  printf("DEBUG: _qDot size after projection: %lu\n", _qDot.size());
 
-  // then advect
-
-  // full-space advect heat and density
+  puts("DEBUG: Starting heat and density advection");
+  // Advection
   advectHeatAndDensityStam();
-  cout << "Finished advect heat and density!" << endl;
+  puts("DEBUG: Finished heat and density advection");
 
-  // reduced advect velocity
-
+  puts("DEBUG: Starting reduced advection");
   reducedAdvectCompressionFriendly();
-  cout << "Finished compression-friendly advection!" << endl;
-  
-  //cout << " post advection qDot: " << _qDot << endl;
-  //exit(0);
+  puts("DEBUG: Finished reduced advection");
+  printf("DEBUG: _qDot size after advection: %lu\n", _qDot.size());
 
-  // then diffuse 
-  TIMER diffusionProjectionTimer("Reduced diffusion");
+  puts("DEBUG: Starting diffusion");
+  // Diffusion
   reducedPeeledDiffusion();
-  diffusionProjectionTimer.stop();
+  puts("DEBUG: Finished diffusion");
+  printf("DEBUG: _qDot size after diffusion: %lu\n", _qDot.size());
 
-  // then pressure project
+  puts("DEBUG: Starting pressure projection");
+  // Pressure projection
   reducedStagedProject();
+  puts("DEBUG: Finished pressure projection");
+  printf("DEBUG: _qDot size after pressure projection: %lu\n", _qDot.size());
 
-  // come back to full space
-  TIMER unprojectionTimer("Velocity unprojection");
+  puts("DEBUG: Starting unprojection");
+  // Unprojection
   PeeledCompressedUnprojectTransform(&_U_final_data, _qDot, &_velocity);
-  // PeeledCompressedUnproject(&_U_final_data, _qDot, &_velocity);
-  unprojectionTimer.stop();
+  puts("DEBUG: Finished unprojection");
 
   currentTime += _dt;
 
@@ -1013,13 +1064,28 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::computePressureToVelocity()
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::reducedStagedProject()
 {
   TIMER functionTimer(__FUNCTION__);
-  cout << "_preprojectToFinal size: " << '(' << _preprojectToFinal.rows() 
-    << ", " << _preprojectToFinal.cols() << ")\n";
+  puts("DEBUG: Starting reducedStagedProject");
+  printf("DEBUG: _preprojectToFinal dimensions: (%lu, %lu)\n", _preprojectToFinal.rows(), _preprojectToFinal.cols());
+  printf("DEBUG: _qDot size before projection: %lu\n", _qDot.size());
+  printf("DEBUG: _inverseProduct dimensions: (%lu, %lu)\n", _inverseProduct.rows(), _inverseProduct.cols());
+  
+  // Check if dimensions match before operations
+  if (_preprojectToFinal.cols() != _qDot.size()) {
+    printf("ERROR: Dimension mismatch in _preprojectToFinal * _qDot: (%lu, %lu) * (%lu)\n", 
+           _preprojectToFinal.rows(), _preprojectToFinal.cols(), _qDot.size());
+    exit(1);
+  }
+  if (_inverseProduct.cols() != _qDot.size()) {
+    printf("ERROR: Dimension mismatch in _inverseProduct * _qDot: (%lu, %lu) * (%lu)\n", 
+           _inverseProduct.rows(), _inverseProduct.cols(), _qDot.size());
+    exit(1);
+  }
 
-  cout << "_inverseProduct size: " << '(' << _inverseProduct.rows()
-    << ", " << _inverseProduct.cols() << ")\n";
-
+  puts("DEBUG: Performing matrix operations");
   _qDot = _preprojectToFinal * _qDot + _inverseProduct * _qDot;
+  puts("DEBUG: Matrix operations completed");
+  printf("DEBUG: _qDot size after projection: %lu\n", _qDot.size());
+  puts("DEBUG: Finished reducedStagedProject");
 }
 //////////////////////////////////////////////////////////////////////
 // do a staged reduced order pressure projection for IOP
@@ -1062,11 +1128,11 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::diffGroundTruth()
   cout << " velocity abs error:      " << _velocityErrorAbs.back() << endl;
   cout << " velocity relative error: " << _velocityErrorRelative.back() << endl;
 
-  diff = _density.peelBoundary().flattenedEigen() - ground.density().peelBoundary().flattenedEigen();
-  _densityErrorAbs.push_back(diff.norm());
-  _densityErrorRelative.push_back(diff.norm() / _density.peelBoundary().flattenedEigen().norm());
-  cout << " density abs error:      " << _densityErrorAbs.back() << endl;
-  cout << " density relative error: " << _densityErrorRelative.back() << endl;
+  // diff = testDensity.peelBoundary().flattenedEigen() - _density.peelBoundary().flattenedEigen();
+  // _densityErrorAbs.push_back(diff.norm());
+  // _densityErrorRelative.push_back(diff.norm() / _density.peelBoundary().flattened().norm2());
+  // cout << " density abs error:      " << _densityErrorAbs.back() << endl;
+  // cout << " density relative error: " << _densityErrorRelative.back() << endl;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1690,37 +1756,30 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::loadReducedRuntimeBases(string path)
 
   string filename;
   
-  COMPRESSION_DATA compression_data0;
-  COMPRESSION_DATA compression_data1;
-  COMPRESSION_DATA compression_data2;
-
+  // Use member variables instead of stack variables
   string preadvectFile = _compressionPath + string("U.preadvect.component0");
-  int* allData0 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data0);
+  int* allData0 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data0);
   preadvectFile = _compressionPath + string("U.preadvect.component1");
-  int* allData1 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data1);
+  int* allData1 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data1);
   preadvectFile = _compressionPath + string("U.preadvect.component2");
-  int* allData2 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data2);
+  int* allData2 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data2);
 
   _U_preadvect_data = MATRIX_COMPRESSION_DATA(allData0, allData1, allData2,
-      &compression_data0, &compression_data1, &compression_data2); 
+      &_compression_data0, &_compression_data1, &_compression_data2); 
 
   _U_preadvect_data.dct_setup(-1);
   _U_preadvect_data.init_cache();
   _U_preadvect_data.set_dampingArrayLists();
 
-  COMPRESSION_DATA final_compression_data0;
-  COMPRESSION_DATA final_compression_data1;
-  COMPRESSION_DATA final_compression_data2;
-
   string finalFile = _compressionPath + string("U.final.component0");
-  allData0 = ReadBinaryFileToMemory(finalFile.c_str(), &final_compression_data0);
+  allData0 = ReadBinaryFileToMemory(finalFile.c_str(), &_final_compression_data0);
   finalFile = _compressionPath + string("U.final.component1");
-  allData1 = ReadBinaryFileToMemory(finalFile.c_str(), &final_compression_data1);
+  allData1 = ReadBinaryFileToMemory(finalFile.c_str(), &_final_compression_data1);
   finalFile = _compressionPath + string("U.final.component2");
-  allData2 = ReadBinaryFileToMemory(finalFile.c_str(), &final_compression_data2);
+  allData2 = ReadBinaryFileToMemory(finalFile.c_str(), &_final_compression_data2);
 
   _U_final_data = MATRIX_COMPRESSION_DATA(allData0, allData1, allData2,
-      &final_compression_data0, &final_compression_data1, &final_compression_data2); 
+      &_final_compression_data0, &_final_compression_data1, &_final_compression_data2); 
 
   _U_final_data.dct_setup(-1);
   _U_final_data.init_cache();
@@ -1736,48 +1795,66 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::loadReducedRuntimeBases(string path)
 //////////////////////////////////////////////////////////////////////
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::loadReducedIOP(string path)
 {
- // DEBUG
- puts(" Called loadReducedIOP in the compressed code!");
- TIMER functionTimer(__FUNCTION__);
-  if (path.length() == 0)
-    path = _reducedPath;
+  // DEBUG
+  puts("Called loadReducedIOP in the compressed code!");
+  TIMER functionTimer(__FUNCTION__);
   
-  COMPRESSION_DATA compression_data0;
-  COMPRESSION_DATA compression_data1;
-  COMPRESSION_DATA compression_data2;
-
+  if (path.length() == 0) {
+    path = _reducedPath;
+    cout << "Using default reduced path: " << path << endl;
+  } else {
+    cout << "Using provided path: " << path << endl;
+  }
+  
+  cout << "Compression path: " << _compressionPath << endl;
+  
+  // Use member variables instead of stack variables
   string preadvectFile = _compressionPath + string("U.preadvect.component0");
-  cout << "Trying to open file: " << preadvectFile << endl;
-  int* allData0 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data0);
+  cout << "Attempting to open file: " << preadvectFile << endl;
+  cout << "Checking if file exists..." << endl;
+  if (!fileExists(preadvectFile)) {
+    cout << "ERROR: File does not exist: " << preadvectFile << endl;
+    cout << "Current working directory: ";
+    system("pwd");
+    cout << "Directory contents of " << _compressionPath << ":" << endl;
+    system(("ls -la " + _compressionPath).c_str());
+    exit(EXIT_FAILURE);
+  }
+  int* allData0 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data0);
+  
   preadvectFile = _compressionPath + string("U.preadvect.component1");
-  cout << "Trying to open file: " << preadvectFile << endl;
-  int* allData1 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data1);
+  cout << "Attempting to open file: " << preadvectFile << endl;
+  if (!fileExists(preadvectFile)) {
+    cout << "ERROR: File does not exist: " << preadvectFile << endl;
+    exit(EXIT_FAILURE);
+  }
+  int* allData1 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data1);
+  
   preadvectFile = _compressionPath + string("U.preadvect.component2");
-  cout << "Trying to open file: " << preadvectFile << endl;
-  int* allData2 = ReadBinaryFileToMemory(preadvectFile.c_str(), &compression_data2);
+  cout << "Attempting to open file: " << preadvectFile << endl;
+  if (!fileExists(preadvectFile)) {
+    cout << "ERROR: File does not exist: " << preadvectFile << endl;
+    exit(EXIT_FAILURE);
+  }
+  int* allData2 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data2);
 
   _U_preadvect_data = MATRIX_COMPRESSION_DATA(allData0, allData1, allData2,
-      &compression_data0, &compression_data1, &compression_data2); 
+      &_compression_data0, &_compression_data1, &_compression_data2); 
 
   // DEBUG
   // _U_preadvect_data.init_cache();
   // _U_preadvect_data.dct_setup(-1);
   _U_preadvect_data.set_dampingArrayLists();
 
-  COMPRESSION_DATA final_compression_data0;
-  COMPRESSION_DATA final_compression_data1;
-  COMPRESSION_DATA final_compression_data2;
-
   string finalFile = _compressionPath + string("U.final.component0");
-  allData0 = ReadBinaryFileToMemory(finalFile.c_str(), &final_compression_data0);
+  allData0 = ReadBinaryFileToMemory(finalFile.c_str(), &_final_compression_data0);
   finalFile = _compressionPath + string("U.final.component1");
-  allData1 = ReadBinaryFileToMemory(finalFile.c_str(), &final_compression_data1);
+  allData1 = ReadBinaryFileToMemory(finalFile.c_str(), &_final_compression_data1);
   finalFile = _compressionPath + string("U.final.component2");
-  allData2 = ReadBinaryFileToMemory(finalFile.c_str(), &final_compression_data2);
-
+  allData2 = ReadBinaryFileToMemory(finalFile.c_str(), &_final_compression_data2);
 
   _U_final_data = MATRIX_COMPRESSION_DATA(allData0, allData1, allData2,
-      &final_compression_data0, &final_compression_data1, &final_compression_data2); 
+      &_final_compression_data0, &_final_compression_data1, &_final_compression_data2); 
 
   // DEBUG
   // _U_final_data.init_cache();

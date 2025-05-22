@@ -40,14 +40,28 @@
 #include "VECTOR3_FIELD_3D.h"
 #include <sys/stat.h>
 #include <errno.h>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+#include <ctime>
 
 using std::vector;
 using std::string;
-
+using std::chrono::system_clock;
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+using std::stringstream;
+using std::put_time;
+using std::localtime;
+using std::setfill;
+using std::setw;
 
 ////////////////////////////////////////////////////////
 // Function Declarations
 ////////////////////////////////////////////////////////
+
+// Helper function to get current time as string
+string getCurrentTime();
 
 // set the damping matrix and compute the number of blocks
 void PreprocessEncoder(COMPRESSION_DATA* data0, COMPRESSION_DATA* data1, COMPRESSION_DATA* data2, int maxIterations, const char* filename);
@@ -81,63 +95,90 @@ string cfgFilename;
 int main(int argc, char* argv[]) {
   TIMER functionTimer(__FUNCTION__);
   
+  cout << "\n=== Starting compression process at " << getCurrentTime() << " ===" << endl;
+  
   // read in the cfg file
   if (argc != 2) {
-    cout << " Usage: " << argv[0] << " *.cfg" << endl;
-    return 0;
+    cout << "Error: Usage: " << argv[0] << " *.cfg" << endl;
+    return 1;
   }
   
+  cout << "Reading configuration from: " << argv[1] << endl;
   SIMPLE_PARSER parser(argv[1]);
   cfgFilename = argv[1];
   string reducedPath = parser.getString("reduced path", "./data/reduced.dummy/"); 
   
+  cout << "Creating reduced path directory: " << reducedPath << endl;
   // Create reduced path directory if it doesn't exist
   if (!createDirectoryIfNotExists(reducedPath)) {
-    cout << "Failed to create reduced path directory. Exiting." << endl;
+    cout << "Error: Failed to create reduced path directory: " << reducedPath << endl;
     return 1;
   }
 
+  cout << "\n=== Reading simulation parameters ===" << endl;
   int xRes = parser.getInt("xRes", 48);
   int yRes = parser.getInt("yRes", 64);
   int zRes = parser.getInt("zRes", 48);
   int numCols = parser.getInt("reduced snapshots", 50);
   bool usingIOP = parser.getBool("iop", 0);
-  cout << " Using IOP: " << usingIOP << endl;
-  cout << " Block size: " << BLOCK_SIZE << endl; 
+  cout << "Simulation dimensions: " << xRes << "x" << yRes << "x" << zRes << endl;
+  cout << "Number of snapshots: " << numCols << endl;
+  cout << "Using IOP: " << (usingIOP ? "Yes" : "No") << endl;
+  cout << "Block size: " << BLOCK_SIZE << endl; 
+
   // we want the peeled resolutions for the matrices
   xRes -= 2;
   yRes -= 2;
   zRes -= 2;
+  cout << "Peeled dimensions: " << xRes << "x" << yRes << "x" << zRes << endl;
 
   VEC3I dims(xRes, yRes, zRes);
   
   // times 3 since it is a VELOCITY3_FIELD_3D flattened out
   int numRows = 3 * xRes * yRes * zRes;
-  cout << "numRows: " << numRows << endl;
-  cout << "numCols: "<< numCols << endl;
+  cout << "Matrix dimensions: " << numRows << "x" << numCols << endl;
 
+  // Initialize matrices
   MatrixXd U_preadvect(numRows, numCols);
   MatrixXd U_final(numRows, numCols);
 
+  cout << "\n=== Reading compression parameters ===" << endl;
   int nBits = parser.getInt("nBits", 24); 
-  cout << " nBits: " << nBits << endl;
   double percent = parser.getFloat("percent", 0.99);
-  cout << " percent: " << percent << endl;
   int maxIterations = parser.getInt("maxIterations", 32);
-  cout << " maxIterations: " << maxIterations << endl;
   bool debug = parser.getBool("debug", false);
-  cout << "debug: " << debug << endl;
-
   bool usingFastPow = parser.getBool("fastPow", false);
-  cout << " fastPow: " << usingFastPow << endl;
+  
+  cout << "Compression settings:" << endl;
+  cout << "  - Bits per value: " << nBits << endl;
+  cout << "  - Compression percentage: " << percent << endl;
+  cout << "  - Max iterations: " << maxIterations << endl;
+  cout << "  - Debug mode: " << (debug ? "Enabled" : "Disabled") << endl;
+  cout << "  - Fast power: " << (usingFastPow ? "Enabled" : "Disabled") << endl;
+
   FIELD_3D::usingFastPow() = usingFastPow;
 
+  cout << "\n=== Loading input matrices ===" << endl;
   preadvectPath = reducedPath + string("U.preadvect.matrix");
   finalPath = reducedPath + string("U.final.matrix");
 
+  cout << "Reading preadvect matrix from: " << preadvectPath << endl;
+  if (!fileExists(preadvectPath)) {
+    cout << "Error: Preadvect matrix file not found: " << preadvectPath << endl;
+    return 1;
+  }
   EIGEN::read(preadvectPath, U_preadvect);
-  EIGEN::read(finalPath, U_final);
+  cout << "Successfully read preadvect matrix" << endl;
 
+  cout << "Reading final matrix from: " << finalPath << endl;
+  if (!fileExists(finalPath)) {
+    cout << "Error: Final matrix file not found: " << finalPath << endl;
+    return 1;
+  }
+  EIGEN::read(finalPath, U_final);
+  cout << "Successfully read final matrix" << endl;
+
+  cout << "\n=== Initializing compression data ===" << endl;
   // set the parameters in compression data
   COMPRESSION_DATA preadvect_compression_data0(dims, numCols, nBits, percent);
   COMPRESSION_DATA preadvect_compression_data1(dims, numCols, nBits, percent);
@@ -146,128 +187,75 @@ int main(int argc, char* argv[]) {
   COMPRESSION_DATA final_compression_data1(dims, numCols, nBits, percent);
   COMPRESSION_DATA final_compression_data2(dims, numCols, nBits, percent);
 
-  /*
-  // compute some additional parameters for compression data
-  const char* preadvectSingularFilename = "singularValues_preadvect.vector";
-  PreprocessEncoder(&preadvect_compression_data0, &preadvect_compression_data1, &preadvect_compression_data2, 
-      maxIterations, preadvectSingularFilename);
-  const char* finalSingularFilename = "singularValues_final.vector";
-  PreprocessEncoder(&final_compression_data0, &final_compression_data1, &final_compression_data2,
-      maxIterations, finalSingularFilename);
-  */
-
-  // ADJ: change this threshold to modulate singular value damping
-  
-  
-  const double threshold = 1.0; 
-  // ADJ: change the scratch path to SSD for big runs!
+  cout << "Setting up scratch directory..." << endl;
   string scratchPath = "./scratch/";
-  
-  // Create scratch directory if it doesn't exist
   if (!createDirectoryIfNotExists(scratchPath)) {
-    cout << "Failed to create scratch directory. Exiting." << endl;
+    cout << "Error: Failed to create scratch directory: " << scratchPath << endl;
     return 1;
   }
 
   string preadvectSingularFilename = scratchPath + string("velocity.preadvect.matrix.singularValues.vector");
+  string finalSingularFilename = scratchPath + string("velocity.final.matrix.singularValues.vector");
 
-  /*
-  string preadvectProcessed = preadvectSingularFilename + string(".processed");
-  if (!fileExists(preadvectProcessed)) {
-    puts("Preadvect singular values are unprocessed; processing now...");
-    printf("Threshold equals: %f\n", threshold);
-    PreprocessSingularValues(preadvectSingularFilename.c_str(), threshold);
-    puts("Done.");
-  }
-  
-  else { 
-    puts("Rewriting over previously pre-processed preadvect singular values...");
-    printf("Threshold equals: %f\n", threshold);
-    PreprocessSingularValues(preadvectSingularFilename.c_str(), threshold);
-  }
-  */
-
+  cout << "\n=== Preprocessing encoder data ===" << endl;
+  cout << "Processing preadvect data..." << endl;
   PreprocessEncoder(&preadvect_compression_data0, &preadvect_compression_data1, &preadvect_compression_data2, 
       maxIterations, preadvectSingularFilename.c_str());
-  
-
-  string finalSingularFilename = scratchPath + string("velocity.final.matrix.singularValues.vector");
-  /*
-  string finalProcessed = finalSingularFilename + string(".processed");
-  if (!fileExists(finalProcessed)) {
-    puts("FInal singular values are unprocessed; processing now...");
-    printf("Threshold equals: %f\n", threshold);
-    PreprocessSingularValues(finalSingularFilename.c_str(), threshold);
-  }
-
-  else {
-    puts("Rewriting over previously pre-processed final singular values...");
-    printf("Threshold equals: %f\n", threshold);
-    PreprocessSingularValues(finalSingularFilename.c_str(), threshold);
-  }
-  */
-
+  cout << "Processing final data..." << endl;
   PreprocessEncoder(&final_compression_data0, &final_compression_data1, &final_compression_data2,
       maxIterations, finalSingularFilename.c_str());
 
-  // write a binary file for each scalar field component
+  cout << "\n=== Setting up output directories ===" << endl;
   string tmpDir = reducedPath + string("tmp");
   if (!createDirectoryIfNotExists(tmpDir)) {
-    cout << "Failed to create tmp directory. Exiting." << endl;
+    cout << "Error: Failed to create tmp directory: " << tmpDir << endl;
     return 1;
   }
 
   string preadvectFilename = reducedPath + string("tmp/U.preadvect.component");
   string finalFilename = reducedPath + string("tmp/U.final.component");
 
-
-  // write out the compressed matrix files
-
+  cout << "\n=== Starting compression ===" << endl;
   if (debug) {
+    cout << "Running in debug mode..." << endl;
     CompressAndWriteMatrixComponentsDebug(preadvectFilename.c_str(), U_preadvect, &preadvect_compression_data0,
       &preadvect_compression_data1, &preadvect_compression_data2);
 
     CompressAndWriteMatrixComponentsDebug(finalFilename.c_str(), U_final, &final_compression_data0, 
       &final_compression_data1, &final_compression_data2);
+  } else {
+    cout << "Running in normal mode..." << endl;
+    cout << "Compressing preadvect matrix..." << endl;
+    CompressAndWriteMatrixComponents(preadvectFilename.c_str(), U_preadvect, &preadvect_compression_data0,
+      &preadvect_compression_data1, &preadvect_compression_data2);
+    
+    cout << "Compressing final matrix..." << endl;
+    CompressAndWriteMatrixComponents(finalFilename.c_str(), U_final, &final_compression_data0, 
+      &final_compression_data1, &final_compression_data2);
   }
 
-    else {
-      CompressAndWriteMatrixComponents(preadvectFilename.c_str(), U_preadvect, &preadvect_compression_data0,
-        &preadvect_compression_data1, &preadvect_compression_data2);
-    
-      CompressAndWriteMatrixComponents(finalFilename.c_str(), U_final, &final_compression_data0, 
-        &final_compression_data1, &final_compression_data2);
-      
-
-      // ADJ: this is old experimental code testing out the different DCT/DST hybrids
-      /*
-      for (int planType = 0; planType < 8; planType++) {
-
-        CompressAndWriteMatrixComponentsDST(preadvectFilename.c_str(), planType, U_preadvect, &preadvect_compression_data0,
-          &preadvect_compression_data1, &preadvect_compression_data2);
-
-        CompressAndWriteMatrixComponentsDST(finalFilename.c_str(), planType, U_final, &final_compression_data0,
-          &final_compression_data1, &final_compression_data2);
-      } 
-      */
-
-    }
-
+  cout << "\n=== Computing compression ratios ===" << endl;
   double ratio = GetCompressionRatios(preadvectFilename, finalFilename);
   int roundedRatio = rint(ratio);
+  cout << "Rounded compression ratio: " << roundedRatio << ":1" << endl;
+
+  cout << "\n=== Finalizing output ===" << endl;
   string newName = reducedPath + to_string(roundedRatio) + string("to1");
   string rename = string("mv ") + reducedPath + string("tmp ") + newName;
+  cout << "Moving compressed data to: " << newName << endl;
   system(rename.c_str());
   
-  // Create pbrt directory in the new location
   string pbrtDir = newName + string("/pbrt");
   if (!createDirectoryIfNotExists(pbrtDir)) {
-    cout << "Failed to create pbrt directory. Exiting." << endl;
+    cout << "Error: Failed to create pbrt directory: " << pbrtDir << endl;
     return 1;
   }
 
+  cout << "Updating configuration file..." << endl;
   UpdateCfgFile(roundedRatio);
 
+  cout << "\n=== Compression process completed at " << getCurrentTime() << " ===" << endl;
+  cout << "Timing information:" << endl;
   TIMER::printTimings();
   
   return 0;
@@ -442,4 +430,15 @@ bool createDirectoryIfNotExists(const string& path) {
         return false;
     }
     return true;
+}
+
+// Helper function to get current time as string
+string getCurrentTime() {
+    auto now = system_clock::now();
+    auto now_time_t = system_clock::to_time_t(now);
+    auto now_ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+    stringstream ss;
+    ss << put_time(std::localtime(&now_time_t), "%Y-%m-%d %H:%M:%S");
+    ss << '.' << setfill('0') << setw(3) << now_ms.count();
+    return ss.str();
 }

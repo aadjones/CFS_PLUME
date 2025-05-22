@@ -58,8 +58,6 @@ class MATRIX_COMPRESSION_DATA {
     // don't call this until _numCols has been set!
     void init_cache()
     {
-      cout << "Calling init_cache()! " << endl;
-
       // initialize cached block number to nonsense
       _cachedBlockNumber = -1;
 
@@ -84,14 +82,11 @@ class MATRIX_COMPRESSION_DATA {
       for (auto itr = _cachedBlocksZ.begin(); itr != _cachedBlocksZ.end(); ++itr) {
         (*itr).resizeAndWipe(xRes, yRes, zRes);
       }
-
     }
 
 
     void dct_setup(int direction)
     {
-      cout << "Calling dct_setup(direction)! " << endl;
-
       const int xRes = BLOCK_SIZE;
       const int yRes = BLOCK_SIZE;
       const int zRes = BLOCK_SIZE;
@@ -102,10 +97,9 @@ class MATRIX_COMPRESSION_DATA {
          _dct_plan = fftw_plan_r2r_3d(zRes, yRes, xRes, _dct_in, _dct_in,
              FFTW_REDFT10, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE);
       }
-
       else { // direction == -1; backward transform
          _dct_plan = fftw_plan_r2r_3d(zRes, yRes, xRes, _dct_in, _dct_in,
-      FFTW_REDFT01, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
+             FFTW_REDFT01, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
       }
     }
 
@@ -118,7 +112,6 @@ class MATRIX_COMPRESSION_DATA {
 
   // build the damping arrays in each component
   void set_dampingArrayLists() {
-    puts("Calling set_dampingArrayLists!");
     _compression_dataX.set_dampingArrayList();
     _compression_dataY.set_dampingArrayList();
     _compression_dataZ.set_dampingArrayList();

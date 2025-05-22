@@ -23,7 +23,21 @@
 //////////////////////////////////////////////////////////////////////
 bool EIGEN::read(const string& filename, MatrixXd& input)
 {
+  cout << "EIGEN::read: Starting to read file: " << filename << endl;
+  cout << "EIGEN::read: Filename length: " << filename.length() << endl;
+  cout << "EIGEN::read: Filename contents: '" << filename << "'" << endl;
+  
+  // Verify string is properly terminated
+  const char* cstr = filename.c_str();
+  cout << "EIGEN::read: C string length: " << strlen(cstr) << endl;
+  cout << "EIGEN::read: First 10 chars of path: ";
+  for(int i = 0; i < 10 && cstr[i] != '\0'; i++) {
+    cout << "'" << cstr[i] << "' ";
+  }
+  cout << endl;
+
   string copy = filename;
+  cout << "EIGEN::read: Copy length: " << copy.length() << endl;
 
   // make sure it's names gz
   int size = copy.size();
@@ -37,47 +51,72 @@ bool EIGEN::read(const string& filename, MatrixXd& input)
   }
 
   FILE* file;
+  cout << "EIGEN::read: Opening file for reading..." << endl;
+  cout << "EIGEN::read: Using path: '" << copy.c_str() << "'" << endl;
   file = fopen(copy.c_str(), "rb");
   if (file == NULL)
   {
     cout << __FILE__ << " " << __LINE__ << " : File " << copy << " not found! " << endl;
+    cout << "EIGEN::read: Error opening file: " << strerror(errno) << endl;
+    cout << "EIGEN::read: errno: " << errno << endl;
     return false;
   }
-  cout << " Reading file: " << copy.c_str() << " ... ";flush(cout);
+  cout << "EIGEN::read: Successfully opened file" << endl;
 
   // read dimensions
   int rows, cols;
-  fread((void*)&rows, sizeof(int), 1, file);
-  fread((void*)&cols, sizeof(int), 1, file);
+  cout << "EIGEN::read: Reading matrix dimensions..." << endl;
+  size_t read_rows = fread((void*)&rows, sizeof(int), 1, file);
+  size_t read_cols = fread((void*)&cols, sizeof(int), 1, file);
+  
+  if (read_rows != 1 || read_cols != 1) {
+    cout << "EIGEN::read: Error reading dimensions. Read " << read_rows << " rows and " << read_cols << " cols" << endl;
+    cout << "EIGEN::read: Error: " << strerror(errno) << endl;
+    fclose(file);
+    return false;
+  }
+  
+  cout << "EIGEN::read: Matrix dimensions: (" << rows << ", " << cols << ")" << endl;
+  
+  if (rows <= 0 || cols <= 0) {
+    cout << "EIGEN::read: Invalid matrix dimensions!" << endl;
+    fclose(file);
+    return false;
+  }
+
+  cout << "EIGEN::read: Resizing matrix..." << endl;
   input.resize(rows, cols);
   input.setZero();
 
-  cout << " rows: " << rows << " cols: " << cols << " " << flush;
-
+  cout << "EIGEN::read: Starting to read matrix data..." << endl;
   int tenth = rows / 10;
-
-  // fread appears to fail after 2 GB?
-  // need to read entry-by-entry for this reason
   double dummy;
   int index = 0;
   for (int x = 0; x < rows; x++)
   {
     for (int y = 0; y < cols; y++, index++)
     {
-      fread((void*)&dummy, sizeof(double), 1, file);
+      size_t read_size = fread((void*)&dummy, sizeof(double), 1, file);
+      if (read_size != 1) {
+        cout << "EIGEN::read: Error reading element at (" << x << "," << y << ")" << endl;
+        cout << "EIGEN::read: Error: " << strerror(errno) << endl;
+        fclose(file);
+        return false;
+      }
       input(x,y) = dummy;
     }
 
     if (rows > 10000000 && x > 0 && x % tenth == 0)
     {
-      cout << " Purging at " << x << " of " << rows << " rows... " << flush;
+      cout << "EIGEN::read: Purging at " << x << " of " << rows << " rows... " << flush;
       system("purge");
       cout << " done." << flush;
     }
   }
 
+  cout << "EIGEN::read: Successfully read all matrix data" << endl;
   fclose(file);
-  cout << "done." << endl;
+  cout << "EIGEN::read: File closed successfully" << endl;
 
   return true;
 }

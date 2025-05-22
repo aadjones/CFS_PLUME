@@ -671,8 +671,9 @@ void SUBSPACE_FLUID_3D_EIGEN::computePressureToVelocity()
 void SUBSPACE_FLUID_3D_EIGEN::reducedStagedProject()
 {
   TIMER functionTimer(__FUNCTION__);
-  cout << "_preprojectToFinal.cols: " << _preprojectToFinal.cols() << endl;
+  cout << "_preprojectToFinal size: (" << _preprojectToFinal.rows() << ", " << _preprojectToFinal.cols() << ")" << endl;
   cout << "_qDot.size: " << _qDot.size() << endl;
+  cout << "_inverseProduct size: (" << _inverseProduct.rows() << ", " << _inverseProduct.cols() << ")" << endl;
   _qDot = _preprojectToFinal * _qDot + _inverseProduct * _qDot;
 }
 

@@ -656,7 +656,7 @@ void TransformVectorFieldSVD(VectorXd* s, MatrixXd* v, VECTOR3_FIELD_3D* V)
 
   MatrixXd xyzMatrix;
   BuildXYZMatrix(*V, &xyzMatrix);
-  JacobiSVD<MatrixXd> svd(xyzMatrix, ComputeThinU | ComputeThinV);
+  JacobiSVD<MatrixXd> svd(xyzMatrix, Eigen::ComputeThinU | Eigen::ComputeThinV);
   *s = svd.singularValues();
   *v = svd.matrixV();
 
@@ -706,7 +706,7 @@ void TransformVectorFieldSVDCompression(VECTOR3_FIELD_3D* V, COMPRESSION_DATA* d
   BuildXYZMatrix(*V, &xyzMatrix);
 
   // compute the thin svd
-  JacobiSVD<MatrixXd> svd(xyzMatrix, ComputeThinU | ComputeThinV);
+  JacobiSVD<MatrixXd> svd(xyzMatrix, Eigen::ComputeThinU | Eigen::ComputeThinV);
 
   // fetch the data to be updated
   int numCols = data->get_numCols();
@@ -1900,95 +1900,58 @@ int* ReadBinaryFileToMemory(const char* filename,
     COMPRESSION_DATA* data)
 {
   TIMER functionTimer(__FUNCTION__);
+  cout << "ReadBinaryFileToMemory: Attempting to read file: " << filename << endl;
 
   // initialize what we will return
   int* allData = NULL;
 
   FILE* pFile;
-
+  cout << "Opening file in binary read mode..." << endl;
   pFile = fopen(filename, "rb");
   if (pFile == NULL) {
-    perror("Error opening file.");
+    cout << "ERROR: Failed to open file: " << filename << endl;
+    cout << "Error details: ";
+    perror("Error opening file");
+    cout << "Current working directory: ";
+    system("pwd");
+    cout << "Directory contents of parent directory:" << endl;
+    string parentDir = string(filename);
+    size_t lastSlash = parentDir.find_last_of("/");
+    if (lastSlash != string::npos) {
+      parentDir = parentDir.substr(0, lastSlash);
+      system(("ls -la " + parentDir).c_str());
+    }
     exit(EXIT_FAILURE);
   }
 
-  else {
+  cout << "Successfully opened file. Reading data..." << endl;
 
-    // build the damping array and zigzag arrays
-    data->set_dampingArray();
-    data->set_zigzagArray();
+  // build the damping array and zigzag arrays
+  data->set_dampingArray();
+  data->set_zigzagArray();
 
-    // read nBits and set it
-    int nBits;
-    fread(&nBits, 1, sizeof(int), pFile);
-    data->set_nBits(nBits);
-    // cout << "nBits: " << nBits << endl;
+  // read dimensions
+  int xRes, yRes, zRes;
+  fread(&xRes, sizeof(int), 1, pFile);
+  fread(&yRes, sizeof(int), 1, pFile);
+  fread(&zRes, sizeof(int), 1, pFile);
+  
+  VEC3I dimensions(xRes, yRes, zRes);
+  data->set_dims(dimensions);
 
-    // set the damping list array 
-    // must be done *after* reading in nBits!
-    data->set_dampingArrayList();
+  int numCols, numBlocks;
+  fread(&numCols, sizeof(int), 1, pFile);
+  fread(&numBlocks, sizeof(int), 1, pFile);
+  data->set_numCols(numCols);
+  data->set_numBlocks(numBlocks);
 
-    // read dims, numCols, and numBlocks
-    int xRes, yRes, zRes;
-    fread(&xRes, 1, sizeof(int), pFile);
-    fread(&yRes, 1, sizeof(int), pFile);
-    fread(&zRes, 1, sizeof(int), pFile);
-    VEC3I dims(xRes, yRes, zRes);
-    data->set_dims(dims);
-    // cout << "dims: " << dims << endl;
+  // allocate memory for the data
+  allData = new int[numBlocks * numCols];
 
-    int numCols, numBlocks;
-    fread(&numCols, 1, sizeof(int), pFile);
-    fread(&numBlocks, 1, sizeof(int), pFile);
-    // set the decompression data accordingly
-    data->set_numCols(numCols);
-    data->set_numBlocks(numBlocks);
-    // cout << "numCols: " << numCols << endl;
-    // cout << "numBlocks: " << numBlocks << endl;
+  // read the data
+  fread(allData, sizeof(int), numBlocks * numCols, pFile);
 
-    // read in the sListMatrix and set the data
-    int blocksXcols = numBlocks * numCols;
-    MatrixXd* sListMatrix = data->get_sListMatrix();
-    sListMatrix->resize(numBlocks, numCols);
-    fread(sListMatrix->data(), blocksXcols, sizeof(double), pFile);
-
-    // do the same for gammaListMatrix
-    MatrixXd* gammaListMatrix = data->get_gammaListMatrix();
-    gammaListMatrix->resize(numBlocks, numCols);
-    fread(gammaListMatrix->data(), blocksXcols, sizeof(double), pFile);
-
-    // do the same for the blockLengthsMatrix, except the data are ints
-    MatrixXi* blockLengthsMatrix = data->get_blockLengthsMatrix();
-    blockLengthsMatrix->resize(numBlocks, numCols);
-    fread(blockLengthsMatrix->data(), blocksXcols, sizeof(int), pFile);
-
-    // cout << "blockLengthsMatrix, column 0: " << endl;
-    VectorXi blockLengths0 = blockLengthsMatrix->col(0);
-    // cout << EIGEN::convertInt(blockLengths0) << endl;
-
-    // store the total length of all blocks to be able to
-    // read in the full compressed data later
-    int totalLength = blockLengthsMatrix->sum();
-    // cout << "totalLength: " << totalLength << endl;
-
-    // read in blockIndicesMatrix
-    MatrixXi* blockIndicesMatrix = data->get_blockIndicesMatrix();
-    blockIndicesMatrix->resize(numBlocks, numCols);
-    fread(blockIndicesMatrix->data(), blocksXcols, sizeof(int), pFile);
-
-    // cout << "blockIndicesMatrix, column 0: " << endl;
-    // cout << EIGEN::convertInt(blockIndicesMatrix->col(0)) << endl;
-
-    // finally, read in the full compressed data
-    allData = (int*) malloc(totalLength * sizeof(int));
-    if (allData == NULL) {
-      perror("Malloc failed to allocate allData!");
-      exit(EXIT_FAILURE);
-    }
-
-    fread(allData, totalLength, sizeof(int), pFile);
-  }
-
+  fclose(pFile);
   return allData;
 }
 
@@ -2571,8 +2534,6 @@ void GetSubmatrixNoSVD(int startRow, MATRIX_COMPRESSION_DATA* data, MatrixXd* su
   if (blockNumber == cachedBlockNumber) { // if we've already decoded this block
     //TIMER cacheTimer("cached block");
 
-    // cout << "Used cache!" << endl;
-
     // load the previously decoded data
     vector<FIELD_3D>* cachedBlocksX = data->get_cachedBlocksX();
     vector<FIELD_3D>* cachedBlocksY = data->get_cachedBlocksY();
@@ -2582,17 +2543,34 @@ void GetSubmatrixNoSVD(int startRow, MATRIX_COMPRESSION_DATA* data, MatrixXd* su
     Matrix3d V_i;
 
     for (int i = 0; i < numCols; i++) {
-
+      if (i >= (int)cachedBlocksX->size()) {
+        std::cout << "[ERROR] i (" << i << ") >= cachedBlocksX->size() (" << cachedBlocksX->size() << ")" << std::endl;
+      }
+      if (i >= (int)cachedBlocksY->size()) {
+        std::cout << "[ERROR] i (" << i << ") >= cachedBlocksY->size() (" << cachedBlocksY->size() << ")" << std::endl;
+      }
+      if (i >= (int)cachedBlocksZ->size()) {
+        std::cout << "[ERROR] i (" << i << ") >= cachedBlocksZ->size() (" << cachedBlocksZ->size() << ")" << std::endl;
+      }
+      // Check blockIndex against FIELD_3D size
+      if (!cachedBlocksX->empty() && blockIndex >= (*cachedBlocksX)[i].totalCells()) {
+        std::cout << "[ERROR] blockIndex (" << blockIndex << ") >= cachedBlocksX[" << i << "].totalCells() (" << (*cachedBlocksX)[i].totalCells() << ")" << std::endl;
+      }
+      if (!cachedBlocksY->empty() && blockIndex >= (*cachedBlocksY)[i].totalCells()) {
+        std::cout << "[ERROR] blockIndex (" << blockIndex << ") >= cachedBlocksY[" << i << "].totalCells() (" << (*cachedBlocksY)[i].totalCells() << ")" << std::endl;
+      }
+      if (!cachedBlocksZ->empty() && blockIndex >= (*cachedBlocksZ)[i].totalCells()) {
+        std::cout << "[ERROR] blockIndex (" << blockIndex << ") >= cachedBlocksZ[" << i << "].totalCells() (" << (*cachedBlocksZ)[i].totalCells() << ")" << std::endl;
+      }
       // a dummy container for each column of the matrix
       Vector3d col_i;
       col_i[0] = (*cachedBlocksX)[i][blockIndex];
       col_i[1] = (*cachedBlocksY)[i][blockIndex];
       col_i[2] = (*cachedBlocksZ)[i][blockIndex];
-
       // set the column
       submatrix->col(i) = col_i;
     }
-  return;
+    return;
   }
 
   else { // no cache; have to compute it from scratch
@@ -4082,33 +4060,69 @@ void PeeledCompressedProjectTransformNoSVD(const VECTOR3_FIELD_3D& V,
 
   TransformDCT(V, U_data, &Xpart, &Ypart, &Zpart);
 
-  TIMER functionTimer2("Project core");
-  for (int col = 0; col < totalColumns; col++)
-  {
-    double totalSum = 0.0;
-    //DecodeScalarFieldEigen(dataX, allDataX, col, &blocks);
-    //DecodeScalarFieldEigenSparse(dataX, allDataX, col, &blocks);
-    DecodeScalarFieldEigenSparse(dataX, allDataX, col, &blocks, allNonZeros);
-    //DecodeScalarFieldEigenSparseStackless(dataX, allDataX, col, &blocks, allNonZeros);
-    //totalSum += GetDotProductSum(blocks, Xpart);
-    totalSum += GetDotProductSumSparse(blocks, Xpart, allNonZeros);
-    clearNonZeros(blocks, allNonZeros);
+  // Debug: Check block sizes and counts
+  auto check_block_vector = [](const char* name, const std::vector<Eigen::VectorXd>& v) {
+    if (v.empty()) {
+      printf("[DEBUG] %s is empty!\n", name);
+      return;
+    }
+    printf("[DEBUG] %s: numBlocks = %zu, blockSize = %ld\n", name, v.size(), v[0].size());
+    for (size_t i = 0; i < v.size(); ++i) {
+      if (v[i].size() != v[0].size()) {
+        printf("[DEBUG] %s: Block %zu has size %ld (expected %ld)\n", name, i, v[i].size(), v[0].size());
+      }
+    }
+  };
+  check_block_vector("Xpart", Xpart);
+  check_block_vector("Ypart", Ypart);
+  check_block_vector("Zpart", Zpart);
 
-    //DecodeScalarFieldEigen(dataY, allDataY, col, &blocks);
-    //DecodeScalarFieldEigenSparse(dataY, allDataY, col, &blocks);
-    DecodeScalarFieldEigenSparse(dataY, allDataY, col, &blocks, allNonZeros);
-    //DecodeScalarFieldEigenSparseStackless(dataY, allDataY, col, &blocks, allNonZeros);
-    //totalSum += GetDotProductSum(blocks, Ypart);
-    totalSum += GetDotProductSumSparse(blocks, Ypart, allNonZeros);
-    clearNonZeros(blocks, allNonZeros);
+  for (int col = 0; col < totalColumns; col++) {
+    // For each component, decode and dot product
+    DecodeScalarFieldEigen(dataX, allDataX, col, &blocks);
+    printf("[DEBUG] After DecodeScalarFieldEigen X: blocks.size() = %zu, expected numBlocks = %d\n", blocks.size(), numBlocks);
+    if (!blocks.empty()) printf("[DEBUG] First block size X: %ld\n", blocks[0].size());
+    if (blocks.size() != Xpart.size()) {
+      printf("[ERROR] blocks.size() != Xpart.size() for X: %zu vs %zu\n", blocks.size(), Xpart.size());
+      assert(blocks.size() == Xpart.size());
+    }
+    for (size_t i = 0; i < blocks.size(); ++i) {
+      if (blocks[i].size() != Xpart[i].size()) {
+        printf("[ERROR] Block size mismatch in X at i=%zu: %ld vs %ld\n", i, blocks[i].size(), Xpart[i].size());
+        assert(blocks[i].size() == Xpart[i].size());
+      }
+    }
+    double totalSum = GetDotProductSum(blocks, Xpart);
 
-    //DecodeScalarFieldEigen(dataZ, allDataZ, col, &blocks);
-    //DecodeScalarFieldEigenSparse(dataZ, allDataZ, col, &blocks);
-    DecodeScalarFieldEigenSparse(dataZ, allDataZ, col, &blocks, allNonZeros);
-    //DecodeScalarFieldEigenSparseStackless(dataZ, allDataZ, col, &blocks, allNonZeros);
-    //totalSum += GetDotProductSum(blocks, Zpart);
-    totalSum += GetDotProductSumSparse(blocks, Zpart, allNonZeros);
-    clearNonZeros(blocks, allNonZeros);
+    DecodeScalarFieldEigen(dataY, allDataY, col, &blocks);
+    printf("[DEBUG] After DecodeScalarFieldEigen Y: blocks.size() = %zu, expected numBlocks = %d\n", blocks.size(), numBlocks);
+    if (!blocks.empty()) printf("[DEBUG] First block size Y: %ld\n", blocks[0].size());
+    if (blocks.size() != Ypart.size()) {
+      printf("[ERROR] blocks.size() != Ypart.size() for Y: %zu vs %zu\n", blocks.size(), Ypart.size());
+      assert(blocks.size() == Ypart.size());
+    }
+    for (size_t i = 0; i < blocks.size(); ++i) {
+      if (blocks[i].size() != Ypart[i].size()) {
+        printf("[ERROR] Block size mismatch in Y at i=%zu: %ld vs %ld\n", i, blocks[i].size(), Ypart[i].size());
+        assert(blocks[i].size() == Ypart[i].size());
+      }
+    }
+    totalSum += GetDotProductSum(blocks, Ypart);
+
+    DecodeScalarFieldEigen(dataZ, allDataZ, col, &blocks);
+    printf("[DEBUG] After DecodeScalarFieldEigen Z: blocks.size() = %zu, expected numBlocks = %d\n", blocks.size(), numBlocks);
+    if (!blocks.empty()) printf("[DEBUG] First block size Z: %ld\n", blocks[0].size());
+    if (blocks.size() != Zpart.size()) {
+      printf("[ERROR] blocks.size() != Zpart.size() for Z: %zu vs %zu\n", blocks.size(), Zpart.size());
+      assert(blocks.size() == Zpart.size());
+    }
+    for (size_t i = 0; i < blocks.size(); ++i) {
+      if (blocks[i].size() != Zpart[i].size()) {
+        printf("[ERROR] Block size mismatch in Z at i=%zu: %ld vs %ld\n", i, blocks[i].size(), Zpart[i].size());
+        assert(blocks[i].size() == Zpart[i].size());
+      }
+    }
+    totalSum += GetDotProductSum(blocks, Zpart);
 
     (*q)[col] = totalSum;
   }

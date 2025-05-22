@@ -146,6 +146,14 @@ protected:
   BOX _box;
   int _totalReducedSteps;
 
+  // Store COMPRESSION_DATA objects as members to ensure proper lifetime
+  COMPRESSION_DATA _compression_data0;
+  COMPRESSION_DATA _compression_data1;
+  COMPRESSION_DATA _compression_data2;
+  COMPRESSION_DATA _final_compression_data0;
+  COMPRESSION_DATA _final_compression_data1;
+  COMPRESSION_DATA _final_compression_data2;
+
   MATRIX_COMPRESSION_DATA _U_final_data;
   MATRIX_COMPRESSION_DATA _U_preadvect_data;
   MATRIX_COMPRESSION_DATA _U_preproject_data;
