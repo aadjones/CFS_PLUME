@@ -38,6 +38,9 @@ size_t getFileSize(const string& filename);
 SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::SUBSPACE_FLUID_3D_COMPRESSED_EIGEN(int xRes, int yRes, int zRes, const string& reducedPath, unsigned int* boundaries, bool usingIOP, bool loadNothing) :
   FLUID_3D_MIC(xRes, yRes, zRes, 4, boundaries), _reducedPath(reducedPath), _discardThreshold(-1), _usingIOP(usingIOP)
 {
+  cout << "DEBUG: SUBSPACE_FLUID_3D_COMPRESSED_EIGEN constructor:" << endl;
+  cout << "  Initial dimensions: " << xRes << "x" << yRes << "x" << zRes << endl;
+  
   _snapshotPath = string("");
 
   // set up the boundary conditions
@@ -66,7 +69,6 @@ SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::SUBSPACE_FLUID_3D_COMPRESSED_EIGEN(int xRes,
       cout << "Calling initOutOfCoreIOP(). " << endl;
       initOutOfCoreIOP();
     }
-
     else { 
       cout << "Calling vanilla initOutOfCore. " << endl;
       initOutOfCore();
@@ -81,8 +83,8 @@ SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::SUBSPACE_FLUID_3D_COMPRESSED_EIGEN(int xRes,
     _yPeeled = _yRes - 2;
     _zPeeled = _zRes - 2;
     _slabPeeled = _xPeeled * _yPeeled;
+    cout << "  Peeled dimensions: " << _xPeeled << "x" << _yPeeled << "x" << _zPeeled << endl;
   }
-
 }
 
 
@@ -92,6 +94,18 @@ SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::SUBSPACE_FLUID_3D_COMPRESSED_EIGEN(int xRes,
 //////////////////////////////////////////////////////////////////////
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::initOutOfCore()
 {
+  cout << "DEBUG: initOutOfCore:" << endl;
+  cout << "  Initial dimensions: " << _xRes << "x" << _yRes << "x" << _zRes << endl;
+  
+  // init the peeled dimensions
+  _xPeeled = _xRes - 2;
+  _yPeeled = _yRes - 2;
+  _zPeeled = _zRes - 2;
+  _slabPeeled = _xPeeled * _yPeeled;
+  
+  cout << "  Peeled dimensions: " << _xPeeled << "x" << _yPeeled << "x" << _zPeeled << endl;
+  cout << "  Slab size: " << _slabPeeled << endl;
+  
   cout << "Starting initOutOfCore..." << endl;
   cout << "_reducedPath length: " << _reducedPath.length() << endl;
   cout << "_reducedPath contents: '" << _reducedPath << "'" << endl;
@@ -560,6 +574,16 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::stepPlume()
   _velocity.axpy(_dt, _force);
 
   puts("DEBUG: Starting projection into subspace");
+  printf("DEBUG: _velocity dimensions: (%d, %d, %d)\n", _velocity.xRes(), _velocity.yRes(), _velocity.zRes());
+  printf("DEBUG: _U_preadvect_data dimensions - X: (%d, %d), Y: (%d, %d), Z: (%d, %d)\n",
+         _U_preadvect_data.get_compression_dataX()->get_dims()[0],
+         _U_preadvect_data.get_compression_dataX()->get_numCols(),
+         _U_preadvect_data.get_compression_dataY()->get_dims()[0],
+         _U_preadvect_data.get_compression_dataY()->get_numCols(),
+         _U_preadvect_data.get_compression_dataZ()->get_dims()[0],
+         _U_preadvect_data.get_compression_dataZ()->get_numCols());
+  printf("DEBUG: _qDot size before projection: %lu\n", _qDot.size());
+  
   // Projection into subspace
   PeeledCompressedProjectTransformNoSVD(_velocity, &_U_preadvect_data, &_qDot);
   puts("DEBUG: Finished projection into subspace");
@@ -1178,6 +1202,13 @@ MatrixXd SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::cellBasisCompressedPeeled(MATRIX_CO
   const int numRows = 3 * xRes * yRes * zRes;
   const int numCols = dataX->get_numCols();
 
+  cout << "DEBUG: cellBasisCompressedPeeled dimensions:" << endl;
+  cout << "  index: " << index << endl;
+  cout << "  x,y,z: " << x << "," << y << "," << z << endl;
+  cout << "  dims: " << xRes << "x" << yRes << "x" << zRes << endl;
+  cout << "  numRows: " << numRows << endl;
+  cout << "  numCols: " << numCols << endl;
+
   assert(x >= 0);
   assert(x < _xRes - 2);
   assert(y >= 0);
@@ -1188,8 +1219,8 @@ MatrixXd SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::cellBasisCompressedPeeled(MATRIX_CO
   
   MatrixXd result(3, numCols); 
   GetSubmatrixNoSVD(3 * index, &U_data, &result); 
+  cout << "  result matrix dimensions: " << result.rows() << "x" << result.cols() << endl;
   return result;
-  // return EIGEN::getRows(3 * index, 3, U); 
 }
 
 
@@ -1201,6 +1232,11 @@ VectorXd SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::advectCellStamPeeled(MATRIX_COMPRES
     Real dt, const VectorXd& qDot, int index, MatrixXd* submatrix)
 {
   TIMER functionTimer(__FUNCTION__);
+  cout << "DEBUG: advectCellStamPeeled dimensions:" << endl;
+  cout << "  cellU dimensions: " << cellU.rows() << "x" << cellU.cols() << endl;
+  cout << "  qDot size: " << qDot.size() << endl;
+  cout << "  index: " << index << endl;
+
   // peeled coordinates were passed in -- need to promote to full grid
   const int decompose = index;
   const int z = decompose / _slabPeeled + 1;
@@ -1209,6 +1245,7 @@ VectorXd SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::advectCellStamPeeled(MATRIX_COMPRES
 
   // get the velocity to backtrace
   VectorXd v = cellU * qDot;
+  cout << "  v size after multiplication: " << v.size() << endl;
 
   // backtrace
   const VEC3F velocity(v[0], v[1], v[2]);
@@ -1333,6 +1370,9 @@ VectorXd SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::advectCellStamPeeled(MATRIX_COMPRES
 //////////////////////////////////////////////////////////////////////
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::readAdvectionCubature()
 {
+  cout << "DEBUG: readAdvectionCubature:" << endl;
+  cout << "  Number of key advection cells: " << _keyAdvectionCells.size() << endl;
+  
   string filename = _reducedPath + string("cubature");
   cout << " Trying to read in cubature file  " << filename.c_str() << " ... "; flush(cout);
 
@@ -1385,6 +1425,7 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::readAdvectionCubature()
   {
     //fclose(file);
     cout << " No advection cubature cache found. Precaching all the advection cubature matrices. " << endl;
+    cout << "  Total points to cache: " << totalPoints << endl;
 
     // make the before cache
     _advectionCubatureBefore.clear();
@@ -1419,6 +1460,7 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::readAdvectionCubature()
     {
       const int index = _keyAdvectionCells[x];
       _advectionCubatureBefore.push_back(cellBasisCompressedPeeled(_U_preadvect_data, index));
+      cout << "  Cached matrix " << x << " dimensions: " << _advectionCubatureBefore[x].rows() << "x" << _advectionCubatureBefore[x].cols() << endl;
     }
     // _preadvectU.resize(0,0);
 
@@ -1461,7 +1503,10 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::readAdvectionCubature()
     _advectionCubatureAfter.resize(_keyAdvectionCells.size());
 
     for (int x = 0; x < totalPoints; x++)
+    {
       EIGEN::read(file, _advectionCubatureBefore[x]);
+      cout << "  Read matrix " << x << " dimensions: " << _advectionCubatureBefore[x].rows() << "x" << _advectionCubatureBefore[x].cols() << endl;
+    }
     for (int x = 0; x < totalPoints; x++)
       EIGEN::read(file, _advectionCubatureAfter[x]);
     fclose(file);
@@ -1476,7 +1521,12 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::readAdvectionCubature()
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::reducedAdvectStagedStamFast()
 {
   TIMER functionTimer(__FUNCTION__);
-  puts("Calling reduced advect staged stam fast from COMPRESSED!");
+  cout << "DEBUG: reducedAdvectStagedStamFast dimensions:" << endl;
+  cout << "  _advectionCubatureAfter[0] dimensions: " << _advectionCubatureAfter[0].rows() << "x" << _advectionCubatureAfter[0].cols() << endl;
+  cout << "  _advectionCubatureBefore[0] dimensions: " << _advectionCubatureBefore[0].rows() << "x" << _advectionCubatureBefore[0].cols() << endl;
+  cout << "  _qDot size: " << _qDot.size() << endl;
+  cout << "  total cubature points: " << _keyAdvectionCells.size() << endl;
+
   VectorXd final(_advectionCubatureAfter[0].rows());
   final.setZero();
   const Real dt0 = _dt / _dx;
@@ -1490,6 +1540,8 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::reducedAdvectStagedStamFast()
   MATRIX_COMPRESSION_DATA& data = (*this).U_final_data();
   COMPRESSION_DATA* dataX = data.get_compression_dataX();
   const int numCols = dataX->get_numCols();
+  
+  cout << "  U_final_data numCols: " << numCols << endl;
   
   MatrixXd submatrix(3, numCols);
 
@@ -2359,5 +2411,18 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::diffTruth(const VECTOR3_FIELD_3D& testV
   // _densityErrorRelative.push_back(diff.norm() / _density.peelBoundary().flattened().norm2());
   // cout << " density abs error:      " << _densityErrorAbs.back() << endl;
   // cout << " density relative error: " << _densityErrorRelative.back() << endl;
+}
+
+//////////////////////////////////////////////////////////////////////
+// The reduced solver, with peeled boundaries, 
+// with cubature enabled
+//////////////////////////////////////////////////////////////////////
+void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::PeeledCompressedProjectTransformNoSVD(const VECTOR3_FIELD_3D& field, MATRIX_COMPRESSION_DATA* U_data, VectorXd* qDot)
+{
+  TIMER functionTimer(__FUNCTION__);
+  puts("DEBUG: Inside PeeledCompressedProjectTransformNoSVD");
+  
+  // Call the global function instead of reimplementing it
+  ::PeeledCompressedProjectTransformNoSVD(field, U_data, qDot);
 }
 

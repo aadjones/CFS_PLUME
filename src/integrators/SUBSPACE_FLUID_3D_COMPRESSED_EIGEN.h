@@ -370,6 +370,8 @@ protected:
   // add a new orthogonalized column to the basis
   void addNewColumn(const VectorXd& newColumn, MatrixXd& U);
 
+  // Project a vector field into the compressed subspace without SVD
+  void PeeledCompressedProjectTransformNoSVD(const VECTOR3_FIELD_3D& field, MATRIX_COMPRESSION_DATA* U_data, VectorXd* qDot);
 
 };
 
