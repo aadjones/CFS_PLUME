@@ -67,7 +67,6 @@ void COMPRESSION_DATA::dct_cleanup() {
    fftw_free(_dct_out);
    _dct_in = NULL;
    _dct_out = NULL;
-   fftw_cleanup();
 }
 
 void COMPRESSION_DATA::set_dampingArray() {

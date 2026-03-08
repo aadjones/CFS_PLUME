@@ -533,7 +533,6 @@ void UnitaryBlockDCT(int direction, vector<FIELD_3D>* blocks)
 
   fftw_free(in);
   fftw_destroy_plan(plan);
-  fftw_cleanup();
 }
 ////////////////////////////////////////////////////////
 // performs a UNITARY dct/idct on each individual flattened
@@ -559,7 +558,6 @@ void UnitaryBlockDCTEigen(int direction, vector<VectorXd>* blocks)
 
   fftw_free(in);
   fftw_destroy_plan(plan);
-  fftw_cleanup();
 }
 
 ////////////////////////////////////////////////////////
@@ -1044,10 +1042,7 @@ void DecodeBlockWithCompressionData(const INTEGER_FIELD_3D& intBlock,
   // appropriate gamma-modulated damping array
   TIMER dampingTimer("Decode Damping Copy");
   const FIELD_3D& dampingArray = data->get_dampingArray();
-  // TK: Skip the allocation every time, just do a memcpy. Using a static
-  // will probably cause OpenMP to misbehave later.
-  //FIELD_3D damp = dampingArray;
-  static FIELD_3D damp(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  FIELD_3D damp(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
   memcpy(damp.data(), dampingArray.dataConst(), damp.totalCells() * sizeof(Real));
   damp.toPower(gamma);
 
@@ -2504,10 +2499,7 @@ void DecodeScalarFieldEigen(COMPRESSION_DATA* compression_data, int* allData,
 
   //TIMER loopTimer("DecodeScalar loop timer");
 
-  // TK: Trying making these static so it doesn't allocate and deallocate every
-  // time. Might cause problems with OpenMP later.
-  static FIELD_3D decodedBlock(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-  static INTEGER_FIELD_3D unflattened(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  INTEGER_FIELD_3D unflattened(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
   for (int blockNumber = 0; blockNumber < numBlocks; blockNumber++)
   {
     unflattened.clear();
@@ -2570,9 +2562,7 @@ void DecodeScalarFieldEigenSparse(COMPRESSION_DATA* compression_data, int* allDa
   const int numBlocks = compression_data->get_numBlocks();
   const INTEGER_FIELD_3D& reverseZigzag = compression_data->get_reverseZigzag();
 
-  // TK: Trying making these static so it doesn't allocate and deallocate every
-  // time. Might cause problems with OpenMP later.
-  static INTEGER_FIELD_3D unflattened(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  INTEGER_FIELD_3D unflattened(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
 
   //TIMER functionTimer2("DecodeScalarFieldEigenSparse, block 2");
   //NONZERO_ENTRIES& nonZeros = allNonZeros[0];
@@ -2631,11 +2621,8 @@ void DecodeScalarFieldEigenSparse(COMPRESSION_DATA* compression_data, int* allDa
     (*decoded)[x].setZero();
   }
 
-  // TK: Trying making these static so it doesn't allocate and deallocate every
-  // time. Might cause problems with OpenMP later.
-  //static FIELD_3D decodedBlock(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-  static INTEGER_FIELD_3D unflattened(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-  static NONZERO_ENTRIES nonZeros;
+  INTEGER_FIELD_3D unflattened(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  NONZERO_ENTRIES nonZeros;
   for (int blockNumber = 0; blockNumber < numBlocks; blockNumber++)
   {
     //vector<int> nonZeros;
