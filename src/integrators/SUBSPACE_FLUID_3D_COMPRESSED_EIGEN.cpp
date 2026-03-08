@@ -305,7 +305,7 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::writeCompressedErrorMatrixDims(int simu
   }
 
   int rows = simulationSnapshots;
-  int cols = simulationSnapshots;
+  int cols = _final_compression_data0.get_numCols();
   // DEBUG
   printf("Writing compressed subspace error matrix dims: (%i, %i)\n", rows, cols);
 
@@ -1561,156 +1561,6 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::reducedAdvectStagedStamFast()
   _qDot = final;
 }
 
-/*
-//////////////////////////////////////////////////////////////////////
-// build the staged bases and the projected matrices
-//////////////////////////////////////////////////////////////////////
-void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::buildOutOfCoreMatrices()
-{
-  TIMER functionTimer(__FUNCTION__);
-
-  cout << "=====================================================" << endl;
-  cout << " Building huge projected matrices " << endl;
-  cout << "=====================================================" << endl;
-
-  // in preparation for writing results to files
-  string filename;
-
-  TIMER pressureTimer("Pressure projection");
-  // read in the needed matrices
-  filename = _reducedPath + string("U.pressure.matrix");
-  EIGEN::read(filename, _pressureU);
-
-  int totalCells = (_xRes - 2) * (_yRes - 2) * (_zRes - 2);
-  SPARSE_MATRIX_ARRAY sparseA(totalCells, totalCells);
-  buildFlatA(sparseA, _obstacles);
-  cout << " Projecting the pressure matrix ... " << flush;
-  _reducedA = sparseA.projectVerySparse(_pressureU, _pressureU);
-  sparseA.clear();
-  cout << " done." << endl;
-
-  filename = _reducedPath + string("projected.A.matrix");
-  EIGEN::write(filename, _reducedA);
-  _Asparse.clear();
-  purge();
-  pressureTimer.stop();
-  TIMER::printTimings();
-
-  TIMER vtodTimer("Velocity to div projection");
-  // read in the needed matrices
-  filename = _reducedPath + string("U.preproject.matrix");
-  EIGEN::read(filename, _preprojectU);
-
-  // build reduced velocity to divergence
-  // Need: _pressureU and _preprojectU
-  computeVelocityToDivergence();
-  cout << " Projecting velocity to divergence ... " << flush;
-  _reducedVelocityToDivergence = _velocityToDivergence.project(_pressureU, _preprojectU);
-  cout << " done." << endl;
-
-  filename = _reducedPath + string("projected.vtod.matrix");
-  EIGEN::write(filename, _reducedVelocityToDivergence);
-  _velocityToDivergence.clear();
-   
-  // stomp matrices to make room in memory
-  _pressureU.resize(0,0);
-  purge();
-  vtodTimer.stop();
-  TIMER::printTimings();
-
-  TIMER dampingTimer("Damping matrix projection");
-  // read in the needed matrices
-  filename = _reducedPath + string("U.prediffuse.matrix");
-  EIGEN::read(filename, _prediffuseU);
-
-  // NEW
-  cout << " Projecting damping matrix ... " << flush;
-  int totalCellsD = 3 * (_xRes - 2) * (_yRes - 2) * (_zRes - 2);
-  SPARSE_MATRIX_ARRAY sparseD(totalCellsD, totalCellsD);
-  buildPeeledDampingMatrixFlat(sparseD);
-  _dampingMatrixReduced = sparseD.projectVerySparse(_preprojectU, _prediffuseU);
-  filename = _reducedPath + string("damping.peeled.matrix");
-  EIGEN::write(filename, _dampingMatrixReduced);
-  sparseD.clear();
-  cout << "done. " << endl;
-
-  // stomp matrices to make room in memory
-  _prediffuseU.resize(0,0);
-  purge();
-  dampingTimer.stop();
-  TIMER::printTimings();
-
-  TIMER preprojectTimer("Preprojection projection");
-  // read in the needed matrices
-
-  
-  // filename = _reducedPath + string("U.final.matrix");
-  // EIGEN::readBig(filename, _U);
-  // EIGEN::read(filename, _U);
-  
-  
-  int* allDataX = NULL;
-  int* allDataY = NULL;
-  int* allDataZ = NULL;
-  DECOMPRESSION_DATA decompression_dataX;
-  DECOMPRESSION_DATA decompression_dataY;
-  DECOMPRESSION_DATA decompression_dataZ;
-  filename = _reducedPath + string("U.final.componentX");
-  ReadBinaryFileToMemory(filename.c_str(), allDataX, decompression_dataX);
-  filename = _reducedPath + string("U.final.componentY");
-  ReadBinaryFileToMemory(filename.c_str(), allDataY, decompression_dataY);
-  filename = _reducedPath + string("U.final.componentZ");
-  ReadBinaryFileToMemory(filename.c_str(), allDataZ, decompression_dataZ);
-  MATRIX_COMPRESSION_DATA U_data(allDataX, allDataY, allDataZ,
-      decompression_dataX, decompression_dataY, decompression_dataZ);
-
-
-
-  // need: preproject and U
-  EIGEN::transposeProduct(_U, _preprojectU, _preprojectToFinal);
-  filename = _reducedPath + string("projected.ptof.matrix");
-  EIGEN::write(filename, _preprojectToFinal);
-
-  // stomp matrices to make room in memory
-  _preprojectU.resize(0,0);
-  purge();
-  preprojectTimer.stop();
-  TIMER::printTimings();
-
-  TIMER ptovTimer("Pressure to velocity projection");
-  // read in the needed matrices
-  filename = _reducedPath + string("U.pressure.matrix");
-  EIGEN::read(filename, _pressureU);
-
-  // build reduced pressure to velocity
-  // Need: pressureU and U
-  computePressureToVelocity();
-  _reducedPressureToVelocity = _pressureToVelocity.project(_U, _pressureU);
-  filename = _reducedPath + string("projected.ptov.matrix");
-  EIGEN::write(filename, _reducedPressureToVelocity);
-
-  // stomp pressure, just in case
-  _pressureU.resize(0,0);
-  purge();
-  ptovTimer.stop();
-  TIMER::printTimings();
-
-  // Needs everything prior to be built already
-  MatrixXd inverse = _reducedA.inverse();
-  _inverseProduct = _reducedPressureToVelocity * inverse * _reducedVelocityToDivergence;
-  filename = _reducedPath + string("inverseProduct.matrix");
-  EIGEN::write(filename, _inverseProduct);
-  TIMER::printTimings();
-
-  // clear out all memory, just to be sure
-  stompAllBases();
-  purge();
-  
-  cout << " Done building matrices " << endl;
-  TIMER::printTimings();
-}
-*/
-
 //////////////////////////////////////////////////////////////////////
 // check of a file exists
 //////////////////////////////////////////////////////////////////////
@@ -1718,25 +1568,12 @@ bool SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::fileExists(const string& filename)
 {
   FILE* file;
   file = fopen(filename.c_str(), "rb");
-  
+
   if (file == NULL)
     return false;
 
   fclose(file);
   return true;
-}
-
-//////////////////////////////////////////////////////////////////////
-// stomp all loaded bases
-//////////////////////////////////////////////////////////////////////
-void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::stompAllBases()
-{
-  _pressureU.resize(0,0);
-  _preprojectU.resize(0,0);
-  _prediffuseU.resize(0,0);
-  _preadvectU.resize(0,0);
-  _U.resize(0,0);
-  _projectionIOP.resize(0,0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1934,34 +1771,31 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::loadReducedIOPAll(string path)
   string filename = path + string("U.preadvect.matrix");
   EIGEN::read(filename, _preadvectU);
   if (_preadvectU.rows() > 1000000)
-    purge();
+
  
   filename = path + string("U.prediffuse.matrix");
   EIGEN::read(filename, _prediffuseU);
   if (_prediffuseU.rows() > 1000000)
-    purge();
+
 
   filename = path + string("U.preproject.matrix");
   EIGEN::read(filename, _preprojectU);
   if (_preprojectU.rows() > 1000000)
-    purge();
+
 
   filename = path + string("U.pressure.matrix");
   EIGEN::read(filename, _pressureU);
   if (_pressureU.rows() > 1000000)
-    purge();
+
 
   filename = path + string("U.final.matrix");
   EIGEN::read(filename, _U);
   if (_U.rows() > 1000000)
-    purge();
+
  
   filename = path + string("U.iop.matrix");
   EIGEN::read(filename, _projectionIOP);
   
-  if (_projectionIOP.rows() > 1000000)
-    purge(); 
-
   TIMER::printTimings();
 }
 

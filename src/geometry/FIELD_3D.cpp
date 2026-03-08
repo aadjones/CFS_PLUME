@@ -16,7 +16,6 @@
 #endif
 
 int FIELD_3D::_quinticClamps = 0;
-bool FIELD_3D::_usingFastPow = false;
 
 ///////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////
@@ -2418,37 +2417,11 @@ void FIELD_3D::setToRandom()
 ///////////////////////////////////////////////////////////////////////
 // set each element to the specified power
 ///////////////////////////////////////////////////////////////////////
-void FIELD_3D::toFastPower(double power) 
-{
-  TIMER functionTimer(__FUNCTION__);
-  for (int index = 0; index < _totalCells; index++) {
-    _data[index] = fastPow(_data[index], power);
-    // ADJ: for our purposes, we *never* want the damping to be less than 1 since we are dividing
-    // by it and expecting to get a smaller number.
-    if (_data[index] < 1.0) {
-      // DEBUG
-      // printf("Computed a fastPow to be %f; this could be dangerous!\n", _data[index]);
-      _data[index] = 1.0; 
-    }
-  }
-}
-
-
-///////////////////////////////////////////////////////////////////////
 // set each element to the specified power
 ///////////////////////////////////////////////////////////////////////
-void FIELD_3D::toPower(double power) 
+void FIELD_3D::toPower(double power)
 {
   TIMER functionTimer(__FUNCTION__);
-
-  
-  if (FIELD_3D::_usingFastPow)
-  {
-    toFastPower(power);
-    return;
-  }
-  
-
   for (int index = 0; index < _totalCells; index++)
     _data[index] = pow(_data[index], power);
 }
@@ -2456,58 +2429,25 @@ void FIELD_3D::toPower(double power)
 ///////////////////////////////////////////////////////////////////////
 // set each element to the specified power
 ///////////////////////////////////////////////////////////////////////
-void FIELD_3D::toPower(double power, const vector<int>& nonZeros) 
+void FIELD_3D::toPower(double power, const vector<int>& nonZeros)
 {
-  //TIMER functionTimer("toPower, sparse");
-
-  
-  if (FIELD_3D::_usingFastPow)
+  for (int index = 0; index < nonZeros.size(); index++)
   {
-    for (int index = 0; index < nonZeros.size(); index++)
-    {
-      const int i = nonZeros[index];
-      _data[i] = fastPow(_data[i], power);
-    }
+    const int i = nonZeros[index];
+    _data[i] = pow(_data[i], power);
   }
-  
-  else
-  {
-  
-    for (int index = 0; index < nonZeros.size(); index++)
-    {
-      const int i = nonZeros[index];
-      _data[i] = pow(_data[i], power);
-    }
-  }
-
 }
 
 ///////////////////////////////////////////////////////////////////////
 // set each element to the specified power
 ///////////////////////////////////////////////////////////////////////
-void FIELD_3D::toPower(double power, const vector<int>& nonZeros, const int size) 
+void FIELD_3D::toPower(double power, const vector<int>& nonZeros, const int size)
 {
-  //TIMER functionTimer("toPower, sparse");
-
-  
-  if (FIELD_3D::_usingFastPow)
+  for (int index = 0; index < size; index++)
   {
-    for (int index = 0; index < size; index++)
-    {
-      const int i = nonZeros[index];
-      _data[i] = fastPow(_data[i], power);
-    }
+    const int i = nonZeros[index];
+    _data[i] = pow(_data[i], power);
   }
-  else
-  {
-  
-    for (int index = 0; index < size; index++)
-    {
-      const int i = nonZeros[index];
-      _data[i] = pow(_data[i], power);
-    }
-  }
-
 }
 ///////////////////////////////////////////////////////////////////////
 // set to a checkerboard solid texture

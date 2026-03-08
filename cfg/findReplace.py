@@ -12,7 +12,7 @@ def findReplace(filename, toReplace, replacement):
         # Only replace if the line starts with the pattern (ignoring whitespace)
         # This prevents matching comments or partial matches
         if line.strip().startswith(toReplace.split('=')[0].strip()):
-            print(replacement, end='')
+            print(replacement)
         else:
             print(line, end='')
 

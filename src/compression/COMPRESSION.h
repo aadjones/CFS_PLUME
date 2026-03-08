@@ -75,10 +75,6 @@ void ModifiedCumSum(const VectorXi& V, VectorXi* sum);
 // modified cum sum
 void BuildBlockIndicesMatrix(COMPRESSION_DATA* data);
 
-// builds the block indices matrix from the block lengths matrix.
-// uses explicitly passed in matrices for debugging purposes!
-void BuildBlockIndicesMatrixDebug(const MatrixXi blockLengths, MatrixXi* blockIndices);
-
 // extract the three scalar fields from a vector field
 void GetScalarFields(const VECTOR3_FIELD_3D& V, FIELD_3D* X, FIELD_3D* Y, FIELD_3D* Z);
 
@@ -131,11 +127,6 @@ void UnitaryBlockDCT(int direction, vector<FIELD_3D>* blocks);
 // direction 1 is dct, -1 is idct.
 void UnitaryBlockDCTEigen(int direction, vector<VectorXd>* blocks);
 
-// build a block diagonal matrix with A's as the kernel for
-// a 'count' number of times. inefficient usage of memory
-// since it fails to use sparse matrix
-void BlockDiagonal(const MatrixXd& A, int count, MatrixXd* B);
-
 // build a sparse block diagonal matrix with A's as the kernel
 // for a 'count' number of times
 void SparseBlockDiagonal(const MatrixXd& A, int count, SparseMatrix<double>* B);
@@ -167,43 +158,21 @@ void UntransformVectorFieldSVD(const MatrixXd& v, VECTOR3_FIELD_3D* transformedV
 // update the sList.
 void PreprocessBlock(FIELD_3D* F, int blockNumber, int col, COMPRESSION_DATA* data);
 
-// Binary search to find the appropriate gamma given
-// desired percent threshold within maxIterations. Prints
-// out information as it goes.
-///////////////////////////////////////////////////////
-void TuneGammaVerbose(const FIELD_3D& F, int blockNumber, int col,
-    COMPRESSION_DATA* data, FIELD_3D* damp);
-
 // do a binary search to find the appropriate gamma given the desired percent
 // energy accuracy and max iterations. the variable damp will be rewritten to the
 // desired damping array. updates gamaList.
 void TuneGamma(const FIELD_3D& F, int blockNumber, int col, COMPRESSION_DATA* data,
     FIELD_3D* damp);
 
-// version that uses fastPow instead of the slower pow
-void TuneGammaFastPow(const FIELD_3D& F, int blockNumber, int col, COMPRESSION_DATA* data,
-    FIELD_3D* damp);
-
 // quantizes the gamma values to quarter-integers
 void TuneGammaQuantized(const FIELD_3D& F, int blockNumber, int col, COMPRESSION_DATA* data,
     FIELD_3D* damp);
-
-// simply sets gamma equal to zero for no damping. for
-// debug purposes only.
-void TuneGammaDebug(const FIELD_3D& F, int blockNumber, int col,
-    COMPRESSION_DATA* data, FIELD_3D* damp);
 
 // takes a passed in FIELD_3D (which is intended to be
 // the result of a DCT post-preprocess). calculates the best gamma value
 // for a damping array. then damps by that array and quantizes the result to an integer.
 // stores the value of gamma for the damping.
 void EncodeBlock(const FIELD_3D& F, int blockNumber, int col, COMPRESSION_DATA* data,
-    INTEGER_FIELD_3D* quantized);
-
-// takes a passed in FIELD_3D (which is intended to be
-// the result of a DCT post-preprocess). for debug purposes
-// only, does not perform any damping---gamma is set to 0.
-void EncodeBlockDebug(const FIELD_3D& F, int blockNumber, int col, COMPRESSION_DATA* data,
     INTEGER_FIELD_3D* quantized);
 
 // takes a passed in INTEGER_FIELD_3D (which is intended to be run-length
@@ -224,9 +193,6 @@ void DecodeBlock(const INTEGER_FIELD_3D& intBlock, int blockNumber, int col,
 // expensive copy at the end.
 void DecodeBlockWithCompressionData(const INTEGER_FIELD_3D& intBlock,
   int blockNumber, int col, COMPRESSION_DATA* data, Real* decoded);
-void DecodeBlockWithCompressionDataSparse(const INTEGER_FIELD_3D& intBlock,
-  int blockNumber, int col, COMPRESSION_DATA* data, Real* decoded, const NONZERO_ENTRIES& nonZeros);
-void DecodeBlockWithCompressionDataSparseStackless();
 void DecodeBlockWithCompressionDataSparseQuantized(const INTEGER_FIELD_3D& intBlock,
   int blockNumber, int col, COMPRESSION_DATA* data, Real* decoded, const NONZERO_ENTRIES& nonZeros);
 
@@ -264,20 +230,10 @@ void RunLengthDecodeBinaryInPlaceSparse(int* allData, int blockNumber, int col,
     const INTEGER_FIELD_3D& reverseZigzag,
     COMPRESSION_DATA* compression_data,
     INTEGER_FIELD_3D& parsedDataField, NONZERO_ENTRIES& nonZeros);
-void RunLengthDecodeBinaryInPlaceSparseStackless();
-
 // takes an input FIELD_3D which is the result of
 // an SVD coordinate transform, compresses it according
 // to the general scheme, and writes it to a binary file
 void CompressAndWriteField(const char* filename, const FIELD_3D& F, int col,
-    COMPRESSION_DATA* compression_data);
-
-// takes an input FIELD_3D at a particular matrix column
-// which is the result of an SVD coordinate transform, compresses
-// it according to the general scheme, and writes it to a binary file.
-// meant to be called in a chain so that the binary file
-// continues to grow. for debugging, gamma is set to zero everywhere!
-void CompressAndWriteFieldDebug(const char* filename, const FIELD_3D& F, int col,
     COMPRESSION_DATA* compression_data);
 
 // print four different percents for how far along each column we are
@@ -285,9 +241,6 @@ void PrintProgress(int col, int numCols);
 
 // generate the header information for the encoded binary file
 void WriteMetaData(const char* filename, const COMPRESSION_DATA& compression_data);
-
-// write the singular values and V matrices to a binary file
-void WriteSVDData(const char* filename, COMPRESSION_DATA* data);
 
 // delete a binary file if it already exists
 void DeleteIfExists(const char* filename);
@@ -297,17 +250,6 @@ void DeleteIfExists(const char* filename);
 // a binary file. applies svd coordinate transform first
 void CompressAndWriteMatrixComponents(const char* filename, const MatrixXd& U,
       COMPRESSION_DATA* data0, COMPRESSION_DATA* data1, COMPRESSION_DATA* data2);
-
-// compress all of the scalar field components
-// of a matrix (which represents a vector field) and write them to
-// a binary file. applies svd coordinate transform first.
-// uses gamma as zero everywhere for debugging!
-void CompressAndWriteMatrixComponentsDebug(const char* filename, const MatrixXd& U,
-      COMPRESSION_DATA* data0, COMPRESSION_DATA* data1, COMPRESSION_DATA* data2);
-
-// reads from a binary file of the SVD data and sets the initializations
-// inside compression data
-void ReadSVDData(const char* filename, COMPRESSION_DATA* data);
 
 // reads from a binary file into a buffer and sets initializations
 // inside compression data
@@ -330,27 +272,14 @@ void DecodeScalarFieldEigenSparse(COMPRESSION_DATA* compression_data, int* allDa
     int col, vector<VectorXd>* decoded);
 void DecodeScalarFieldEigenSparse(COMPRESSION_DATA* compression_data, int* allData,
     int col, vector<VectorXd>* decoded, vector<NONZERO_ENTRIES>& nonZeros);
-void DecodeScalarFieldEigenSparseStackless(COMPRESSION_DATA* compression_data, int* allData,
-    int col, vector<VectorXd>* decoded, vector<NONZERO_ENTRIES>& nonZeros);
-
 // uses DecodeScalarField three times to form a vector field, and then undoes
 // the SVD transform to recover the original vector field corresponding to col
 void DecodeVectorField(MATRIX_COMPRESSION_DATA* data, int col,
     VECTOR3_FIELD_3D* decoded);
 
-// uses DecodeVectorField on each column to recover a lossy entire matrix
-void DecodeMatrix(MATRIX_COMPRESSION_DATA* data, MatrixXd* decoded);
-
 // compute the block-wise dot product between two lists and sum them into one
 // large dot product
 double GetDotProductSum(const vector<VectorXd>& Vlist, const vector<VectorXd>& Wlist);
-
-// helper function for frequency domain projection. transforms
-// V first by the SVD and then DCT. fills up the three vectors
-// with the three components.
-void TransformSVDAndDCT(int col, const VECTOR3_FIELD_3D& V,
-    MATRIX_COMPRESSION_DATA* U_data,
-    vector<VectorXd>* Xpart, vector<VectorXd>* Ypart, vector<VectorXd>* Zpart);
 
 // helper function for frequency domain projection. transforms
 // V by the DCT. fills up the three vectors
@@ -358,14 +287,6 @@ void TransformSVDAndDCT(int col, const VECTOR3_FIELD_3D& V,
 void TransformDCT(const VECTOR3_FIELD_3D& V,
     MATRIX_COMPRESSION_DATA* U_data, vector<VectorXd>* Xpart, vector<VectorXd>* Ypart,
     vector<VectorXd>* Zpart);
-
-// do peeled compressed projection naively in the regular spatial domain
-void PeeledCompressedProject(const VECTOR3_FIELD_3D& V, MATRIX_COMPRESSION_DATA* U_data,
-    VectorXd* q);
-
-// projection, implemented in the frequency domain
-void PeeledCompressedProjectTransform(const VECTOR3_FIELD_3D& V,
-    MATRIX_COMPRESSION_DATA* U_data, VectorXd* q);
 
 // projection, implemented in the frequency domain. assumes no SVD!
 void PeeledCompressedProjectTransformNoSVD(const VECTOR3_FIELD_3D& V,
@@ -396,17 +317,6 @@ void AddVectorEigen(const vector<VectorXd> V, vector<VectorXd>* W);
 // blockIndex with the corresponding value as well.
 void ComputeBlockNumber(int row, const VEC3I& dims, int* blockNumber, int* blockIndex);
 
-
-// given a (row, col), decode the vector
-// at that cell from the lossy matrix. assumes row
-// is divisible by 3 since it is the start of the vector.
-void DecodeFromRowCol(int row, int col, MATRIX_COMPRESSION_DATA* data, Vector3d* cell);
-
-
-// given a start row, computes the 3 x numCols submatrix
-// given the compression data. assumes start row is
-// divisible by 3!
-void GetSubmatrix(int startRow, MATRIX_COMPRESSION_DATA* data, MatrixXd* submatrix);
 
 // given a start row, computes the 3 x numCols submatrix
 // given the compression data. assumes start row is

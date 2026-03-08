@@ -114,9 +114,6 @@ public:
   // stomp the other matrices and load the ones needed for cubature training
   void loadCubatureTrainingBases();
   
-  // stomp all loaded bases
-  void stompAllBases();
-
   // initialize the matrix compression data
   void initCompressionData();
 
@@ -360,9 +357,6 @@ protected:
 
   // check of a file exists
   bool fileExists(const string& filename);
-
-  // purge inactive memory on OSX
-  void purge() { cout << " Purging inactive OSX memory" << endl; system("purge"); };
 
   // reduced order IOP -- both orthogonal and pressure projection
   void reducedIOP();

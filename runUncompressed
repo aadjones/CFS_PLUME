@@ -1,11 +1,19 @@
 #!/bin/bash
+set -e
 
-# Default config file
-DEFAULT_CONFIG="cfg/stam.64.cfg"
+CFG=${1:-cfg/stam.64.cfg}
 
-# Use provided config file if given, otherwise use default
-CONFIG_FILE=${1:-$DEFAULT_CONFIG}
+if [ ! -f "$CFG" ]; then
+    echo "Error: Config file not found: $CFG"
+    exit 1
+fi
 
-# Run the reduced3D executable with the config file
-echo "Using config file: $CONFIG_FILE"
-./bin/reduced3D "$CONFIG_FILE" 
+if [ ! -f "./bin/reduced3D" ]; then
+    echo "Error: ./bin/reduced3D not found. Run 'make' first."
+    exit 1
+fi
+
+mkdir -p ./movies
+
+echo "Using config file: $CFG"
+./bin/reduced3D "$CFG"

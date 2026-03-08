@@ -1776,7 +1776,7 @@ void SUBSPACE_FLUID_3D_EIGEN::writeSubspaceErrorMatrixDims(int simulationSnapsho
   }
 
   int rows = simulationSnapshots;
-  int cols = simulationSnapshots;
+  int cols = _U.cols();
   // DEBUG
   printf("Writing subspace error matrix dims: (%i, %i)\n", rows, cols);
 

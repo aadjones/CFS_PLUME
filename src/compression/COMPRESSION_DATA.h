@@ -120,9 +120,9 @@ class COMPRESSION_DATA {
     INTEGER_FIELD_3D _zigzagArray;
     INTEGER_FIELD_3D _reverseZigzag;
 
-    double* _dct_in;
-    double* _dct_out;
-    fftw_plan _dct_plan;
+    double* _dct_in = nullptr;
+    double* _dct_out = nullptr;
+    fftw_plan _dct_plan = nullptr;
 };
 
 #endif

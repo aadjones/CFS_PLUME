@@ -80,9 +80,9 @@ int main(int argc, char* argv[])
   cout << " Using discard threshold: " << discardThreshold << endl;
 
   // create the reduced order directory if necessary
-  string mkdir("mkdir ");
-  mkdir = mkdir + reducedPath;
-  system(mkdir.c_str());
+  string mkdirCmd("mkdir -p '");
+  mkdirCmd = mkdirCmd + reducedPath + "'";
+  system(mkdirCmd.c_str());
   cout << " dims: " << xRes << " " << yRes << " " << zRes << endl;
 
 	SUBSPACE_FLUID_3D_EIGEN subspaceFluid(xRes, yRes, zRes, reducedPath, &boundaries[0], usingIOP, true);

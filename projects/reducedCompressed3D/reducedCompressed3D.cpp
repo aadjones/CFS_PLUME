@@ -58,7 +58,6 @@ SUBSPACE_FLUID_3D_COMPRESSED_EIGEN* fluid = NULL;
 // Quicktime movie to capture to
 QUICKTIME_MOVIE movie;
 
-void runOnce();
 void runEverytime();
 // helper function to write unique filenames
 bool fileExists(const string& filename);
@@ -347,11 +346,6 @@ int main(int argc, char *argv[])
   bool usingIOP = parser.getBool("iop", 0);
   cout << "Using IOP: " << usingIOP << endl;
 
-  bool fastPow = parser.getBool("fastPow", false);
-  cout << " Fast pow: " << fastPow << endl;
-
-  bool debug = parser.getBool("debug", 0);
-  cout << "Debug: " << debug << endl;
 
   string compressionPath = parser.getString("compression path", "./data/compression/");
   cout << "Compression path set to: " << compressionPath << endl;
@@ -369,10 +363,6 @@ int main(int argc, char *argv[])
   fluid->fullRankPath() = snapshotPath;
   fluid->vorticityEps() = vorticity;
 
-
-  // set the FIELD_3D static
-  FIELD_3D::usingFastPow() = fastPow;
-  
   // ground = new FLUID_3D_MIC(xRes, yRes, zRes, 0);
  
   TIMER::printTimings();
@@ -385,11 +375,6 @@ int main(int argc, char *argv[])
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-
-void runOnce()
-{
-  fluid->initCompressionData();
-}
 
 void runEverytime()
 {

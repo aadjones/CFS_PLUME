@@ -374,7 +374,7 @@ void runEverytime()
     static int step = 0;
     if (step == 0) { 
       fluid->writeSubspaceErrorMatrixDims(simulationSnapshots); 
-      string cmd = string("mkdir ") + reducedPath + string("pbrt");
+      string cmd = string("mkdir -p '") + reducedPath + string("pbrt'");
       system(cmd.c_str());
     }
 

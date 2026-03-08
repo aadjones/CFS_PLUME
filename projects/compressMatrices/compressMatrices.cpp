@@ -66,9 +66,6 @@ string getCurrentTime();
 // set the damping matrix and compute the number of blocks
 void PreprocessEncoder(COMPRESSION_DATA* data0, COMPRESSION_DATA* data1, COMPRESSION_DATA* data2, int maxIterations, const char* filename);
 
-// rescale the singular values to use for damping
-void PreprocessSingularValues(const char* filename, double threshold); 
-
 // check if a file exists
 bool fileExists(const string& filename);
 
@@ -119,12 +116,10 @@ int main(int argc, char* argv[]) {
   int xRes = parser.getInt("xRes", 48);
   int yRes = parser.getInt("yRes", 64);
   int zRes = parser.getInt("zRes", 48);
-  int numCols = parser.getInt("reduced snapshots", 50);
   bool usingIOP = parser.getBool("iop", 0);
   cout << "Simulation dimensions: " << xRes << "x" << yRes << "x" << zRes << endl;
-  cout << "Number of snapshots: " << numCols << endl;
   cout << "Using IOP: " << (usingIOP ? "Yes" : "No") << endl;
-  cout << "Block size: " << BLOCK_SIZE << endl; 
+  cout << "Block size: " << BLOCK_SIZE << endl;
 
   // we want the peeled resolutions for the matrices
   xRes -= 2;
@@ -133,34 +128,24 @@ int main(int argc, char* argv[]) {
   cout << "Peeled dimensions: " << xRes << "x" << yRes << "x" << zRes << endl;
 
   VEC3I dims(xRes, yRes, zRes);
-  
-  // times 3 since it is a VELOCITY3_FIELD_3D flattened out
-  int numRows = 3 * xRes * yRes * zRes;
-  cout << "Matrix dimensions: " << numRows << "x" << numCols << endl;
-
-  // Initialize matrices
-  MatrixXd U_preadvect(numRows, numCols);
-  MatrixXd U_final(numRows, numCols);
 
   cout << "\n=== Reading compression parameters ===" << endl;
-  int nBits = parser.getInt("nBits", 24); 
+  int nBits = parser.getInt("nBits", 24);
   double percent = parser.getFloat("percent", 0.99);
   int maxIterations = parser.getInt("maxIterations", 32);
-  bool debug = parser.getBool("debug", false);
-  bool usingFastPow = parser.getBool("fastPow", false);
-  
+
   cout << "Compression settings:" << endl;
   cout << "  - Bits per value: " << nBits << endl;
   cout << "  - Compression percentage: " << percent << endl;
   cout << "  - Max iterations: " << maxIterations << endl;
-  cout << "  - Debug mode: " << (debug ? "Enabled" : "Disabled") << endl;
-  cout << "  - Fast power: " << (usingFastPow ? "Enabled" : "Disabled") << endl;
-
-  FIELD_3D::usingFastPow() = usingFastPow;
 
   cout << "\n=== Loading input matrices ===" << endl;
   preadvectPath = reducedPath + string("U.preadvect.matrix");
   finalPath = reducedPath + string("U.final.matrix");
+
+  // Load matrices first so we know the actual column counts
+  MatrixXd U_preadvect;
+  MatrixXd U_final;
 
   cout << "Reading preadvect matrix from: " << preadvectPath << endl;
   if (!fileExists(preadvectPath)) {
@@ -168,7 +153,7 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   EIGEN::read(preadvectPath, U_preadvect);
-  cout << "Successfully read preadvect matrix" << endl;
+  cout << "Successfully read preadvect matrix: " << U_preadvect.rows() << " x " << U_preadvect.cols() << endl;
 
   cout << "Reading final matrix from: " << finalPath << endl;
   if (!fileExists(finalPath)) {
@@ -176,16 +161,21 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   EIGEN::read(finalPath, U_final);
-  cout << "Successfully read final matrix" << endl;
+  cout << "Successfully read final matrix: " << U_final.rows() << " x " << U_final.cols() << endl;
+
+  // Use actual column counts from the loaded matrices
+  int preadvectCols = U_preadvect.cols();
+  int finalCols = U_final.cols();
+  cout << "Preadvect basis columns: " << preadvectCols << endl;
+  cout << "Final basis columns: " << finalCols << endl;
 
   cout << "\n=== Initializing compression data ===" << endl;
-  // set the parameters in compression data
-  COMPRESSION_DATA preadvect_compression_data0(dims, numCols, nBits, percent);
-  COMPRESSION_DATA preadvect_compression_data1(dims, numCols, nBits, percent);
-  COMPRESSION_DATA preadvect_compression_data2(dims, numCols, nBits, percent);
-  COMPRESSION_DATA final_compression_data0(dims, numCols, nBits, percent);
-  COMPRESSION_DATA final_compression_data1(dims, numCols, nBits, percent);
-  COMPRESSION_DATA final_compression_data2(dims, numCols, nBits, percent);
+  COMPRESSION_DATA preadvect_compression_data0(dims, preadvectCols, nBits, percent);
+  COMPRESSION_DATA preadvect_compression_data1(dims, preadvectCols, nBits, percent);
+  COMPRESSION_DATA preadvect_compression_data2(dims, preadvectCols, nBits, percent);
+  COMPRESSION_DATA final_compression_data0(dims, finalCols, nBits, percent);
+  COMPRESSION_DATA final_compression_data1(dims, finalCols, nBits, percent);
+  COMPRESSION_DATA final_compression_data2(dims, finalCols, nBits, percent);
 
   cout << "Setting up scratch directory..." << endl;
   string scratchPath = "./scratch/";
@@ -216,23 +206,13 @@ int main(int argc, char* argv[]) {
   string finalFilename = reducedPath + string("tmp/U.final.component");
 
   cout << "\n=== Starting compression ===" << endl;
-  if (debug) {
-    cout << "Running in debug mode..." << endl;
-    CompressAndWriteMatrixComponentsDebug(preadvectFilename.c_str(), U_preadvect, &preadvect_compression_data0,
-      &preadvect_compression_data1, &preadvect_compression_data2);
+  cout << "Compressing preadvect matrix..." << endl;
+  CompressAndWriteMatrixComponents(preadvectFilename.c_str(), U_preadvect, &preadvect_compression_data0,
+    &preadvect_compression_data1, &preadvect_compression_data2);
 
-    CompressAndWriteMatrixComponentsDebug(finalFilename.c_str(), U_final, &final_compression_data0, 
-      &final_compression_data1, &final_compression_data2);
-  } else {
-    cout << "Running in normal mode..." << endl;
-    cout << "Compressing preadvect matrix..." << endl;
-    CompressAndWriteMatrixComponents(preadvectFilename.c_str(), U_preadvect, &preadvect_compression_data0,
-      &preadvect_compression_data1, &preadvect_compression_data2);
-    
-    cout << "Compressing final matrix..." << endl;
-    CompressAndWriteMatrixComponents(finalFilename.c_str(), U_final, &final_compression_data0, 
-      &final_compression_data1, &final_compression_data2);
-  }
+  cout << "Compressing final matrix..." << endl;
+  CompressAndWriteMatrixComponents(finalFilename.c_str(), U_final, &final_compression_data0,
+    &final_compression_data1, &final_compression_data2);
 
   cout << "\n=== Computing compression ratios ===" << endl;
   double ratio = GetCompressionRatios(preadvectFilename, finalFilename);
@@ -306,32 +286,6 @@ void PreprocessEncoder(COMPRESSION_DATA* data0, COMPRESSION_DATA* data1, COMPRES
   data2->set_singularValues(filename);
   */
 }
-
-void PreprocessSingularValues(const char* filename, double threshold)
-{
-  VECTOR singularValues;
-  singularValues.read(filename);
-  for (int i = 0; i < singularValues.size(); i++) {
-    singularValues[i] = log(singularValues[i]);
-  }
-  double min = singularValues.min();
-  for (int i = 0; i < singularValues.size(); i++) {
-    singularValues[i] -= min;
-  }
-  double s0inv = 1.0 / singularValues[0];
-  singularValues *= s0inv;
-
-  for (int i = 0; i < singularValues.size(); i++) {
-    singularValues[i] *= (1 - threshold);
-    singularValues[i] += threshold;
-  }
-
-  string output(filename);
-  output += string(".processed");
-  singularValues.write(output.c_str());
-  printf("Wrote out rescaled singular values!\n");
-}
-   
 
 //////////////////////////////////////////////////////////////////////
 // check if a file exists

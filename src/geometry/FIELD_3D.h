@@ -84,7 +84,6 @@ public:
   const int outside() const { return _outside; };
   const int& quinticClamps() const { return _quinticClamps; };
   const bool initialized() const;
-  static bool& usingFastPow() { return _usingFastPow; };
 
   const int maxRes() const { return (_xRes > _yRes) ? ((_zRes > _xRes) ? _zRes : _xRes) : ((_zRes > _yRes) ? _zRes : _yRes); };
 
@@ -224,8 +223,6 @@ public:
 
   // take each element to the specified power
   void toPower(double power);
-
-  void toFastPower(double power);
 
   void toPower(double power, const vector<int>& nonZeros);
   void toPower(double power, const vector<int>& nonZeros, const int size);
@@ -474,22 +471,6 @@ public:
   //static FIELD_3D turbulentPlume(const int xRes, const int yRes, const int zRes, const int seed);
   static FIELD_3D yRampField(const FIELD_3D& example, const Real plumeBase = 0.0);
 
-  // from here: 
-  // http://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
-
-  
-  static inline double fastPow(double a, double b) 
-  {
-    //printf(" calling fast pow. ");
-    union {
-      double d;
-      int x[2];
-    } u = { a };
-    u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
-    u.x[0] = 0;
-    return u.d;
-  }
-  
   // write out to a PBRT file for rendering
   static void exportPbrt(const FIELD_3D& density, const char* out);
 
@@ -531,8 +512,6 @@ private:
 
   // has this field been initialized?
   //bool _initialized;
-
-  static bool _usingFastPow;
 
   // do fast marching in one direction
   void marchOneway(bool forward, MIN_HEAP& minHeap);

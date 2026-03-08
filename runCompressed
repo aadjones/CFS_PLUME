@@ -1,70 +1,25 @@
 #!/bin/bash
-
-# Enable error handling and logging
 set -e
-exec 1> >(tee -a "compression_$(date +%Y%m%d_%H%M%S).log")
-exec 2>&1
 
-echo "=== Starting compression run at $(date) ==="
-echo "Command line arguments: $@"
+CFG=${1:-cfg/stam.64.cfg}
 
-# Default config file
-DEFAULT_CONFIG="cfg/stam.64.cfg"
-
-# Use provided config file if given, otherwise use default
-CONFIG_FILE=${1:-$DEFAULT_CONFIG}
-echo "Using config file: $CONFIG_FILE"
-
-# Create base data directory
-echo "Creating base data directory..."
-mkdir -p ./data/reduced.stam.64
-
-# Extract the reduced path from the config file
-echo "Extracting reduced path from config..."
-REDUCED_PATH=$(grep "reduced path" "$CONFIG_FILE" | cut -d'=' -f2 | tr -d ' ')
-
-if [ -z "$REDUCED_PATH" ]; then
-    echo "Error: Could not find reduced path in config file"
+if [ ! -f "$CFG" ]; then
+    echo "Error: Config file not found: $CFG"
     exit 1
 fi
 
-# Create a temporary modified config file
-echo "Creating temporary config file..."
-TMP_CONFIG=$(mktemp)
-cp "$CONFIG_FILE" "$TMP_CONFIG"
-
-# Debug output
-echo "=== Configuration Details ==="
-echo "Original config file: $CONFIG_FILE"
-echo "Temporary config file: $TMP_CONFIG"
-echo "Reduced path from config: $REDUCED_PATH"
-echo "Compression path in temp config:"
-grep "compression path" "$TMP_CONFIG"
-
-# Check if executable exists
 if [ ! -f "./bin/reducedCompressed3D" ]; then
-    echo "Error: Executable ./bin/reducedCompressed3D not found"
+    echo "Error: ./bin/reducedCompressed3D not found. Run 'make' first."
     exit 1
 fi
 
-# Run the reduced3D_compressed executable with the modified config file
-echo "=== Starting compression process ==="
-echo "Using config file: $TMP_CONFIG"
-echo "Using reduced path: $REDUCED_PATH"
-
-# Run with time tracking
-time ./bin/reducedCompressed3D "$TMP_CONFIG"
-COMPRESSION_EXIT_CODE=$?
-
-if [ $COMPRESSION_EXIT_CODE -ne 0 ]; then
-    echo "Error: Compression process failed with exit code $COMPRESSION_EXIT_CODE"
-    exit $COMPRESSION_EXIT_CODE
+# Create output directories referenced by config
+COMPRESSION_PATH=$(grep "^compression path" "$CFG" | cut -d'=' -f2 | tr -d ' ')
+if [ -n "$COMPRESSION_PATH" ]; then
+    mkdir -p "$COMPRESSION_PATH"
+    mkdir -p "${COMPRESSION_PATH}pbrt"
 fi
+mkdir -p ./movies
 
-echo "=== Compression completed successfully ==="
-
-# Clean up
-echo "Cleaning up temporary files..."
-rm "$TMP_CONFIG"
-
-echo "=== Compression run completed at $(date) ===" 
+echo "Using config file: $CFG"
+./bin/reducedCompressed3D "$CFG"

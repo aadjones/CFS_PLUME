@@ -104,10 +104,14 @@ class MATRIX_COMPRESSION_DATA {
     }
 
    void dct_cleanup() {
-     fftw_destroy_plan(_dct_plan);
-     fftw_free(_dct_in);
-     _dct_in = NULL;
-     fftw_cleanup();
+     if (_dct_plan) {
+       fftw_destroy_plan(_dct_plan);
+       _dct_plan = nullptr;
+     }
+     if (_dct_in) {
+       fftw_free(_dct_in);
+       _dct_in = nullptr;
+     }
    }
 
   // build the damping arrays in each component
@@ -118,9 +122,9 @@ class MATRIX_COMPRESSION_DATA {
   }
 
   private:
-    int* _dataX;
-    int* _dataY;
-    int* _dataZ;
+    int* _dataX = nullptr;
+    int* _dataY = nullptr;
+    int* _dataZ = nullptr;
 
     COMPRESSION_DATA _compression_dataX;
     COMPRESSION_DATA _compression_dataY;
@@ -130,10 +134,10 @@ class MATRIX_COMPRESSION_DATA {
     vector<FIELD_3D> _cachedBlocksY;
     vector<FIELD_3D> _cachedBlocksZ;
 
-    int _cachedBlockNumber;
+    int _cachedBlockNumber = -1;
 
-    double* _dct_in;
-    fftw_plan _dct_plan;
+    double* _dct_in = nullptr;
+    fftw_plan _dct_plan = nullptr;
 };
 
 #endif
