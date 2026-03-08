@@ -23,16 +23,16 @@ COMPRESSION_DATA::~COMPRESSION_DATA()
 }
 
 void COMPRESSION_DATA::set_dampingArrayList() {
-    TIMER functionTimer(__FUNCTION__);
-    assert(_dampingArrayBuilt);
+    // Ensure damping array is built first
+    set_dampingArray();
+
     if (_dampingArrayListBuilt) { return; }
 
-    puts("Inside set_dampingArrayList!");
+    TIMER functionTimer(__FUNCTION__);
 
     FIELD_3D dampingArray(_dampingArray);
     int totalNumber = 4 * _nBits + 1;
     _dampingArrayList.resize(totalNumber);
-    cout << "total number: " << totalNumber << endl;
     for (int i = 0; i < totalNumber; i++) {
       double gamma = i / 4.0;
       dampingArray.toPower(gamma);
@@ -40,7 +40,6 @@ void COMPRESSION_DATA::set_dampingArrayList() {
       dampingArray = _dampingArray;
     }
     _dampingArrayListBuilt = true;
-    cout << "array list built: " << _dampingArrayListBuilt << endl;
 }
 
 void COMPRESSION_DATA::dct_setup(int direction) {
@@ -52,11 +51,11 @@ void COMPRESSION_DATA::dct_setup(int direction) {
     _dct_out = (double*) fftw_malloc(xRes * yRes * zRes * sizeof(double));
 
     if (direction == 1) { // forward transform
-       _dct_plan = fftw_plan_r2r_3d(zRes, yRes, xRes, _dct_in, _dct_out, 
-           FFTW_REDFT10, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE); 
+       _dct_plan = fftw_plan_r2r_3d(zRes, yRes, xRes, _dct_in, _dct_out,
+           FFTW_REDFT10, FFTW_REDFT10, FFTW_REDFT10, FFTW_MEASURE);
     }
     else { // direction == -1; backward transform
-       _dct_plan = fftw_plan_r2r_3d(zRes, yRes, xRes, _dct_in, _dct_out, 
+       _dct_plan = fftw_plan_r2r_3d(zRes, yRes, xRes, _dct_in, _dct_out,
            FFTW_REDFT01, FFTW_REDFT01, FFTW_REDFT01, FFTW_MEASURE);
     }
 }
@@ -89,8 +88,9 @@ void COMPRESSION_DATA::set_dampingArray() {
 }
 
 void COMPRESSION_DATA::set_zigzagArray() {
-    TIMER functionTimer(__FUNCTION__);
     if (_zigzagArrayBuilt) { return; }
+
+    TIMER functionTimer(__FUNCTION__);
 
     int xRes = BLOCK_SIZE;
     int yRes = BLOCK_SIZE;

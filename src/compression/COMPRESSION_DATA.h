@@ -98,9 +98,11 @@ class COMPRESSION_DATA {
     double _nBits;
     double _percent;
 
-    bool _dampingArrayBuilt=false;
-    bool _dampingArrayListBuilt=false;
-    bool _zigzagArrayBuilt=false;
+    // NOTE: not thread-safe. If OpenMP is added to decode paths,
+    // these guards need std::call_once (requires making COMPRESSION_DATA non-copyable).
+    bool _dampingArrayBuilt = false;
+    bool _dampingArrayListBuilt = false;
+    bool _zigzagArrayBuilt = false;
 
     VectorXi _blockLengths;
     VectorXi _blockIndices;

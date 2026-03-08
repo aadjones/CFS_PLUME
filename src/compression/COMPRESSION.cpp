@@ -2331,7 +2331,14 @@ void CompressAndWriteMatrixComponents(const char* filename, const MatrixXd& U,
   BuildBlockIndicesMatrix(data2);
 
   // write the metadata for each component one at a time
-  const char* metafile = "metadata.bin";
+  // Derive metadata path from output filename's directory to avoid CWD conflicts
+  string metafilePath(filename);
+  size_t lastSlash = metafilePath.find_last_of('/');
+  if (lastSlash != string::npos)
+    metafilePath = metafilePath.substr(0, lastSlash + 1) + "metadata.bin";
+  else
+    metafilePath = "metadata.bin";
+  const char* metafile = metafilePath.c_str();
   WriteMetaData(metafile, *data0);
 
   // appends the metadata as a header to the main binary file and pipes them into final_string
