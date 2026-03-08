@@ -2,66 +2,106 @@
 
 <img width="600" alt="compressions" src="https://github.com/user-attachments/assets/087128ff-8f71-458c-80cc-ca705e8693f6">
 
-This is a reference implementation of the algorithm described in the paper [*Compressing Fluid Subspaces*](https://www.tkim.graphics/COMPRESSING/JonesSenKim2016.pdf). It is intended to be the simplest possible working example of a DCT-based fluid subspace compression codec. In keeping with this simplicity, extra features such as obstacle handling and multithread support have been removed.
+Reference implementation of the algorithm from [*Compressing Fluid Subspaces*](https://www.tkim.graphics/COMPRESSING/JonesSenKim2016.pdf) (Jones, Sen, Kim 2016). A DCT-based codec for compressing reduced-order fluid simulation bases.
 
-## Building the Code
+## Dependencies
 
-We have successfully built this code in Mac OS X (10.9, Mavericks). The default `Makefile` is for OS X. We have made an effort to remove dependencies on external libraries, so aside from some commonly available libraries (`fftw3`, `zlib`, `libpng`, `GLUT`), you should not need to download and install anything special in order to successfully compile. Notably, CFS requires the `Eigen` library, but it comes included in the download. You should be able to build using the following sequence:
+Install via Homebrew (macOS):
 
-    gunzip CFS_PLUME.tar.gz
-    tar -xvf CFS_PLUME.tar
-    cd CFS_PLUME
-    make
+```bash
+brew install fftw libpng jpeg zlib
+```
 
-If you are successful, the binaries:
+Also requires: OpenGL, GLUT, and the Accelerate framework (included with macOS). Eigen is bundled in `src/Eigen/`.
 
-- `buildProducts`
-- `compressMatrices`
-- `cubatureGeneratorStamStaged`
-- `fluid3D`
-- `reduced3D`
-- `reducedCompressed3D`
-- `svdOutOfCoreMultiple`
+## Building
 
-should now be in the `CFS_PLUME/bin` directory.
+```bash
+make          # Build all 8 binaries to ./bin/
+make clean    # Remove all .o files and binaries
+```
 
-## Running the Code
+Binaries: `fluid3D`, `svdOutOfCoreMultiple`, `cubatureGeneratorStamStaged`, `cubatureMemory`, `reduced3D`, `compressMatrices`, `buildProducts`, `reducedCompressed3D`.
 
-The configuration file for a very small example is provided, `./cfg/stam.64.cfg`. Running the entire subspace pipeline on a large example can be very time consuming, so it is highly recommended that you first verify that this example can be run successfully. The following is the execution sequence.
+Two additional comparison binaries are not in the top-level Makefile. Build them separately if needed:
 
-From the `CFS_PLUME` directory, start by generating all the preprocess data, including compressed data:
+```bash
+cd projects/reduced3DWriteVelocities && make -f Makefile
+cd projects/reducedCompressed3DCompareVelocities && make -f Makefile
+```
 
-    sudo ./runPreprocess
+## Running
 
+All commands run from the project root. The config file `cfg/stam.64.cfg` defines the small (48x64x48) test case.
 
-This will generate snapshot data, build the empirical eigenvectors in order to construct a subspace, generate a semi-Lagrangian cubature scheme for the subspace, precompute subspace run-time matrices, and generate compressed subspace matrix data.
+### 1. Preprocess (generate data, build subspace, compress)
 
-Next, to do either the uncompressed subspace re-simulation or the compressed subspace re-simulation, run:
+```bash
+./runPreprocess
+```
 
-    sudo ./runUncompressed
+This runs the full 5-step pipeline: full-rank simulation (50 timesteps), SVD, cubature generation, matrix compression, and product precomputation. Takes several minutes.
 
-    
-or
+### 2. Simulate
 
-    sudo ./runCompressed
+```bash
+./runUncompressed          # Reduced-order simulation (ground truth)
+./runCompressed            # Compressed simulation (~6:1 compression)
+```
 
-respectively. The compressed simulation is set to approximately 6:1 compression.
+Both load original snapshots and report per-timestep error metrics. Expected results at frame 49 for 6:1 compression:
 
-By default, both `runUncompressed` and `runCompressed` load up the original simulation data and compare it to the subspace result. If the cubature has trained correctly, you should see the relative error of the velocity field in the uncompressed subspace simulation remain below 1%. Depending on the compression level, in the compressed simulation, this error should remain below 10% for results not to degrade in noticeable visual quality.
+```
+velocity relative error: 0.0529028
+density relative error: 0.0480764
+```
 
-Note that the simulations will not run as fast as they otherwise could, since the time from pulling a comparison file from disk at each timestep is quite expensive. If your 6:1 compressed simulation gets to 50 timesteps and outputs something along the lines of:
+Uncompressed should stay below 1% relative error; compressed below 10%.
 
-    =====================================================
-    Ground truth difference for frame 49
-    =====================================================
-    velocity abs error: 0.213755
-    velocity relative error: 0.0529028
-    density abs error: 1.13693
-    density relative error: 0.0480764
+### 3. Movies
 
-then your installation has succeeded.
+Simulation movies are written to `./movies/` in legacy MJPEG QuickTime format. Convert to H.264 for modern playback:
 
-If you would like to vary the amount of compression, you must edit the percent parameter in the configuration ./cfg/stam.64.cfg. In practice, values quite close to 1.0, e.g., 0.999, 0.99, etc., are generally advised for high quality results.
+```bash
+./movies/convert.sh
+```
+
+## Tests
+
+```bash
+cd tests && make           # Build test binary
+cd .. && ./tests/test_compression_data   # Run from project root (needs ./data/)
+```
+
+17 tests covering the decode pipeline, codec round-trip accuracy, and arithmetic helpers.
+
+## Configuration
+
+Edit `cfg/stam.64.cfg` to change parameters. Key settings:
+
+| Parameter | Default | Description |
+|---|---|---|
+| `percent` | 0.999999 | Compression ratio (0.99 = keep 99%, more lossy) |
+| `nBits` | 32 | Quantization bit depth |
+| `simulation snapshots` | 50 | Number of timesteps |
+| `xRes/yRes/zRes` | 48/64/48 | Grid resolution |
+
+Note: `compressMatrices` rewrites `compression path` and `preview movie` in the config file automatically based on the achieved compression ratio.
+
+## Project Structure
+
+```
+CFS_PLUME/
+  cfg/              Config files
+  src/              Source libraries (compression, integrators, geometry, etc.)
+  projects/         Per-binary build directories with Makefiles
+  tests/            Compression codec tests
+  bin/              Compiled binaries (generated)
+  data/             Simulation data (generated)
+  movies/           Output videos (generated)
+  scratch/          Temporary files for out-of-core SVD (generated)
+```
 
 ## Credits
+
 Aaron Demby Jones, Pradeep Sen, and Theodore Kim
