@@ -83,7 +83,7 @@ vector<VECTOR> snapshots;
 
 // user configuration initializations
 string snapshotPath("./data/snapshots.stam.no.vorticity/");
-string previewMovie("./data/stam.mov");
+string previewMovie("./movies/stam.mov");
 int simulationSnapshots = 20;
 
 ///////////////////////////////////////////////////////////////////////
@@ -187,7 +187,7 @@ void glutKeyboard(unsigned char key, int x, int y)
       if (captureMovie)
       {
         // write out the movie
-        movie.writeMovie("movie.mov");
+        movie.writeMovie("./movies/movie.mov");
 
         // reset the movie object
         movie = QUICKTIME_MOVIE();
@@ -425,12 +425,12 @@ void writeToQuicktime()
   // write out the movie
   int i = 0;
   char buffer[256];
-  sprintf(buffer, "movieObstacle%i.mov", i);
+  sprintf(buffer, "./movies/movieObstacle%i.mov", i);
   string movieString(buffer);
 
   while (fileExists(movieString)) {
     i++;
-    sprintf(buffer, "movieObstacle%i.mov", i);
+    sprintf(buffer, "./movies/movieObstacle%i.mov", i);
     movieString = string(buffer);
   }
   movie.writeMovie(movieString.c_str());

@@ -193,7 +193,7 @@ void glutKeyboard(unsigned char key, int x, int y)
         if (captureMovie)
         {
          // write out the movie
-         movie.writeMovie("movie.mov");
+         movie.writeMovie("./movies/movie.mov");
 
         // reset the movie object
         movie = QUICKTIME_MOVIE();
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
   int zRes = parser.getInt("zRes", 48);
   string reducedPath = parser.getString("reduced path", "./data/reduced.dummy/");
   snapshotPath = parser.getString("snapshot path", "./data/dummy/");
-  previewReducedMovie = parser.getString("preview movie", "./data/movie.mov");
+  previewReducedMovie = parser.getString("preview movie", "./movies/movie.mov");
   cout << "Reduced movie is written to: " << previewReducedMovie << endl;
   simulationSnapshots = parser.getInt("simulation snapshots", 20);
   Real vorticity = parser.getFloat("vorticity", 0);
@@ -459,12 +459,12 @@ void writeToQuicktime()
   // write out the movie
   int i = 0;
   char buffer[256];
-  sprintf(buffer, "movieObstacleSubspaceCompressed%i.mov", i);
+  sprintf(buffer, "./movies/movieObstacleSubspaceCompressed%i.mov", i);
   string movieString(buffer);
 
   while (fileExists(movieString)) {
     i++;
-    sprintf(buffer, "movieObstacleSubspaceCompressed%i.mov", i);
+    sprintf(buffer, "./movies/movieObstacleSubspaceCompressed%i.mov", i);
     movieString = string(buffer);
   }
   movie.writeMovie(movieString.c_str());

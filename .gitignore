@@ -55,5 +55,8 @@ movies/*
 # Test binaries
 tests/test_compression_data
 
+# Movies (legacy MJPEG QuickTime format)
+*.mov
+
 # Logs
 *.log

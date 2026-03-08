@@ -190,7 +190,7 @@ void glutKeyboard(unsigned char key, int x, int y)
         if (captureMovie)
         {
          // write out the movie
-         movie.writeMovie("movieSubspace.mov");
+         movie.writeMovie("./movies/movieSubspace.mov");
 
         // reset the movie object
         movie = QUICKTIME_MOVIE();
@@ -432,12 +432,12 @@ void writeToQuicktime()
   // write out the movie
   int i = 0;
   char buffer[256];
-  sprintf(buffer, "movieObstacleSubspace%i.mov", i);
+  sprintf(buffer, "./movies/movieObstacleSubspace%i.mov", i);
   string movieString(buffer);
 
   while (fileExists(movieString)) {
     i++;
-    sprintf(buffer, "movieObstacleSubspace%i.mov", i);
+    sprintf(buffer, "./movies/movieObstacleSubspace%i.mov", i);
     movieString = string(buffer);
   }
   movie.writeMovie(movieString.c_str());
