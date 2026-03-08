@@ -25,9 +25,20 @@
 #include "CUBATURE_GENERATOR_EIGEN.h"
 #include "MATRIX.h"
 #include "SIMPLE_PARSER.h"
+#include <sys/stat.h>
+
+// Create a directory (and parents) without shelling out
+static void ensureDirectoryExists(const string& path) {
+  string built;
+  for (size_t i = 0; i < path.size(); i++) {
+    built += path[i];
+    if (path[i] == '/' || i == path.size() - 1)
+      mkdir(built.c_str(), 0755);
+  }
+}
 
 //////////////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
@@ -80,9 +91,7 @@ int main(int argc, char* argv[])
   cout << " Using discard threshold: " << discardThreshold << endl;
 
   // create the reduced order directory if necessary
-  string mkdirCmd("mkdir -p '");
-  mkdirCmd = mkdirCmd + reducedPath + "'";
-  system(mkdirCmd.c_str());
+  ensureDirectoryExists(reducedPath);
   cout << " dims: " << xRes << " " << yRes << " " << zRes << endl;
 
 	SUBSPACE_FLUID_3D_EIGEN subspaceFluid(xRes, yRes, zRes, reducedPath, &boundaries[0], usingIOP, true);

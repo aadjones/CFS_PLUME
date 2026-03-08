@@ -52,5 +52,8 @@ movies/*
 .DS_Store
 ._*
 
+# Test binaries
+tests/test_compression_data
+
 # Logs
 *.log

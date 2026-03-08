@@ -573,48 +573,21 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::stepPlume()
   addVorticity();
   _velocity.axpy(_dt, _force);
 
-  puts("DEBUG: Starting projection into subspace");
-  printf("DEBUG: _velocity dimensions: (%d, %d, %d)\n", _velocity.xRes(), _velocity.yRes(), _velocity.zRes());
-  printf("DEBUG: _U_preadvect_data dimensions - X: (%d, %d), Y: (%d, %d), Z: (%d, %d)\n",
-         _U_preadvect_data.get_compression_dataX()->get_dims()[0],
-         _U_preadvect_data.get_compression_dataX()->get_numCols(),
-         _U_preadvect_data.get_compression_dataY()->get_dims()[0],
-         _U_preadvect_data.get_compression_dataY()->get_numCols(),
-         _U_preadvect_data.get_compression_dataZ()->get_dims()[0],
-         _U_preadvect_data.get_compression_dataZ()->get_numCols());
-  printf("DEBUG: _qDot size before projection: %lu\n", _qDot.size());
-  
   // Projection into subspace
   PeeledCompressedProjectTransformNoSVD(_velocity, &_U_preadvect_data, &_qDot);
-  puts("DEBUG: Finished projection into subspace");
-  printf("DEBUG: _qDot size after projection: %lu\n", _qDot.size());
 
-  puts("DEBUG: Starting heat and density advection");
   // Advection
   advectHeatAndDensityStam();
-  puts("DEBUG: Finished heat and density advection");
-
-  puts("DEBUG: Starting reduced advection");
   reducedAdvectCompressionFriendly();
-  puts("DEBUG: Finished reduced advection");
-  printf("DEBUG: _qDot size after advection: %lu\n", _qDot.size());
 
-  puts("DEBUG: Starting diffusion");
   // Diffusion
   reducedPeeledDiffusion();
-  puts("DEBUG: Finished diffusion");
-  printf("DEBUG: _qDot size after diffusion: %lu\n", _qDot.size());
 
-  puts("DEBUG: Starting pressure projection");
   // Pressure projection
   reducedStagedProject();
-  puts("DEBUG: Finished pressure projection");
-  printf("DEBUG: _qDot size after pressure projection: %lu\n", _qDot.size());
 
-  puts("DEBUG: Starting unprojection");
   // Unprojection
   PeeledCompressedUnprojectTransform(&_U_final_data, _qDot, &_velocity);
-  puts("DEBUG: Finished unprojection");
 
   currentTime += _dt;
 
@@ -1088,28 +1061,7 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::computePressureToVelocity()
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::reducedStagedProject()
 {
   TIMER functionTimer(__FUNCTION__);
-  puts("DEBUG: Starting reducedStagedProject");
-  printf("DEBUG: _preprojectToFinal dimensions: (%lu, %lu)\n", _preprojectToFinal.rows(), _preprojectToFinal.cols());
-  printf("DEBUG: _qDot size before projection: %lu\n", _qDot.size());
-  printf("DEBUG: _inverseProduct dimensions: (%lu, %lu)\n", _inverseProduct.rows(), _inverseProduct.cols());
-  
-  // Check if dimensions match before operations
-  if (_preprojectToFinal.cols() != _qDot.size()) {
-    printf("ERROR: Dimension mismatch in _preprojectToFinal * _qDot: (%lu, %lu) * (%lu)\n", 
-           _preprojectToFinal.rows(), _preprojectToFinal.cols(), _qDot.size());
-    exit(1);
-  }
-  if (_inverseProduct.cols() != _qDot.size()) {
-    printf("ERROR: Dimension mismatch in _inverseProduct * _qDot: (%lu, %lu) * (%lu)\n", 
-           _inverseProduct.rows(), _inverseProduct.cols(), _qDot.size());
-    exit(1);
-  }
-
-  puts("DEBUG: Performing matrix operations");
   _qDot = _preprojectToFinal * _qDot + _inverseProduct * _qDot;
-  puts("DEBUG: Matrix operations completed");
-  printf("DEBUG: _qDot size after projection: %lu\n", _qDot.size());
-  puts("DEBUG: Finished reducedStagedProject");
 }
 //////////////////////////////////////////////////////////////////////
 // do a staged reduced order pressure projection for IOP
@@ -1117,9 +1069,6 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::reducedStagedProject()
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::reducedStagedProjectIOP()
 {
   TIMER functionTimer(__FUNCTION__);
-  cout << "_preprojectToPreadvect.cols: " << _preprojectToPreadvect.cols() << endl;
-  cout << "_qDot.size: " << _qDot.size() << endl;
-  cout << "_inverseProduct rows, cols: " << "(" << _inverseProduct.rows() << ", " << _inverseProduct.cols() << ")" << endl;
   _qDot = _preprojectToPreadvect * _qDot + _inverseProduct * _qDot;
 }
 
@@ -1684,55 +1633,22 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::loadReducedRuntimeBases(string path)
 //////////////////////////////////////////////////////////////////////
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::loadReducedIOP(string path)
 {
-  // DEBUG
-  puts("Called loadReducedIOP in the compressed code!");
   TIMER functionTimer(__FUNCTION__);
-  
-  if (path.length() == 0) {
+
+  if (path.length() == 0)
     path = _reducedPath;
-    cout << "Using default reduced path: " << path << endl;
-  } else {
-    cout << "Using provided path: " << path << endl;
-  }
-  
-  cout << "Compression path: " << _compressionPath << endl;
-  
-  // Use member variables instead of stack variables
+
   string preadvectFile = _compressionPath + string("U.preadvect.component0");
-  cout << "Attempting to open file: " << preadvectFile << endl;
-  cout << "Checking if file exists..." << endl;
-  if (!fileExists(preadvectFile)) {
-    cout << "ERROR: File does not exist: " << preadvectFile << endl;
-    cout << "Current working directory: ";
-    system("pwd");
-    cout << "Directory contents of " << _compressionPath << ":" << endl;
-    system(("ls -la " + _compressionPath).c_str());
-    exit(EXIT_FAILURE);
-  }
   int* allData0 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data0);
-  
+
   preadvectFile = _compressionPath + string("U.preadvect.component1");
-  cout << "Attempting to open file: " << preadvectFile << endl;
-  if (!fileExists(preadvectFile)) {
-    cout << "ERROR: File does not exist: " << preadvectFile << endl;
-    exit(EXIT_FAILURE);
-  }
   int* allData1 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data1);
-  
+
   preadvectFile = _compressionPath + string("U.preadvect.component2");
-  cout << "Attempting to open file: " << preadvectFile << endl;
-  if (!fileExists(preadvectFile)) {
-    cout << "ERROR: File does not exist: " << preadvectFile << endl;
-    exit(EXIT_FAILURE);
-  }
   int* allData2 = ReadBinaryFileToMemory(preadvectFile.c_str(), &_compression_data2);
 
   _U_preadvect_data = MATRIX_COMPRESSION_DATA(allData0, allData1, allData2,
-      &_compression_data0, &_compression_data1, &_compression_data2); 
-
-  // DEBUG
-  // _U_preadvect_data.init_cache();
-  // _U_preadvect_data.dct_setup(-1);
+      &_compression_data0, &_compression_data1, &_compression_data2);
   _U_preadvect_data.set_dampingArrayLists();
 
   string finalFile = _compressionPath + string("U.final.component0");
@@ -1743,11 +1659,7 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::loadReducedIOP(string path)
   allData2 = ReadBinaryFileToMemory(finalFile.c_str(), &_final_compression_data2);
 
   _U_final_data = MATRIX_COMPRESSION_DATA(allData0, allData1, allData2,
-      &_final_compression_data0, &_final_compression_data1, &_final_compression_data2); 
-
-  // DEBUG
-  // _U_final_data.init_cache();
-  // _U_final_data.dct_setup(-1);
+      &_final_compression_data0, &_final_compression_data1, &_final_compression_data2);
   _U_final_data.set_dampingArrayLists();
 
   TIMER::printTimings();
@@ -2254,8 +2166,6 @@ void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::diffTruth(const VECTOR3_FIELD_3D& testV
 void SUBSPACE_FLUID_3D_COMPRESSED_EIGEN::PeeledCompressedProjectTransformNoSVD(const VECTOR3_FIELD_3D& field, MATRIX_COMPRESSION_DATA* U_data, VectorXd* qDot)
 {
   TIMER functionTimer(__FUNCTION__);
-  puts("DEBUG: Inside PeeledCompressedProjectTransformNoSVD");
-  
   // Call the global function instead of reimplementing it
   ::PeeledCompressedProjectTransformNoSVD(field, U_data, qDot);
 }

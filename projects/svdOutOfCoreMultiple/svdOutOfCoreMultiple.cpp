@@ -25,11 +25,16 @@
 #include "MATRIX.h"
 #include "BIG_MATRIX.h"
 #include "SIMPLE_PARSER.h"
+#include <sys/stat.h>
 
-// Helper function to create directories recursively
-void ensureDirectoryExists(const string& path) {
-  string cmd = "mkdir -p " + path;
-  system(cmd.c_str());
+// Create a directory (and parents) without shelling out
+static void ensureDirectoryExists(const string& path) {
+  string built;
+  for (size_t i = 0; i < path.size(); i++) {
+    built += path[i];
+    if (path[i] == '/' || i == path.size() - 1)
+      mkdir(built.c_str(), 0755);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -113,8 +118,7 @@ int main(int argc, char *argv[])
   BIG_MATRIX::scratchPath() = scratchPath;
   
   // Ensure the scratch directory exists
-  string cmd = "mkdir -p '" + scratchPath + "'";
-  system(cmd.c_str());
+  ensureDirectoryExists(scratchPath);
 
   ensureDirectoryExists(reducedPath);
 
@@ -156,9 +160,12 @@ int main(int argc, char *argv[])
     BIG_MATRIX::outOfCoreSVD(filenamePrefixes[x], reducedPath, discardThreshold);
   
     // back up the final U matrix SVD values so we can build reduced accuracy versions later
-    string cp("cp ");
-    cp = cp + BIG_MATRIX::scratchPath() + string("svd.vector ") + pcaFilenames[x];
-    system(cp.c_str());
+    {
+      string srcFile = BIG_MATRIX::scratchPath() + string("svd.vector");
+      ifstream src(srcFile, ios::binary);
+      ofstream dst(pcaFilenames[x], ios::binary);
+      dst << src.rdbuf();
+    }
 
     BIG_MATRIX::writeFinalU(finalFilenames[x]);
     TIMER::printTimings();

@@ -108,9 +108,7 @@ bool EIGEN::read(const string& filename, MatrixXd& input)
 
     if (rows > 10000000 && x > 0 && x % tenth == 0)
     {
-      cout << "EIGEN::read: Purging at " << x << " of " << rows << " rows... " << flush;
-      system("purge");
-      cout << " done." << flush;
+      cout << "EIGEN::read: " << x << " of " << rows << " rows... " << flush;
     }
   }
 
@@ -165,9 +163,7 @@ bool EIGEN::readBig(const string& filename, MatrixXd& input)
 
     if (rows > 10000000 && x > 0 && x % tenth == 0)
     {
-      cout << " Purging at " << x << " of " << rows << " rows... " << flush;
-      system("purge");
-      cout << " done." << flush;
+      cout << " Reading at " << x << " of " << rows << " rows... " << flush;
     }
   }
   

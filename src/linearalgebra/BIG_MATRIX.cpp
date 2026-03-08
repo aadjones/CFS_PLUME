@@ -171,7 +171,7 @@ MATRIX BIG_MATRIX::outOfCoreQR(const string& filenamePrefix, int& qRows, int& qC
 
     // read in the current columns
     BIG_MATRIX currentColumns;
-    system("purge");
+    // system("purge") removed — macOS-only, requires sudo, no effect on correctness
 
     // indent the reads for output readability
     TIMER currentRead("QR current read");
@@ -179,7 +179,7 @@ MATRIX BIG_MATRIX::outOfCoreQR(const string& filenamePrefix, int& qRows, int& qC
     currentColumns.readColumns(rows, totalReadColumns, file);
     cout << " done. " << endl;
     currentRead.stop();
-    system("purge");
+    // system("purge") removed — macOS-only, requires sudo, no effect on correctness
 
     // subtract off columns from previous blocks
     for (int p = 0; p < b; p++)
@@ -218,7 +218,7 @@ MATRIX BIG_MATRIX::outOfCoreQR(const string& filenamePrefix, int& qRows, int& qC
       }
       cout << " done. " << endl;
       subtractTimer.stop();
-      system("purge");
+      // system("purge") removed — macOS-only, requires sudo, no effect on correctness
     }
 
     // perform QR on the current block
@@ -265,7 +265,7 @@ MATRIX BIG_MATRIX::outOfCoreQR(const string& filenamePrefix, int& qRows, int& qC
 
     TIMER::printTimings();
   }
-  system("purge");
+  // system("purge") removed — macOS-only, requires sudo, no effect on correctness
 
   return R;
 }

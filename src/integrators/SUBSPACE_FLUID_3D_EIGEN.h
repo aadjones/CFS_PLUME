@@ -321,7 +321,7 @@ protected:
   bool fileExists(const string& filename);
 
   // purge inactive memory on OSX
-  void purge() { cout << " Purging inactive OSX memory" << endl; system("purge"); };
+  void purge() { /* no-op: system("purge") removed — macOS-only, requires sudo */ };
 
   // reduced order IOP -- both orthogonal and pressure projection
   void reducedIOP();

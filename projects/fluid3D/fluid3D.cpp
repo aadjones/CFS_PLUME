@@ -33,14 +33,16 @@
 #include "FLUID_3D_MIC.h"
 #include "MATRIX.h"
 #include "SIMPLE_PARSER.h"
+#include <sys/stat.h>
 using namespace std;
 
-// Helper function to create directories recursively
-void ensureDirectoryExists(const string& path) {
-  string cmd = "mkdir -p '" + path + "'";
-  int result = system(cmd.c_str());
-  if (result != 0) {
-    cerr << "Failed to create directory: " << path << endl;
+// Create a directory (and parents) without shelling out
+static void ensureDirectoryExists(const string& path) {
+  string built;
+  for (size_t i = 0; i < path.size(); i++) {
+    built += path[i];
+    if (path[i] == '/' || i == path.size() - 1)
+      mkdir(built.c_str(), 0755);
   }
 }
 

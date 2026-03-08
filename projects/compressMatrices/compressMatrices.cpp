@@ -221,9 +221,12 @@ int main(int argc, char* argv[]) {
 
   cout << "\n=== Finalizing output ===" << endl;
   string newName = reducedPath + to_string(roundedRatio) + string("to1");
-  string rename = string("mv ") + reducedPath + string("tmp ") + newName;
+  string oldName = reducedPath + string("tmp");
   cout << "Moving compressed data to: " << newName << endl;
-  system(rename.c_str());
+  if (::rename(oldName.c_str(), newName.c_str()) != 0) {
+    perror("rename failed");
+    return 1;
+  }
   
   string pbrtDir = newName + string("/pbrt");
   if (!createDirectoryIfNotExists(pbrtDir)) {

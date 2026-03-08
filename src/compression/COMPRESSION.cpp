@@ -420,8 +420,6 @@ void GetBlocksEigen(const FIELD_3D& F, vector<VectorXd>* blocks)
   // fill these in with the appropriate paddings
   GetPaddings(v, &paddings);
 
-  printf("[DEBUG][GetBlocksEigen] Input dims: (%d, %d, %d), Padding: (%d, %d, %d)\n", xRes, yRes, zRes, paddings[0], paddings[1], paddings[2]);
-
   // call zero pad rather than continuous value pad
   FIELD_3D F_padded = F.zeroPad_xyz(paddings);
 
@@ -430,15 +428,12 @@ void GetBlocksEigen(const FIELD_3D& F, vector<VectorXd>* blocks)
   yRes = F_padded.yRes();
   zRes = F_padded.zRes();
 
-  printf("[DEBUG][GetBlocksEigen] Padded dims: (%d, %d, %d)\n", xRes, yRes, zRes);
-
   // sanity check that our padder had the desired effect
   assert(xRes % BLOCK_SIZE == 0);
   assert(yRes % BLOCK_SIZE == 0);
   assert(zRes % BLOCK_SIZE == 0);
 
   int numBlocks = xRes/BLOCK_SIZE * yRes/BLOCK_SIZE * zRes/BLOCK_SIZE;
-  printf("[DEBUG][GetBlocksEigen] numBlocks: %d\n", numBlocks);
 
   // resize blocks appropriately
   blocks->resize(numBlocks);
@@ -453,7 +448,6 @@ void GetBlocksEigen(const FIELD_3D& F, vector<VectorXd>* blocks)
       }
     }
   }
-  printf("[DEBUG][GetBlocksEigen] blocks->size(): %lu\n", blocks->size());
 }
 ////////////////////////////////////////////////////////
 // reconstruct a FIELD_3D with the passed in dims
@@ -1464,18 +1458,13 @@ int* ReadBinaryFileToMemory(const char* filename,
 {
   TIMER functionTimer(__FUNCTION__);
 
-  cout << "Checking if file exists..." << endl;
-  cout << "ReadBinaryFileToMemory: Attempting to read file: " << filename << endl;
-
   FILE* pFile;
   pFile = fopen(filename, "rb");
   if (pFile == NULL) {
-    perror("Error opening file.");
-    cout << "Opening file in binary read mode..." << endl;
+    perror("Error opening file");
+    cout << "ReadBinaryFileToMemory: failed to open " << filename << endl;
     return NULL;
   }
-
-  cout << "Successfully opened file. Reading data..." << endl;
 
   // build the damping array and zigzag arrays
   data->set_dampingArray();
@@ -1488,8 +1477,6 @@ int* ReadBinaryFileToMemory(const char* filename,
     fclose(pFile);
     return NULL;
   }
-  printf("[DEBUG] Reading file version: %d\n", version);
-
   // read nBits
   int nBits;
   if (fread(&nBits, sizeof(int), 1, pFile) != 1) {
@@ -1526,9 +1513,6 @@ int* ReadBinaryFileToMemory(const char* filename,
     zPadded = paddings[2];
   }
 
-  printf("[DEBUG][ReadBinaryFileToMemory] Read dimensions: (%d, %d, %d), padded: (%d, %d, %d)\n", 
-         xRes, yRes, zRes, xPadded, yPadded, zPadded);
-  
   VEC3I dimensions(xRes, yRes, zRes);
   VEC3I paddedDimensions(xPadded, yPadded, zPadded);
   data->set_dims(dimensions);
@@ -1541,8 +1525,6 @@ int* ReadBinaryFileToMemory(const char* filename,
     cout << "Error reading numCols/numBlocks from file" << endl;
     fclose(pFile); return NULL;
   }
-  printf("[DEBUG][ReadBinaryFileToMemory] Read numCols: %d, numBlocks: %d\n", numCols, numBlocks);
-  
   // Sanity check the values
   if (numCols <= 0 || numBlocks <= 0) {
     cout << "ERROR: Invalid dimensions read from file. numCols=" << numCols << ", numBlocks=" << numBlocks << endl;
@@ -1554,8 +1536,6 @@ int* ReadBinaryFileToMemory(const char* filename,
   data->set_numBlocks(numBlocks);
 
   size_t totalSize = (size_t)numBlocks * (size_t)numCols;
-  printf("[DEBUG][ReadBinaryFileToMemory] numBlocks=%d, numCols=%d, totalSize=%zu\n",
-         numBlocks, numCols, totalSize);
 
   // Read the four metadata matrices written by WriteMetaData:
   //   sListMatrix (doubles), gammaListMatrix (doubles),
@@ -1601,8 +1581,6 @@ int* ReadBinaryFileToMemory(const char* filename,
   fseek(pFile, dataStart, SEEK_SET);
 
   size_t compressedInts = compressedBytes / sizeof(int);
-  printf("[DEBUG][ReadBinaryFileToMemory] Compressed data: %ld bytes (%zu ints)\n",
-         compressedBytes, compressedInts);
 
   int* allData = new int[compressedInts];
   if (fread(allData, sizeof(int), compressedInts, pFile) != compressedInts) {
@@ -2950,11 +2928,6 @@ double GetDotProductSumSparse(const vector<VectorXd>& Vlist, const vector<Vector
 // large dot product
 //////////////////////////////////////////////////////////////////////
 double GetDotProductSum(const vector<VectorXd>& Vlist, const vector<VectorXd>& Wlist) {
-  printf("[DEBUG][GetDotProductSum] Vlist.size() = %lu, Wlist.size() = %lu\n", Vlist.size(), Wlist.size());
-  if (!Vlist.empty() && !Wlist.empty()) {
-    printf("[DEBUG][GetDotProductSum] Vlist[0].size() = %lu, Wlist[0].size() = %lu\n", Vlist[0].size(), Wlist[0].size());
-  }
-
   assert(Vlist.size() == Wlist.size());
 
   int size = Vlist.size();
@@ -2980,32 +2953,17 @@ void TransformDCT(const VECTOR3_FIELD_3D& V,
     vector<VectorXd>* Zpart)
 {
   TIMER functionTimer(__FUNCTION__);
-  puts("[DEBUG][TransformDCT] Inside TransformDCT");
-  printf("[DEBUG][TransformDCT] Input V dimensions: (%d, %d, %d)\n", V.xRes(), V.yRes(), V.zRes());
 
   FIELD_3D V_X, V_Y, V_Z;
   GetScalarFields(V.peelBoundary(), &V_X, &V_Y, &V_Z);
-  printf("[DEBUG][TransformDCT] Peeled field dimensions - X: (%d, %d, %d), Y: (%d, %d, %d), Z: (%d, %d, %d)\n",
-         V_X.xRes(), V_X.yRes(), V_X.zRes(),
-         V_Y.xRes(), V_Y.yRes(), V_Y.zRes(),
-         V_Z.xRes(), V_Z.yRes(), V_Z.zRes());
 
-  puts("[DEBUG][TransformDCT] Getting blocks");
   GetBlocksEigen(V_X, Xpart);
   GetBlocksEigen(V_Y, Ypart);
   GetBlocksEigen(V_Z, Zpart);
-  printf("[DEBUG][TransformDCT] Block counts - X: %lu, Y: %lu, Z: %lu\n", 
-         Xpart->size(), Ypart->size(), Zpart->size());
-  if (!Xpart->empty()) {
-    printf("[DEBUG][TransformDCT] First block sizes - X: %lu, Y: %lu, Z: %lu\n",
-           (*Xpart)[0].size(), (*Ypart)[0].size(), (*Zpart)[0].size());
-  }
 
-  puts("[DEBUG][TransformDCT] Starting DCT transforms");
   UnitaryBlockDCTEigen(1, Xpart);
   UnitaryBlockDCTEigen(1, Ypart);
   UnitaryBlockDCTEigen(1, Zpart);
-  puts("[DEBUG][TransformDCT] Finished DCT transforms");
 }
 //////////////////////////////////////////////////////////////////////
 // projection, implemented in the frequency domain. assumes no SVD!
@@ -3014,16 +2972,11 @@ void PeeledCompressedProjectTransformNoSVD(const VECTOR3_FIELD_3D& V,
     MATRIX_COMPRESSION_DATA* U_data, VectorXd* q)
 {
   TIMER functionTimer(__FUNCTION__);
-  puts("[DEBUG][PeeledCompressedProjectTransformNoSVD] Inside function");
+
   // fetch the compression data and the full data buffer for each component
   COMPRESSION_DATA* dataX = U_data->get_compression_dataX();
   COMPRESSION_DATA* dataY = U_data->get_compression_dataY();
   COMPRESSION_DATA* dataZ = U_data->get_compression_dataZ();
-
-  printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] dataX dims: (%d, %d, %d), paddedDims: (%d, %d, %d), numBlocks: %d, numCols: %d\n",
-         dataX->get_dims()[0], dataX->get_dims()[1], dataX->get_dims()[2],
-         dataX->get_paddedDims()[0], dataX->get_paddedDims()[1], dataX->get_paddedDims()[2],
-         dataX->get_numBlocks(), dataX->get_numCols());
 
   int* allDataX = U_data->get_dataX();
   int* allDataY = U_data->get_dataY();
@@ -3031,66 +2984,28 @@ void PeeledCompressedProjectTransformNoSVD(const VECTOR3_FIELD_3D& V,
 
   // preallocate the resulting vector
   int totalColumns = dataX->get_numCols();
-  printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] totalColumns: %d\n", totalColumns);
   q->resize(totalColumns);
   q->setZero();
 
   vector<VectorXd> Xpart, Ypart, Zpart;
   vector<VectorXd> blocks;
 
-  puts("[DEBUG][PeeledCompressedProjectTransformNoSVD] Starting TransformDCT");
   TransformDCT(V, U_data, &Xpart, &Ypart, &Zpart);
-  puts("[DEBUG][PeeledCompressedProjectTransformNoSVD] Finished TransformDCT");
-
-  printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] Xpart size: %lu, Ypart size: %lu, Zpart size: %lu\n", 
-         Xpart.size(), Ypart.size(), Zpart.size());
-  if (!Xpart.empty()) {
-    printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] First block sizes - X: %lu, Y: %lu, Z: %lu\n",
-           Xpart[0].size(), Ypart[0].size(), Zpart[0].size());
-  }
 
   for (int col = 0; col < totalColumns; col++) {
-    printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] Processing column %d/%d\n", col + 1, totalColumns);
     double totalSum = 0.0;
-    puts("[DEBUG][PeeledCompressedProjectTransformNoSVD] Decoding X component");
+
     DecodeScalarFieldEigen(dataX, allDataX, col, &blocks);
-    printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] X blocks size: %lu, Xpart size: %lu\n", blocks.size(), Xpart.size());
-    if (!blocks.empty() && !Xpart.empty()) {
-      printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] First X block size: %lu, First Xpart block size: %lu\n", blocks[0].size(), Xpart[0].size());
-      printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] First 10 values of first X block:\n");
-      for (int i = 0; i < std::min(10, (int)blocks[0].size()); ++i) {
-        printf("  blocks[0][%d] = %g\n", i, blocks[0][i]);
-      }
-    }
     totalSum += GetDotProductSum(blocks, Xpart);
 
-    puts("[DEBUG][PeeledCompressedProjectTransformNoSVD] Decoding Y component");
     DecodeScalarFieldEigen(dataY, allDataY, col, &blocks);
-    printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] Y blocks size: %lu, Ypart size: %lu\n", blocks.size(), Ypart.size());
-    if (!blocks.empty() && !Ypart.empty()) {
-      printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] First Y block size: %lu, First Ypart block size: %lu\n", blocks[0].size(), Ypart[0].size());
-      printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] First 10 values of first Y block:\n");
-      for (int i = 0; i < std::min(10, (int)blocks[0].size()); ++i) {
-        printf("  blocks[0][%d] = %g\n", i, blocks[0][i]);
-      }
-    }
     totalSum += GetDotProductSum(blocks, Ypart);
 
-    puts("[DEBUG][PeeledCompressedProjectTransformNoSVD] Decoding Z component");
     DecodeScalarFieldEigen(dataZ, allDataZ, col, &blocks);
-    printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] Z blocks size: %lu, Zpart size: %lu\n", blocks.size(), Zpart.size());
-    if (!blocks.empty() && !Zpart.empty()) {
-      printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] First Z block size: %lu, First Zpart block size: %lu\n", blocks[0].size(), Zpart[0].size());
-      printf("[DEBUG][PeeledCompressedProjectTransformNoSVD] First 10 values of first Z block:\n");
-      for (int i = 0; i < std::min(10, (int)blocks[0].size()); ++i) {
-        printf("  blocks[0][%d] = %g\n", i, blocks[0][i]);
-      }
-    }
     totalSum += GetDotProductSum(blocks, Zpart);
 
     (*q)[col] = totalSum;
   }
-  puts("[DEBUG][PeeledCompressedProjectTransformNoSVD] Finished function");
 }
 
 //////////////////////////////////////////////////////////////////////
