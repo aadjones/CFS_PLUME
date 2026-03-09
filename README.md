@@ -38,7 +38,7 @@ All commands run from the project root. The config file `cfg/stam.64.cfg` define
 ### 1. Preprocess (generate data, build subspace, compress)
 
 ```bash
-./runPreprocess
+./scripts/runPreprocess.sh
 ```
 
 This runs the full 5-step pipeline: full-rank simulation (100 timesteps), SVD, cubature generation, matrix compression, and product precomputation. Takes several minutes.
@@ -46,8 +46,8 @@ This runs the full 5-step pipeline: full-rank simulation (100 timesteps), SVD, c
 ### 2. Simulate
 
 ```bash
-./runUncompressed          # Reduced-order simulation (no compression)
-./runCompressed            # Compressed simulation
+./scripts/runUncompressed.sh       # Reduced-order simulation (no compression)
+./scripts/runCompressed.sh         # Compressed simulation
 ```
 
 ### Comparison pipeline
@@ -76,7 +76,7 @@ To try different compression ratios, edit `percent` in `cfg/stam.64.cfg` and re-
 Simulation movies are written to `./movies/` in legacy MJPEG QuickTime format. Convert to H.264 for modern playback:
 
 ```bash
-./movies/convert.sh
+./scripts/convert-movies.sh
 ```
 
 ## Tests
@@ -106,6 +106,7 @@ Note: `compressMatrices` rewrites `compression path` and `preview movie` in the 
 ```
 CFS_PLUME/
   cfg/              Config files
+  scripts/          Shell scripts (preprocess, simulate, convert movies)
   src/              Source libraries (compression, integrators, geometry, etc.)
   projects/         Per-binary build directories with Makefiles
   tests/            Compression codec tests

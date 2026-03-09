@@ -2,7 +2,7 @@
 # Convert legacy MJPEG .mov files to H.264 .mp4 for modern playback
 # Requires: ffmpeg (brew install ffmpeg)
 #
-# Usage: ./movies/convert.sh [input.mov]
+# Usage: ./scripts/convert-movies.sh [input.mov]
 #   If no argument given, converts all .mov files in ./movies/
 
 set -e

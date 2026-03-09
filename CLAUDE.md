@@ -31,7 +31,7 @@ cd projects/<name> && make -f Makefile
 
 The system has two phases: offline preprocessing and online simulation.
 
-**Preprocessing** (run sequentially via `./runPreprocess`):
+**Preprocessing** (run sequentially via `./scripts/runPreprocess.sh`):
 1. `fluid3D` — Generate full-rank simulation snapshots (100 timesteps default)
 2. `svdOutOfCoreMultiple` — Compute POD basis via out-of-core SVD
 3. `cubatureGeneratorStamStaged` — Build semi-Lagrangian cubature scheme
@@ -39,12 +39,12 @@ The system has two phases: offline preprocessing and online simulation.
 5. `buildProducts` — Precompute runtime matrix products
 
 **Simulation** (run independently):
-- `./runUncompressed` — Reduced-order simulation without compression (ground truth)
-- `./runCompressed` — Compressed reduced-order simulation (~5:1 compression)
+- `./scripts/runUncompressed.sh` — Reduced-order simulation without compression (ground truth)
+- `./scripts/runCompressed.sh` — Compressed reduced-order simulation (~5:1 compression)
 
 All scripts use config file `cfg/stam.64.cfg`. Both simulation scripts load original snapshots and report error metrics per timestep.
 
-**Important:** Changing `simulation snapshots` requires a full re-run of `./runPreprocess` — the SVD produces a different-sized basis. `buildProducts` auto-detects stale projected matrices and rebuilds them, but cubature and compression must also be regenerated.
+**Important:** Changing `simulation snapshots` requires a full re-run of `./scripts/runPreprocess.sh` — the SVD produces a different-sized basis. `buildProducts` auto-detects stale projected matrices and rebuilds them, but cubature and compression must also be regenerated.
 
 ## Architecture
 
@@ -109,5 +109,5 @@ cd projects/viewModes && make -f Makefile                          # Visualize P
 
 - `SIMPLE_PARSER` does NOT handle inline `#` comments—comments must be on their own line in `.cfg` files
 - `compressMatrices` rewrites `cfg/stam.64.cfg` via `cfg/findReplace.py` to update compression/movie paths
-- Movie output goes to `./movies/` in legacy MJPEG format; use `./movies/convert.sh` to convert to H.264
+- Movie output goes to `./movies/` in legacy MJPEG format; use `./scripts/convert-movies.sh` to convert to H.264
 - All binaries must be run from the project root (relative paths throughout)
