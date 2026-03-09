@@ -3,19 +3,20 @@
 
 include ../projects/include.mk
 
-# Override: no Accelerate framework or GL dependencies for headless tests.
-# We still need FFTW, zlib, libpng, libjpeg for the compression codec.
+# Auto-detect Homebrew prefix (ARM64: /opt/homebrew, Intel: /usr/local)
+HOMEBREW_PREFIX := $(shell brew --prefix 2>/dev/null || echo /opt/homebrew)
+
 LDFLAGS = -framework Accelerate -framework GLUT -framework OpenGL \
-          -L/opt/homebrew/lib -lstdc++ -lz -lm \
-          -L/opt/homebrew/opt/libpng/lib -lpng \
-          -L/opt/homebrew/opt/jpeg/lib -ljpeg \
-          -L/opt/homebrew/opt/fftw/lib -lfftw3
+          -L$(HOMEBREW_PREFIX)/lib -lstdc++ -lz -lm \
+          -L$(HOMEBREW_PREFIX)/opt/libpng/lib -lpng \
+          -L$(HOMEBREW_PREFIX)/opt/jpeg/lib -ljpeg \
+          -L$(HOMEBREW_PREFIX)/opt/fftw/lib -lfftw3
 
 CFLAGS = -c -w -Wno-deprecated \
          -I../src/integrators -I../src/linearalgebra -I../src/geometry \
          -I../src/util -I../src/compression -I../src/glvu \
          -I../ -I../src/Eigen/ \
-         -I/opt/homebrew/include -I/opt/local/include/ \
+         -I$(HOMEBREW_PREFIX)/include -I/opt/local/include/ \
          -I. \
          -DDO_PNG_OUT=0 -DNO_FFT -O2 -flax-vector-conversions \
          -Wno-c++11-narrowing

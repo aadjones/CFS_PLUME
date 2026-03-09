@@ -23,11 +23,12 @@ make clean    # Remove all .o files and binaries
 
 Binaries: `fluid3D`, `svdOutOfCoreMultiple`, `cubatureGeneratorStamStaged`, `cubatureMemory`, `reduced3D`, `compressMatrices`, `buildProducts`, `reducedCompressed3D`.
 
-Two additional comparison binaries are not in the top-level Makefile. Build them separately if needed:
+Additional binaries not in the top-level Makefile (build separately if needed):
 
 ```bash
-cd projects/reduced3DWriteVelocities && make -f Makefile
-cd projects/reducedCompressed3DCompareVelocities && make -f Makefile
+cd projects/reduced3DWriteVelocities && make -f Makefile           # Write uncompressed q-vectors
+cd projects/reducedCompressed3DCompareVelocities && make -f Makefile  # Compare compressed vs uncompressed
+cd projects/viewModes && make -f Makefile                          # Visualize POD eigenvector modes
 ```
 
 ## Running
@@ -40,23 +41,35 @@ All commands run from the project root. The config file `cfg/stam.64.cfg` define
 ./runPreprocess
 ```
 
-This runs the full 5-step pipeline: full-rank simulation (50 timesteps), SVD, cubature generation, matrix compression, and product precomputation. Takes several minutes.
+This runs the full 5-step pipeline: full-rank simulation (100 timesteps), SVD, cubature generation, matrix compression, and product precomputation. Takes several minutes.
 
 ### 2. Simulate
 
 ```bash
-./runUncompressed          # Reduced-order simulation (ground truth)
-./runCompressed            # Compressed simulation (~6:1 compression)
+./runUncompressed          # Reduced-order simulation (no compression)
+./runCompressed            # Compressed simulation
 ```
 
-Both load original snapshots and report per-timestep error metrics. Expected results at frame 49 for 6:1 compression:
+### Comparison pipeline
+
+To measure compression error directly (compressed vs uncompressed subspace), build and run the comparison binaries:
+
+```bash
+cd projects/reduced3DWriteVelocities && make -f Makefile && cd ../..
+cd projects/reducedCompressed3DCompareVelocities && make -f Makefile && cd ../..
+./bin/reduced3DWriteVelocities cfg/stam.64.cfg
+./bin/reducedCompressed3DCompareVelocities cfg/stam.64.cfg
+```
+
+With the default config (`percent=0.9995`, 100 snapshots), per-step relative L2 error between compressed and uncompressed q-vectors at 5:1 compression:
 
 ```
-velocity relative error: 0.0529028
-density relative error: 0.0480764
+step  1: 0.25%     step 50: 0.91%     step 100: 1.06%
 ```
 
-Uncompressed should stay below 1% relative error; compressed below 10%.
+Error stabilizes around 1%—the 52-mode basis (from 100 snapshots) is rich enough to absorb compression perturbation without chaotic divergence.
+
+To try different compression ratios, edit `percent` in `cfg/stam.64.cfg` and re-run `compressMatrices` then `buildProducts`.
 
 ### 3. Movies
 
@@ -73,7 +86,7 @@ cd tests && make           # Build test binary
 cd .. && ./tests/test_compression_data   # Run from project root (needs ./data/)
 ```
 
-17 tests covering the decode pipeline, codec round-trip accuracy, and arithmetic helpers.
+31 tests covering the decode pipeline, codec round-trip accuracy, RLE encode/decode, block decomposition, DCT, zigzag scan, SVD coordinate transform, multi-block RLE, DCT energy compaction, SparseBlockDiagonal, and arithmetic helpers.
 
 ## Configuration
 
@@ -81,9 +94,9 @@ Edit `cfg/stam.64.cfg` to change parameters. Key settings:
 
 | Parameter | Default | Description |
 |---|---|---|
-| `percent` | 0.999999 | Compression ratio (0.99 = keep 99%, more lossy) |
+| `percent` | 0.9995 | Energy retention (0.99 = keep 99%, more lossy; 0.9995 ≈ 5:1) |
 | `nBits` | 32 | Quantization bit depth |
-| `simulation snapshots` | 50 | Number of timesteps |
+| `simulation snapshots` | 100 | Number of timesteps |
 | `xRes/yRes/zRes` | 48/64/48 | Grid resolution |
 
 Note: `compressMatrices` rewrites `compression path` and `preview movie` in the config file automatically based on the achieved compression ratio.

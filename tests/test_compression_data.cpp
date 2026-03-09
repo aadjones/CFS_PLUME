@@ -1205,6 +1205,730 @@ TEST(get_paddings_correctness) {
 }
 
 //////////////////////////////////////////////////////////////////////
+// Zigzag flatten/unflatten round-trip
+//////////////////////////////////////////////////////////////////////
+TEST(zigzag_roundtrip) {
+  // Build the zigzag array the same way COMPRESSION_DATA does
+  INTEGER_FIELD_3D zigzagArray(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  int idx = 0;
+  for (int sum = 0; sum < 3 * BLOCK_SIZE; sum++) {
+    for (int z = 0; z < BLOCK_SIZE; z++) {
+      for (int y = 0; y < BLOCK_SIZE; y++) {
+        for (int x = 0; x < BLOCK_SIZE; x++) {
+          if (x + y + z == sum) {
+            zigzagArray(x, y, z) = idx;
+            idx++;
+          }
+        }
+      }
+    }
+  }
+
+  // Create a block with known values
+  INTEGER_FIELD_3D original(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  for (int i = 0; i < original.totalCells(); i++) {
+    original[i] = (i * 7 + 13) % 200 - 100;  // arbitrary signed values
+  }
+
+  // Flatten
+  VectorXi zigzagged;
+  ZigzagFlatten(original, zigzagArray, &zigzagged);
+  ASSERT_MSG(zigzagged.size() == BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE,
+      "Zigzagged size wrong");
+
+  // Unflatten
+  INTEGER_FIELD_3D recovered(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  ZigzagUnflatten(zigzagged, zigzagArray, &recovered);
+
+  // Verify round-trip
+  for (int i = 0; i < original.totalCells(); i++) {
+    ASSERT_MSG(original[i] == recovered[i],
+        "Zigzag roundtrip mismatch at index " + to_string(i) +
+        ": expected " + to_string(original[i]) + ", got " + to_string(recovered[i]));
+  }
+
+  INFO("Zigzag round-trip: all " << original.totalCells() << " values match");
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Zigzag array is a permutation (bijection on [0, BLOCK_SIZE^3))
+//////////////////////////////////////////////////////////////////////
+TEST(zigzag_is_permutation) {
+  INTEGER_FIELD_3D zigzagArray(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  int idx = 0;
+  for (int sum = 0; sum < 3 * BLOCK_SIZE; sum++) {
+    for (int z = 0; z < BLOCK_SIZE; z++) {
+      for (int y = 0; y < BLOCK_SIZE; y++) {
+        for (int x = 0; x < BLOCK_SIZE; x++) {
+          if (x + y + z == sum) {
+            zigzagArray(x, y, z) = idx;
+            idx++;
+          }
+        }
+      }
+    }
+  }
+
+  int totalCells = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
+  ASSERT_MSG(idx == totalCells, "Zigzag didn't fill all cells");
+
+  // Every value in [0, totalCells) should appear exactly once
+  vector<bool> seen(totalCells, false);
+  for (int i = 0; i < totalCells; i++) {
+    int val = zigzagArray[i];
+    ASSERT_MSG(val >= 0 && val < totalCells,
+        "Zigzag value out of range: " + to_string(val));
+    ASSERT_MSG(!seen[val], "Zigzag has duplicate value: " + to_string(val));
+    seen[val] = true;
+  }
+
+  INFO("Zigzag array is a valid permutation of [0, " << totalCells << ")");
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// RLE encode/decode round-trip (in-memory via temp file)
+//////////////////////////////////////////////////////////////////////
+TEST(rle_roundtrip) {
+  // Set up a COMPRESSION_DATA with 1 block, 1 column — minimal config
+  VEC3I dims(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  COMPRESSION_DATA data(dims, 1, 32, 0.99);
+  data.set_numBlocks(1);
+
+  // Build the zigzag array (needed for the codec)
+  INTEGER_FIELD_3D zigzagArray(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  int idx = 0;
+  for (int sum = 0; sum < 3 * BLOCK_SIZE; sum++) {
+    for (int z = 0; z < BLOCK_SIZE; z++) {
+      for (int y = 0; y < BLOCK_SIZE; y++) {
+        for (int x = 0; x < BLOCK_SIZE; x++) {
+          if (x + y + z == sum) {
+            zigzagArray(x, y, z) = idx;
+            idx++;
+          }
+        }
+      }
+    }
+  }
+
+  int totalCells = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
+
+  // Create test data with runs of zeros (typical DCT output)
+  VectorXi original(totalCells);
+  original.setZero();
+  original[0] = 2147483646;  // DC component (max nBits value)
+  original[1] = 42;
+  original[2] = 42;  // run of 2
+  original[3] = -7;
+  original[10] = 3;
+  original[11] = 3;
+  original[12] = 3;
+  original[13] = 3;  // run of 4
+  // rest are zeros — a long zero run
+
+  // Encode to a temp file
+  string tmpFile = "/tmp/cfs_test_rle.bin";
+  remove(tmpFile.c_str());
+  RunLengthEncodeBinary(tmpFile.c_str(), 0, 0, original, &data);
+
+  // Read the file back into memory
+  FILE* f = fopen(tmpFile.c_str(), "rb");
+  ASSERT_MSG(f != NULL, "Failed to open temp RLE file");
+  fseek(f, 0, SEEK_END);
+  long fileSize = ftell(f);
+  fseek(f, 0, SEEK_SET);
+  int numInts = fileSize / sizeof(int);
+  int* allData = new int[numInts];
+  fread(allData, sizeof(int), numInts, f);
+  fclose(f);
+
+  // Build block indices from block lengths
+  BuildBlockIndicesMatrix(&data);
+
+  // Decode
+  VectorXi decoded(totalCells);
+  decoded.setZero();
+  RunLengthDecodeBinary(allData, 0, 0, &data, &decoded);
+
+  // Verify
+  for (int i = 0; i < totalCells; i++) {
+    ASSERT_MSG(original[i] == decoded[i],
+        "RLE roundtrip mismatch at index " + to_string(i) +
+        ": expected " + to_string(original[i]) + ", got " + to_string(decoded[i]));
+  }
+
+  INFO("RLE round-trip: all " << totalCells << " values match");
+  INFO("Encoded size: " << numInts << " ints vs original " << totalCells
+       << " (" << (100.0 * numInts / totalCells) << "%)");
+
+  delete[] allData;
+  remove(tmpFile.c_str());
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// RLE round-trip with all-zeros input (edge case: maximum compression)
+//////////////////////////////////////////////////////////////////////
+TEST(rle_roundtrip_all_zeros) {
+  VEC3I dims(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  COMPRESSION_DATA data(dims, 1, 32, 0.99);
+  data.set_numBlocks(1);
+
+  int totalCells = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
+  VectorXi original = VectorXi::Zero(totalCells);
+
+  string tmpFile = "/tmp/cfs_test_rle_zeros.bin";
+  remove(tmpFile.c_str());
+  RunLengthEncodeBinary(tmpFile.c_str(), 0, 0, original, &data);
+
+  FILE* f = fopen(tmpFile.c_str(), "rb");
+  ASSERT_MSG(f != NULL, "Failed to open temp file");
+  fseek(f, 0, SEEK_END);
+  long fileSize = ftell(f);
+  fseek(f, 0, SEEK_SET);
+  int numInts = fileSize / sizeof(int);
+  int* allData = new int[numInts];
+  fread(allData, sizeof(int), numInts, f);
+  fclose(f);
+
+  BuildBlockIndicesMatrix(&data);
+
+  VectorXi decoded(totalCells);
+  decoded.setZero();
+  RunLengthDecodeBinary(allData, 0, 0, &data, &decoded);
+
+  for (int i = 0; i < totalCells; i++) {
+    ASSERT_MSG(decoded[i] == 0, "All-zeros RLE decode produced non-zero at index " + to_string(i));
+  }
+
+  // All-zeros should compress to 3 ints: value, value, runLength
+  ASSERT_MSG(numInts == 3,
+      "All-zeros should encode to 3 ints (val, val, count), got " + to_string(numInts));
+  INFO("RLE all-zeros: encoded to " << numInts << " ints (expected 3)");
+
+  delete[] allData;
+  remove(tmpFile.c_str());
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// RLE round-trip with no runs (all unique values — worst case)
+//////////////////////////////////////////////////////////////////////
+TEST(rle_roundtrip_no_runs) {
+  VEC3I dims(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  COMPRESSION_DATA data(dims, 1, 32, 0.99);
+  data.set_numBlocks(1);
+
+  int totalCells = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
+  VectorXi original(totalCells);
+  for (int i = 0; i < totalCells; i++) {
+    original[i] = i + 1;  // all unique, no consecutive duplicates
+  }
+
+  string tmpFile = "/tmp/cfs_test_rle_unique.bin";
+  remove(tmpFile.c_str());
+  RunLengthEncodeBinary(tmpFile.c_str(), 0, 0, original, &data);
+
+  FILE* f = fopen(tmpFile.c_str(), "rb");
+  fseek(f, 0, SEEK_END);
+  int numInts = ftell(f) / sizeof(int);
+  fseek(f, 0, SEEK_SET);
+  int* allData = new int[numInts];
+  fread(allData, sizeof(int), numInts, f);
+  fclose(f);
+
+  BuildBlockIndicesMatrix(&data);
+
+  VectorXi decoded(totalCells);
+  decoded.setZero();
+  RunLengthDecodeBinary(allData, 0, 0, &data, &decoded);
+
+  for (int i = 0; i < totalCells; i++) {
+    ASSERT_MSG(original[i] == decoded[i],
+        "No-runs RLE mismatch at index " + to_string(i));
+  }
+
+  // No runs means encoded size == original size
+  ASSERT_MSG(numInts == totalCells,
+      "No-runs should encode to same size, got " + to_string(numInts) + " vs " + to_string(totalCells));
+  INFO("RLE no-runs: encoded size equals input size (" << numInts << ")");
+
+  delete[] allData;
+  remove(tmpFile.c_str());
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Block decomposition/reassembly round-trip (GetBlocksEigen + AssimilateBlocksEigen)
+//////////////////////////////////////////////////////////////////////
+TEST(block_decomposition_roundtrip) {
+  // Use peeled dims (46x62x46) — the actual grid size
+  int xRes = EXPECTED_XPEELED;
+  int yRes = EXPECTED_YPEELED;
+  int zRes = EXPECTED_ZPEELED;
+
+  // Create a field with known values
+  FIELD_3D original(xRes, yRes, zRes);
+  for (int i = 0; i < original.totalCells(); i++) {
+    original[i] = sin(i * 0.01) * 100.0;
+  }
+
+  // Decompose into blocks
+  vector<VectorXd> blocks;
+  GetBlocksEigen(original, &blocks);
+
+  // Compute padded dims
+  VEC3I dims(xRes, yRes, zRes);
+  VEC3I paddings;
+  GetPaddings(dims, &paddings);
+  int xPadded = xRes + paddings[0];
+  int yPadded = yRes + paddings[1];
+  int zPadded = zRes + paddings[2];
+  int expectedBlocks = (xPadded / BLOCK_SIZE) * (yPadded / BLOCK_SIZE) * (zPadded / BLOCK_SIZE);
+  ASSERT_MSG((int)blocks.size() == expectedBlocks,
+      "Expected " + to_string(expectedBlocks) + " blocks, got " + to_string(blocks.size()));
+
+  // Each block should be BLOCK_SIZE^3
+  for (size_t i = 0; i < blocks.size(); i++) {
+    ASSERT_MSG(blocks[i].size() == BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE,
+        "Block " + to_string(i) + " has wrong size: " + to_string(blocks[i].size()));
+  }
+
+  // Reassemble (into padded dims)
+  VEC3I paddedDims(xPadded, yPadded, zPadded);
+  FIELD_3D recovered(xPadded, yPadded, zPadded);
+  AssimilateBlocksEigen(paddedDims, &blocks, &recovered);
+
+  // Verify the non-padded region matches
+  double maxError = 0;
+  for (int z = 0; z < zRes; z++) {
+    for (int y = 0; y < yRes; y++) {
+      for (int x = 0; x < xRes; x++) {
+        double err = fabs(original(x, y, z) - recovered(x, y, z));
+        maxError = max(maxError, err);
+      }
+    }
+  }
+
+  ASSERT_MSG(maxError < 1e-10,
+      "Block round-trip max error too large: " + to_string(maxError));
+  INFO("Block decomposition round-trip: max error = " << maxError);
+
+  // Verify padded region is zero
+  double padMax = 0;
+  for (int z = zRes; z < zPadded; z++)
+    for (int y = 0; y < yPadded; y++)
+      for (int x = 0; x < xPadded; x++)
+        padMax = max(padMax, fabs(recovered(x, y, z)));
+  for (int z = 0; z < zPadded; z++)
+    for (int y = yRes; y < yPadded; y++)
+      for (int x = 0; x < xPadded; x++)
+        padMax = max(padMax, fabs(recovered(x, y, z)));
+  for (int z = 0; z < zPadded; z++)
+    for (int y = 0; y < yPadded; y++)
+      for (int x = xRes; x < xPadded; x++)
+        padMax = max(padMax, fabs(recovered(x, y, z)));
+
+  ASSERT_MSG(padMax < 1e-15, "Padded region should be zero, max = " + to_string(padMax));
+  INFO("Padded region max value: " << padMax);
+
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// DCT forward/inverse round-trip (UnitaryBlockDCTEigen)
+//////////////////////////////////////////////////////////////////////
+TEST(dct_roundtrip) {
+  // Create a set of blocks with known values
+  int numBlocks = 4;
+  vector<VectorXd> blocks(numBlocks);
+  int blockCells = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
+
+  for (int b = 0; b < numBlocks; b++) {
+    blocks[b].resize(blockCells);
+    for (int i = 0; i < blockCells; i++) {
+      blocks[b][i] = sin((b + 1) * i * 0.03) * (b + 1);
+    }
+  }
+
+  // Save originals
+  vector<VectorXd> originals = blocks;
+
+  // Forward DCT
+  UnitaryBlockDCTEigen(1, &blocks);
+
+  // Verify DCT actually changed the data
+  double sumDiff = 0;
+  for (int b = 0; b < numBlocks; b++) {
+    sumDiff += (blocks[b] - originals[b]).norm();
+  }
+  ASSERT_MSG(sumDiff > 1.0, "DCT didn't change the data (sum diff = " + to_string(sumDiff) + ")");
+
+  // Inverse DCT
+  UnitaryBlockDCTEigen(-1, &blocks);
+
+  // Verify round-trip
+  double maxError = 0;
+  for (int b = 0; b < numBlocks; b++) {
+    double err = (blocks[b] - originals[b]).lpNorm<Infinity>();
+    maxError = max(maxError, err);
+  }
+
+  ASSERT_MSG(maxError < 1e-10,
+      "DCT round-trip max error too large: " + to_string(maxError));
+  INFO("DCT round-trip: max error = " << maxError << " across " << numBlocks << " blocks");
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// RoundFieldToInt / CastIntFieldToDouble round-trip
+//////////////////////////////////////////////////////////////////////
+TEST(round_cast_roundtrip) {
+  FIELD_3D original(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  for (int i = 0; i < original.totalCells(); i++) {
+    original[i] = (double)(i * 3 - 200);  // integer-valued doubles
+  }
+
+  INTEGER_FIELD_3D intField(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  RoundFieldToInt(original, &intField);
+
+  FIELD_3D recovered(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  CastIntFieldToDouble(intField, &recovered);
+
+  double maxError = 0;
+  for (int i = 0; i < original.totalCells(); i++) {
+    maxError = max(maxError, fabs(original[i] - recovered[i]));
+  }
+
+  ASSERT_MSG(maxError < 1e-15,
+      "Round/Cast roundtrip error for integer values: " + to_string(maxError));
+  INFO("Round/Cast roundtrip (integer values): max error = " << maxError);
+
+  // Now test with non-integer values — should round
+  FIELD_3D fractional(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+  for (int i = 0; i < fractional.totalCells(); i++) {
+    fractional[i] = i * 0.7 - 100.3;
+  }
+  RoundFieldToInt(fractional, &intField);
+  CastIntFieldToDouble(intField, &recovered);
+
+  // Each value should be within 0.5 of original
+  for (int i = 0; i < fractional.totalCells(); i++) {
+    double err = fabs(fractional[i] - recovered[i]);
+    ASSERT_MSG(err <= 0.5 + 1e-10,
+        "Rounding error > 0.5 at index " + to_string(i) + ": " + to_string(err));
+  }
+  INFO("Round/Cast roundtrip (fractional values): all within 0.5");
+
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// NONZERO_ENTRIES basic operations
+//////////////////////////////////////////////////////////////////////
+TEST(nonzero_entries_operations) {
+  NONZERO_ENTRIES nz;
+
+  ASSERT_MSG(nz.size() == 0, "Initial size should be 0");
+
+  nz.push_back(5);
+  nz.push_back(10);
+  nz.push_back(42);
+
+  ASSERT_MSG(nz.size() == 3, "Size after 3 pushes should be 3");
+  ASSERT_MSG(nz[0] == 5, "First element should be 5");
+  ASSERT_MSG(nz[1] == 10, "Second element should be 10");
+  ASSERT_MSG(nz[2] == 42, "Third element should be 42");
+
+  nz.clear();
+  ASSERT_MSG(nz.size() == 0, "Size after clear should be 0");
+
+  // Fill to capacity
+  int capacity = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
+  for (int i = 0; i < capacity; i++) {
+    nz.push_back(i);
+  }
+  ASSERT_MSG(nz.size() == capacity, "Size after filling to capacity should be " + to_string(capacity));
+
+  INFO("NONZERO_ENTRIES: all operations correct");
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// SVD coordinate transform round-trip
+// TransformVectorFieldSVDCompression + UntransformVectorFieldSVD
+//////////////////////////////////////////////////////////////////////
+TEST(svd_coordinate_transform_roundtrip) {
+  // Create a small vector field with known values
+  int res = 8;  // 8x8x8 is fine for this test
+  VECTOR3_FIELD_3D V(res, res, res);
+  for (int i = 0; i < V.totalCells(); i++) {
+    V[i] = VEC3F(sin(i * 0.1), cos(i * 0.2), sin(i * 0.3 + 1.0));
+  }
+
+  // Save original data
+  VectorXd originalFlat = V.flattenedEigen();
+
+  // Set up a COMPRESSION_DATA just to store the SVD results
+  VEC3I dims(res, res, res);
+  COMPRESSION_DATA cd(dims, 1, 32, 0.99);
+
+  // Forward transform
+  TransformVectorFieldSVDCompression(&V, &cd);
+
+  // Verify the data actually changed
+  VectorXd transformedFlat = V.flattenedEigen();
+  double diff = (originalFlat - transformedFlat).norm();
+  ASSERT_MSG(diff > 1e-10, "SVD transform didn't change the data");
+  INFO("SVD transform changed data by L2 = " << diff);
+
+  // The SVD should have stored the V matrix
+  vector<Matrix3d>* vList = cd.get_vList();
+  ASSERT_MSG(vList->size() == 1, "Expected 1 V matrix, got " + to_string(vList->size()));
+  Matrix3d vMatrix = (*vList)[0];
+
+  // Inverse transform: UntransformVectorFieldSVD takes V (not V^T)
+  UntransformVectorFieldSVD(vMatrix, &V);
+
+  // Verify round-trip
+  VectorXd recoveredFlat = V.flattenedEigen();
+  double maxError = (originalFlat - recoveredFlat).lpNorm<Infinity>();
+  double relError = (originalFlat - recoveredFlat).norm() / originalFlat.norm();
+
+  INFO("SVD roundtrip max element error: " << maxError);
+  INFO("SVD roundtrip relative L2 error: " << relError);
+
+  ASSERT_MSG(maxError < 1e-10,
+      "SVD coordinate transform roundtrip max error too large: " + to_string(maxError));
+
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// GetScalarFields / vector field decomposition
+// Verify X/Y/Z extraction matches per-cell access
+//////////////////////////////////////////////////////////////////////
+TEST(get_scalar_fields_correctness) {
+  int res = 8;
+  VECTOR3_FIELD_3D V(res, res, res);
+  for (int i = 0; i < V.totalCells(); i++) {
+    V[i] = VEC3F(i * 1.0, i * 2.0 + 0.5, i * 3.0 - 1.0);
+  }
+
+  FIELD_3D X, Y, Z;
+  GetScalarFields(V, &X, &Y, &Z);
+
+  ASSERT_MSG(X.totalCells() == V.totalCells(), "X field size mismatch");
+  ASSERT_MSG(Y.totalCells() == V.totalCells(), "Y field size mismatch");
+  ASSERT_MSG(Z.totalCells() == V.totalCells(), "Z field size mismatch");
+
+  for (int i = 0; i < V.totalCells(); i++) {
+    ASSERT_MSG(fabs(X[i] - V[i][0]) < 1e-15,
+        "X component mismatch at " + to_string(i));
+    ASSERT_MSG(fabs(Y[i] - V[i][1]) < 1e-15,
+        "Y component mismatch at " + to_string(i));
+    ASSERT_MSG(fabs(Z[i] - V[i][2]) < 1e-15,
+        "Z component mismatch at " + to_string(i));
+  }
+
+  INFO("GetScalarFields: all 3 components match for " << V.totalCells() << " cells");
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Multi-block multi-column RLE round-trip
+// Exercises the block indices seek table (blockLengths/blockIndices)
+//////////////////////////////////////////////////////////////////////
+TEST(rle_multiblock_roundtrip) {
+  int numCols = 3;
+  VEC3I dims(BLOCK_SIZE * 2, BLOCK_SIZE * 2, BLOCK_SIZE);  // 16x16x8 -> 4 blocks
+
+  VEC3I paddings;
+  GetPaddings(dims, &paddings);
+  VEC3I paddedDims = dims + paddings;
+  int numBlocks = (paddedDims[0] / BLOCK_SIZE) * (paddedDims[1] / BLOCK_SIZE) * (paddedDims[2] / BLOCK_SIZE);
+
+  COMPRESSION_DATA data(dims, numCols, 32, 0.99);
+  data.set_paddedDims(paddedDims);
+  data.set_numBlocks(numBlocks);
+
+  int totalCells = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
+  string tmpFile = "/tmp/cfs_test_rle_multi.bin";
+  remove(tmpFile.c_str());
+
+  // Store all original vectors for verification
+  vector<vector<VectorXi>> originals(numCols, vector<VectorXi>(numBlocks));
+
+  for (int col = 0; col < numCols; col++) {
+    for (int block = 0; block < numBlocks; block++) {
+      VectorXi v(totalCells);
+      v.setZero();
+      // Different pattern per block/col
+      int seed = col * numBlocks + block;
+      v[0] = 1000 + seed;        // DC
+      v[1] = 50 + seed;
+      v[2] = 50 + seed;          // run of 2
+      v[seed % totalCells] = -seed;
+      originals[col][block] = v;
+
+      RunLengthEncodeBinary(tmpFile.c_str(), block, col, v, &data);
+    }
+  }
+
+  // Read file back
+  FILE* f = fopen(tmpFile.c_str(), "rb");
+  ASSERT_MSG(f != NULL, "Failed to open multi-block RLE file");
+  fseek(f, 0, SEEK_END);
+  int numInts = ftell(f) / sizeof(int);
+  fseek(f, 0, SEEK_SET);
+  int* allData = new int[numInts];
+  fread(allData, sizeof(int), numInts, f);
+  fclose(f);
+
+  BuildBlockIndicesMatrix(&data);
+
+  // Decode all blocks/columns and verify
+  for (int col = 0; col < numCols; col++) {
+    for (int block = 0; block < numBlocks; block++) {
+      VectorXi decoded(totalCells);
+      decoded.setZero();
+      RunLengthDecodeBinary(allData, block, col, &data, &decoded);
+
+      for (int i = 0; i < totalCells; i++) {
+        ASSERT_MSG(originals[col][block][i] == decoded[i],
+            "Multi-block RLE mismatch at col=" + to_string(col) +
+            " block=" + to_string(block) + " index=" + to_string(i) +
+            ": expected " + to_string(originals[col][block][i]) +
+            ", got " + to_string(decoded[i]));
+      }
+    }
+  }
+
+  INFO("Multi-block RLE round-trip: " << numCols << " cols x " << numBlocks
+       << " blocks, all match");
+
+  delete[] allData;
+  remove(tmpFile.c_str());
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// DCT energy compaction — verify forward DCT concentrates energy
+// in low-frequency coefficients (validates why compression works)
+//////////////////////////////////////////////////////////////////////
+TEST(dct_energy_compaction) {
+  // Create a smooth signal (low frequency content)
+  int blockCells = BLOCK_SIZE * BLOCK_SIZE * BLOCK_SIZE;
+  vector<VectorXd> blocks(1);
+  blocks[0].resize(blockCells);
+
+  // Smooth field: a low-frequency sinusoid
+  int idx = 0;
+  for (int z = 0; z < BLOCK_SIZE; z++)
+    for (int y = 0; y < BLOCK_SIZE; y++)
+      for (int x = 0; x < BLOCK_SIZE; x++)
+        blocks[0][idx++] = sin(x * 0.5) + cos(y * 0.3) + sin(z * 0.2);
+
+  double totalEnergy = blocks[0].squaredNorm();
+
+  // Forward DCT
+  UnitaryBlockDCTEigen(1, &blocks);
+
+  // The DCT output should have most energy in the first few coefficients
+  // Sort coefficients by magnitude (descending)
+  VectorXd magnitudes = blocks[0].cwiseAbs();
+
+  // Compute energy in first 10% of coefficients
+  // (For a smooth signal, this should capture most of the energy)
+  vector<double> sorted(blockCells);
+  for (int i = 0; i < blockCells; i++) sorted[i] = blocks[0][i] * blocks[0][i];
+  std::sort(sorted.begin(), sorted.end(), std::greater<double>());
+
+  int topCount = blockCells / 10;  // top 10%
+  double topEnergy = 0;
+  for (int i = 0; i < topCount; i++) topEnergy += sorted[i];
+  double topPercent = topEnergy / totalEnergy * 100.0;
+
+  INFO("Total energy: " << totalEnergy);
+  INFO("Top 10% coefficients (" << topCount << "/" << blockCells
+       << ") contain " << topPercent << "% of energy");
+
+  // For a smooth signal, top 10% should capture at least 90% of energy
+  ASSERT_MSG(topPercent > 90.0,
+      "DCT didn't compact energy well enough: top 10% only has " +
+      to_string(topPercent) + "% (expected > 90%)");
+
+  // DC coefficient (index 0) should be the largest
+  double dcMagnitude = fabs(blocks[0][0]);
+  double maxMagnitude = magnitudes.maxCoeff();
+  INFO("DC magnitude: " << dcMagnitude << ", max magnitude: " << maxMagnitude);
+  ASSERT_MSG(dcMagnitude == maxMagnitude,
+      "DC coefficient should be largest for a smooth signal");
+
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// SparseBlockDiagonal correctness
+// Verify it builds the right block-diagonal structure
+//////////////////////////////////////////////////////////////////////
+TEST(sparse_block_diagonal_correctness) {
+  // SparseBlockDiagonal asserts A is 3x3 (always used for SVD transform on 3D vectors)
+  // Build a 3x3 kernel, repeated 4 times -> 12x12 block diagonal
+  MatrixXd kernel(3, 3);
+  kernel << 1.0, 2.0, 3.0,
+            4.0, 5.0, 6.0,
+            7.0, 8.0, 9.0;
+  int count = 4;
+
+  SparseMatrix<double> B;
+  SparseBlockDiagonal(kernel, count, &B);
+
+  ASSERT_MSG(B.rows() == 3 * count, "Expected " + to_string(3 * count) +
+      " rows, got " + to_string(B.rows()));
+  ASSERT_MSG(B.cols() == 3 * count, "Expected " + to_string(3 * count) +
+      " cols, got " + to_string(B.cols()));
+
+  // Convert to dense for easy checking
+  MatrixXd D = MatrixXd(B);
+
+  // Check each 3x3 block on the diagonal
+  for (int b = 0; b < count; b++) {
+    int r = b * 3;
+    int c = b * 3;
+    for (int i = 0; i < 3; i++)
+      for (int j = 0; j < 3; j++)
+        ASSERT_MSG(fabs(D(r+i, c+j) - kernel(i,j)) < 1e-15,
+            "Block " + to_string(b) + " (" + to_string(i) + "," + to_string(j) + ") wrong");
+  }
+
+  // Off-diagonal blocks should be zero
+  for (int b1 = 0; b1 < count; b1++) {
+    for (int b2 = 0; b2 < count; b2++) {
+      if (b1 == b2) continue;
+      for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+          ASSERT_MSG(fabs(D(b1*3+i, b2*3+j)) < 1e-15,
+              "Off-diagonal block (" + to_string(b1) + "," + to_string(b2) + ") not zero");
+    }
+  }
+
+  // Verify multiply: B * [1,0,0, 1,0,0, ...] should extract first column of kernel per block
+  VectorXd v = VectorXd::Zero(3 * count);
+  for (int b = 0; b < count; b++) v[b * 3] = 1.0;
+  VectorXd result = B * v;
+  for (int b = 0; b < count; b++) {
+    ASSERT_MSG(fabs(result[b*3+0] - 1.0) < 1e-15, "Multiply block " + to_string(b) + " [0] wrong");
+    ASSERT_MSG(fabs(result[b*3+1] - 4.0) < 1e-15, "Multiply block " + to_string(b) + " [1] wrong");
+    ASSERT_MSG(fabs(result[b*3+2] - 7.0) < 1e-15, "Multiply block " + to_string(b) + " [2] wrong");
+  }
+
+  INFO("SparseBlockDiagonal: structure and multiply correct for " << count << " blocks of 3x3");
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////
 // Main
 //////////////////////////////////////////////////////////////////////
 

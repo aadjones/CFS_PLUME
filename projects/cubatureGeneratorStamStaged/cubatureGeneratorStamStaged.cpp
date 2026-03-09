@@ -120,8 +120,7 @@ int main(int argc, char* argv[])
   if (file == NULL)
   {
     cout << " None found! " << endl;
-    //fclose(file);
-    
+
     cout << "================================================================" << endl;
     cout << " Loading up training samples " << endl;
     cout << "================================================================" << endl;
@@ -169,20 +168,121 @@ int main(int argc, char* argv[])
       VectorXd approx = preadvectU * (preadvectU.transpose() * preadvect);
       VectorXd diff = preadvect - approx;
       cout << " Preadvection projection error: " << diff.norm() << endl;
-      
+
       approx = prediffuseU * (prediffuseU .transpose() * prediffuse);
       diff = prediffuse - approx;
       cout << " Postadvection projection error: " << diff.norm() << endl;
     }
     // cache results to a file
     file = fopen(trainingFilename.c_str(), "wb");
+    int numSamples = reducedSnapshots;
+    int preadvectCols = preadvectU.cols();
+    int prediffuseCols = prediffuseU.cols();
+    fwrite((void*)&numSamples, sizeof(int), 1, file);
+    fwrite((void*)&preadvectCols, sizeof(int), 1, file);
+    fwrite((void*)&prediffuseCols, sizeof(int), 1, file);
     for (int x = 0; x < reducedSnapshots; x++)
     {
       EIGEN::write(file, preadvection[x]);
       EIGEN::write(file, postadvection[x]);
     }
+    fclose(file);
     fclose(filePreadvect);
     fclose(filePrediffuse);
+  }
+  else
+  {
+    // Read cached training samples, but validate dimensions match current basis
+    int cachedSamples, cachedPreadvectCols, cachedPrediffuseCols;
+    fread((void*)&cachedSamples, sizeof(int), 1, file);
+    fread((void*)&cachedPreadvectCols, sizeof(int), 1, file);
+    fread((void*)&cachedPrediffuseCols, sizeof(int), 1, file);
+    fclose(file);
+
+    bool cacheValid = (cachedPreadvectCols == preadvectU.cols() &&
+                       cachedPrediffuseCols == prediffuseU.cols());
+
+    if (cacheValid)
+    {
+      cout << " Found valid cache (" << cachedSamples << " samples, "
+           << cachedPreadvectCols << "/" << cachedPrediffuseCols << " cols)" << endl;
+      file = fopen(trainingFilename.c_str(), "rb");
+      // skip the 3-int header
+      fseek(file, 3 * sizeof(int), SEEK_SET);
+      for (int x = 0; x < cachedSamples; x++)
+      {
+        VectorXd pre, post;
+        int preSize, postSize;
+        fread((void*)&preSize, sizeof(int), 1, file);
+        pre.resize(preSize);
+        for (int i = 0; i < preSize; i++) {
+          double val;
+          fread((void*)&val, sizeof(double), 1, file);
+          pre[i] = val;
+        }
+        fread((void*)&postSize, sizeof(int), 1, file);
+        post.resize(postSize);
+        for (int i = 0; i < postSize; i++) {
+          double val;
+          fread((void*)&val, sizeof(double), 1, file);
+          post[i] = val;
+        }
+        preadvection.push_back(pre);
+        postadvection.push_back(post);
+      }
+      fclose(file);
+    }
+    else
+    {
+      cout << " Cache stale (basis changed from " << cachedPreadvectCols << "/"
+           << cachedPrediffuseCols << " to " << preadvectU.cols() << "/"
+           << prediffuseU.cols() << "), regenerating..." << endl;
+      // Delete stale cache and regenerate from snapshots
+      remove(trainingFilename.c_str());
+
+      string dimsFilename = snapshotPath + string("velocity.preadvect.matrix.dims");
+      file = fopen(dimsFilename.c_str(), "rb");
+      if (file == NULL) {
+        cout << __FILE__ << " " << __LINE__ << " : File " << dimsFilename.c_str() << " not found! " << endl;
+        exit(0);
+      }
+      int rows, cols;
+      fread((void*)&rows, sizeof(int), 1, file);
+      fread((void*)&cols, sizeof(int), 1, file);
+      fclose(file);
+
+      FILE* filePreadvect = fopen((snapshotPath + string("velocity.preadvect.matrix.transpose")).c_str(), "rb");
+      FILE* filePrediffuse = fopen((snapshotPath + string("velocity.prediffuse.matrix.transpose")).c_str(), "rb");
+      if (!filePreadvect || !filePrediffuse) {
+        cout << "Couldn't open snapshot files!" << endl;
+        exit(0);
+      }
+
+      for (int x = 0; x < reducedSnapshots; x++)
+      {
+        VectorXd preadvect, prediffuse;
+        EIGEN::readRaw(filePreadvect, cols, preadvect);
+        EIGEN::readRaw(filePrediffuse, cols, prediffuse);
+        preadvection.push_back(preadvectU.transpose() * preadvect);
+        postadvection.push_back(prediffuseU.transpose() * prediffuse);
+      }
+      fclose(filePreadvect);
+      fclose(filePrediffuse);
+
+      // Write new cache with header
+      file = fopen(trainingFilename.c_str(), "wb");
+      int numSamples = reducedSnapshots;
+      int preadvectCols = preadvectU.cols();
+      int prediffuseCols = prediffuseU.cols();
+      fwrite((void*)&numSamples, sizeof(int), 1, file);
+      fwrite((void*)&preadvectCols, sizeof(int), 1, file);
+      fwrite((void*)&prediffuseCols, sizeof(int), 1, file);
+      for (int x = 0; x < reducedSnapshots; x++) {
+        EIGEN::write(file, preadvection[x]);
+        EIGEN::write(file, postadvection[x]);
+      }
+      fclose(file);
+    }
   }
 
   cout << "================================================================" << endl;

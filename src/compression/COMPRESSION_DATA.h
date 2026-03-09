@@ -91,12 +91,12 @@ class COMPRESSION_DATA {
   private:
     VEC3I _dims;
     VEC3I _paddedDims;
-    int _numCols;
-    int _numBlocks;
-    int _currBlockNum;
-    int _maxIterations;
-    double _nBits;
-    double _percent;
+    int _numCols = 0;
+    int _numBlocks = 0;
+    int _currBlockNum = 0;
+    int _maxIterations = 0;
+    double _nBits = 0;
+    double _percent = 0;
 
     // NOTE: not thread-safe. If OpenMP is added to decode paths,
     // these guards need std::call_once (requires making COMPRESSION_DATA non-copyable).

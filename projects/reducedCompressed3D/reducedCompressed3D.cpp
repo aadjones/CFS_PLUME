@@ -386,11 +386,6 @@ void runEverytime()
     fluid->stepPlume();
 
 
-    char buffer[256];
-    const char* path = "./pbrt/";
-    sprintf(buffer, "%sfluidPlume.%04i.pbrt", path, step);
-    FIELD_3D::exportPbrt(fluid->density(), buffer);
-
     // Use the Debug routine with loadReducedIOPAll above
 
 

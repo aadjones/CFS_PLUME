@@ -390,12 +390,6 @@ void runEverytime()
     fluid->addSmokeColumn();
     fluid->stepPlume();
 
-    // write to pbrt
-    char buffer[256];
-    string pbrtPath = compressionPath + string("pbrt/");
-    sprintf(buffer, "%splume.compressed.%04i.pbrt", pbrtPath.c_str(), step);
-    FIELD_3D::exportPbrt(fluid->density(), buffer);
-
     fluid->appendCompressedSubspaceVectors();
     fluid->compareSubspace(step);
 

@@ -372,22 +372,14 @@ void runEverytime()
   if (animate)
   {
     static int step = 0;
-    if (step == 0) { 
-      fluid->writeSubspaceErrorMatrixDims(simulationSnapshots); 
-      string cmd = string("mkdir -p '") + reducedPath + string("pbrt'");
-      system(cmd.c_str());
+    if (step == 0) {
+      fluid->writeSubspaceErrorMatrixDims(simulationSnapshots);
     }
 
     cout << " Simulation step " << 1 + step << endl;
 
     fluid->addSmokeColumn();
     fluid->stepReorderedCubatureStam();
-
-    // write to pbrt
-    char buffer[256];
-    string pbrtPath = reducedPath + string("pbrt/");
-    sprintf(buffer, "%splume.uncompressed.%04i.pbrt", pbrtPath.c_str(), step);
-    FIELD_3D::exportPbrt(fluid->density(), buffer);
 
     fluid->appendSubspaceVectors();
 

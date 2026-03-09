@@ -102,13 +102,42 @@ void SUBSPACE_FLUID_3D_EIGEN::initOutOfCore()
                     fileExists(_reducedPath + string("projected.ptov.matrix")) &&
                     fileExists(_reducedPath + string("inverseProduct.matrix"));
 
+  // Validate cached matrices match current basis dimensions
+  if (filesBuilt)
+  {
+    // Read U.final.matrix column count directly from file header
+    string basisFile = _reducedPath + string("U.final.matrix");
+    FILE* fb = fopen(basisFile.c_str(), "rb");
+    if (fb) {
+      int basisRows, basisCols;
+      fread((void*)&basisRows, sizeof(int), 1, fb);
+      fread((void*)&basisCols, sizeof(int), 1, fb);
+      fclose(fb);
+
+      // Compare against cached ptof matrix rows (should equal basisCols)
+      string checkFile = _reducedPath + string("projected.ptof.matrix");
+      FILE* fp = fopen(checkFile.c_str(), "rb");
+      if (fp) {
+        int ptofRows, ptofCols;
+        fread((void*)&ptofRows, sizeof(int), 1, fp);
+        fread((void*)&ptofCols, sizeof(int), 1, fp);
+        fclose(fp);
+        if (ptofRows != basisCols) {
+          cout << " Stale projected matrices (ptof rows=" << ptofRows
+               << " vs U.final cols=" << basisCols << "), rebuilding..." << endl;
+          filesBuilt = false;
+        }
+      }
+    }
+  }
+
   cout << " filesBuilt: " << filesBuilt << endl;
   if (!filesBuilt)
     buildOutOfCoreMatrices();
   else
   {
     string filename;
-    
+
     filename = _reducedPath + string("projected.ptof.matrix");
     EIGEN::read(filename, _preprojectToFinal);
 

@@ -228,12 +228,6 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   
-  string pbrtDir = newName + string("/pbrt");
-  if (!createDirectoryIfNotExists(pbrtDir)) {
-    cout << "Error: Failed to create pbrt directory: " << pbrtDir << endl;
-    return 1;
-  }
-
   cout << "Updating configuration file..." << endl;
   UpdateCfgFile(roundedRatio);
 

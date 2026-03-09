@@ -32,7 +32,7 @@ cd projects/<name> && make -f Makefile
 The system has two phases: offline preprocessing and online simulation.
 
 **Preprocessing** (run sequentially via `./runPreprocess`):
-1. `fluid3D` — Generate full-rank simulation snapshots (50 timesteps)
+1. `fluid3D` — Generate full-rank simulation snapshots (100 timesteps default)
 2. `svdOutOfCoreMultiple` — Compute POD basis via out-of-core SVD
 3. `cubatureGeneratorStamStaged` — Build semi-Lagrangian cubature scheme
 4. `compressMatrices` — Compress basis matrices using DCT
@@ -40,9 +40,11 @@ The system has two phases: offline preprocessing and online simulation.
 
 **Simulation** (run independently):
 - `./runUncompressed` — Reduced-order simulation without compression (ground truth)
-- `./runCompressed` — Compressed reduced-order simulation (~6:1 compression)
+- `./runCompressed` — Compressed reduced-order simulation (~5:1 compression)
 
 All scripts use config file `cfg/stam.64.cfg`. Both simulation scripts load original snapshots and report error metrics per timestep.
+
+**Important:** Changing `simulation snapshots` requires a full re-run of `./runPreprocess` — the SVD produces a different-sized basis. `buildProducts` auto-detects stale projected matrices and rebuilds them, but cubature and compression must also be regenerated.
 
 ## Architecture
 
@@ -75,6 +77,7 @@ Full-rank snapshots → POD eigenvectors (SVD) → cubature points → compresse
 ## Compiler Notes
 
 - Auto-detects GCC 14/13 or falls back to system default (see `include.mk`)
+- Auto-detects Homebrew prefix (`brew --prefix`) for ARM64 (`/opt/homebrew`) and Intel (`/usr/local`) Macs
 - Flags: `-O3`, `-DNO_FFT`, `-flax-vector-conversions`, `-w` (warnings suppressed)
 - Links against Accelerate framework for BLAS/LAPACK on macOS
 
@@ -85,21 +88,21 @@ Build and run from the project root (tests use relative paths to `./data/`):
 cd tests && make && cd .. && ./tests/test_compression_data
 ```
 
-17 tests covering decode pipeline, codec round-trip accuracy (2.6e-9 near-lossless error), project/unproject hot path (1.08e-10 relative error), and arithmetic helpers.
+31 tests covering decode pipeline, codec round-trip accuracy (2.6e-9 near-lossless error), project/unproject hot path, SVD coordinate transform, multi-block RLE, DCT energy compaction, SparseBlockDiagonal, and arithmetic helpers.
 
 ## Validation
 
-Integration-based validation via simulation error metrics:
-- Uncompressed simulation: velocity relative error should stay below 1%
-- Compressed simulation (6:1): velocity relative error should stay below 10%
-- Success example at frame 49: `velocity relative error: 0.0529028`
+Compression error is measured as compressed vs uncompressed q-vectors (not vs full-rank ground truth, which measures subspace approximation quality instead).
 
-## Comparison Binaries
+With 100 snapshots and `percent=0.9995` (5:1 compression), relative L2 error between compressed and uncompressed q-vectors stabilizes around 1% through all 100 steps.
 
-Two additional binaries for per-step subspace comparison (not in top-level Makefile):
+## Additional Binaries
+
+Not in the top-level Makefile; build separately:
 ```bash
-cd projects/reduced3DWriteVelocities && make -f Makefile
-cd projects/reducedCompressed3DCompareVelocities && make -f Makefile
+cd projects/reduced3DWriteVelocities && make -f Makefile           # Write uncompressed q-vectors
+cd projects/reducedCompressed3DCompareVelocities && make -f Makefile  # Compare compressed vs uncompressed
+cd projects/viewModes && make -f Makefile                          # Visualize POD eigenvector modes
 ```
 
 ## Important Conventions

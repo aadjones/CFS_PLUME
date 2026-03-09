@@ -52,6 +52,15 @@ movies/*
 .DS_Store
 ._*
 
+# Generated metadata
+metadata.bin
+
+# ctags
+tags
+
+# PBRT scene output (optional visualization)
+pbrt/
+
 # Test binaries
 tests/test_compression_data
 

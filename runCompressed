@@ -17,7 +17,6 @@ fi
 COMPRESSION_PATH=$(grep "^compression path" "$CFG" | cut -d'=' -f2 | tr -d ' ')
 if [ -n "$COMPRESSION_PATH" ]; then
     mkdir -p "$COMPRESSION_PATH"
-    mkdir -p "${COMPRESSION_PATH}pbrt"
 fi
 mkdir -p ./movies
 

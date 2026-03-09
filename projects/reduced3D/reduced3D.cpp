@@ -374,11 +374,6 @@ void runEverytime()
     fluid->addSmokeColumn();
     fluid->stepReorderedCubatureStam();
 
-    char buffer[256];
-    const char* path = "./pbrt/";
-    sprintf(buffer, "%splume.%04i.pbrt", path, step);
-    FIELD_3D::exportPbrt(fluid->density(), buffer); 
-
     // print timings periodically
     if (step % 10 == 0) {
       VECTOR::printVertical = false;
